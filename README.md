@@ -1,3 +1,20 @@
+# Quack
+Платформа, яка поєднує електронний щоденник з персональними профілями та внутрішню комунікацію між студентами і викладачами.
+
+## Scope
+| Частина системи | Технології |
+|-----------------|------------|
+| Design          | Figma |
+| Frontend        | React + TypeScript (Vite) |
+| Backend         | Django + DRF |
+| Authentication  | JWT |
+| Database        | PostgreSQL |
+
+## Demo
+TBA
+
+
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
