@@ -347,3 +347,16 @@ template {
 [hidden] {
   display: none;
 }
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px [Your desired background color] inset !important;
+  transition: background-color 5000s ease-in-out 0s; /* Optional: adds a long transition delay */
+}
+
+/* Change the text color if needed */
+input:-webkit-autofill {
+  -webkit-text-fill-color: [Your desired text color] !important;
+}

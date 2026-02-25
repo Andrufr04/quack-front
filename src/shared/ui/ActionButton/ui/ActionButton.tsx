@@ -10,6 +10,6 @@ export default function ActionButton({actionButton}: {actionButton: ActionButton
     }
 
     return <div className={styles.button} onClick={onClick}>
-        <div className={styles.text}>{actionButton.text}</div>
+        <div className={styles.text + " bold"}>{actionButton.text}</div>
     </div>
 }

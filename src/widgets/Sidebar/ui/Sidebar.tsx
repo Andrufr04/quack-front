@@ -24,8 +24,8 @@ export default function Sidebar() {
                         : <img src="/icons/logo.svg" alt="Logo" />}
             </div>
             <div className={style.icons}>
-                <div className={style.iconsPages}>{navigationButtons.map(b => <NavigationButton navigationButton={b} visible={expanded} />)}</div>
-                <div className={style.iconsSettings}>{settingsButtons.map(b => <NavigationButton navigationButton={b} visible={expanded} />)}</div>
+                <div className={style.iconsPages} onClick={(e) => e.stopPropagation()}>{navigationButtons.map(b => <NavigationButton navigationButton={b} visible={expanded} />)}</div>
+                <div className={style.iconsSettings} onClick={(e) => e.stopPropagation()}>{settingsButtons.map(b => <NavigationButton navigationButton={b} visible={expanded} />)}</div>
             </div>
         </div>
     </>

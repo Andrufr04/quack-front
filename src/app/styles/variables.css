@@ -10,9 +10,33 @@
     --color-opaque-secondary: rgba(255, 255, 255, 0.3);
     --color-text-secondary: #b6b6b6;
     --color-ui-secondary: #b6b6b6;
+    --color-form-bg: rgba(242, 210, 186, 0.5);
+    --color-text-dark-grey: #353535;
+    --color-text-opposite: #ffffff;
 
     --blur-main: blur(9px);
+    --blur-form: blur(15px);
 
     --shadow-main: 0px 10px 20px rgba(0, 0, 0, 0.25);
-    --shadow-secondary: 0px 10px 20px rgba(0, 0, 0, 0.25);
+    --shadow-secondary: 0px 10px 20px rgba(0, 0, 0, 0.15);
+
+    --radius-main: 20px;
+    --radius-secondary: 8px;
+}
+
+.dark {
+    --color-text: #ffffff;
+    --color-bg: #1e1e1e;
+
+    --color-hover-icon-bg: rgba(236, 135, 53, 0.3);
+    --color-hover-icon: #ec8735;
+    --color-icon-text: #ffffff;
+    --color-hover-icon-text: #ffffff;
+    --color-menu-icon: #ec8735;
+    --color-opaque-secondary: rgba(0, 0, 0, 0.5);
+    --color-text-secondary: #565656;
+    --color-ui-secondary: #454545;
+    --color-form-bg: rgba(0, 0, 0, 0.5);
+    --color-text-dark-grey: #bababa;
+    --color-text-opposite: #ffffff;
 }

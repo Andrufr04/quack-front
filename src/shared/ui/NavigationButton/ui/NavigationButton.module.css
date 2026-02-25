@@ -3,6 +3,7 @@
     color: var(--color-ui-secondary);
     display: flex;
     align-items: center;
+    cursor: pointer;
 }
 
 svg {

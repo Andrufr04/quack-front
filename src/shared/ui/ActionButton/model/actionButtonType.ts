@@ -1,7 +1,8 @@
 type ActionButtonProps = {
     text: string,
     onClick: () => void,
-    enabled: boolean
+    enabled: boolean,
+    height?: string
 }
 
 export type { ActionButtonProps }

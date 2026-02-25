@@ -1,0 +1,37 @@
+.input {
+    position: relative;
+}
+
+.title {
+    margin-bottom: 0.3em;
+}
+
+.field {
+    background: none;
+    border-radius: var(--radius-secondary);
+    border: 1px solid var(--color-text);
+    width: 100%;
+    height: 38px;
+    padding: 0 1em; 
+}
+
+.field::placeholder {
+    color: var(--color-text-dark-grey);
+}
+
+.field:focus {
+    outline: none;
+    outline: 1px solid var(--color-text);
+}
+
+.show {
+     color: var(--color-text-dark-grey);
+    position: absolute;
+    right: 15px;
+    top: 31px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+
