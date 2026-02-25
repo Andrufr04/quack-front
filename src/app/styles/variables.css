@@ -1,0 +1,18 @@
+:root {
+    --color-main: #ec8735;
+    --color-text: #000000;
+    --color-bg: #ffffff;
+    --color-hover-icon-bg: #ec8735;
+    --color-hover-icon: #ffffff;
+    --color-icon-text: #b6b6b6;
+    --color-hover-icon-text: #ffffff;
+    --color-menu-icon: #ffffff;
+    --color-opaque-secondary: rgba(255, 255, 255, 0.3);
+    --color-text-secondary: #b6b6b6;
+    --color-ui-secondary: #b6b6b6;
+
+    --blur-main: blur(9px);
+
+    --shadow-main: 0px 10px 20px rgba(0, 0, 0, 0.25);
+    --shadow-secondary: 0px 10px 20px rgba(0, 0, 0, 0.25);
+}

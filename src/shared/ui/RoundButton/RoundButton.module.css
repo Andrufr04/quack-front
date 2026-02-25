@@ -1,0 +1,17 @@
+.button {
+    background: var(--color-opaque-secondary);
+    backdrop-filter: var(--blur-main);
+    border-radius: 50%;
+    box-shadow: var(--shadow-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+}
+
+.icon {
+    width: 16px;
+    height: 16px;
+    color: var(--color-menu-icon);
+}

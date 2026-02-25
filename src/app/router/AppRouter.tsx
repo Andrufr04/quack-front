@@ -12,6 +12,7 @@ export default function AppRouter() {
                 <Route path="/" element={<MainLayout />}>
                     <Route path={routes.home} element={<HomePage/>} />
                     <Route path={routes.profile} element={<ProfilePage/>} />
+                    <Route path={routes.login} element={<ProfilePage/>} />
                 </Route>
             </Routes>
         </BrowserRouter>
