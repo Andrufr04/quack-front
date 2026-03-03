@@ -360,3 +360,18 @@ input:-webkit-autofill:active {
 input:-webkit-autofill {
   -webkit-text-fill-color: [Your desired text color] !important;
 }
+
+/* Chrome, Safari, Edge */
+input:-webkit-autofill {
+    -webkit-text-fill-color: var(--color-text); /* основной цвет текста */
+}
+
+/* Firefox */
+input:-moz-autofill {
+    -moz-text-fill-color: var(--color-text);
+}
+
+/* Общий вариант, если нужно */
+input:-ms-input-placeholder { /* для IE */
+    color: var(--color-text);
+}

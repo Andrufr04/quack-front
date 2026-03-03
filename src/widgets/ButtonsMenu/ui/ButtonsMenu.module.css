@@ -3,7 +3,14 @@
     top: 1em;
     right: 1em;
     display: flex;
-    flex-direction: column;
-    gap: 0.7em;
+    gap: 0.5em;
     color: var(--color-menu-icon);
+}
+
+.vertical {
+    flex-direction: column;
+}
+
+.horizontal {
+    flex-direction: row;
 }

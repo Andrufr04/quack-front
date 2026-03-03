@@ -4,6 +4,7 @@
 
 .title {
     margin-bottom: 0.3em;
+    user-select: none;
 }
 
 .field {
@@ -13,10 +14,12 @@
     width: 100%;
     height: 38px;
     padding: 0 1em; 
+    color: var(--color-text);
 }
 
 .field::placeholder {
     color: var(--color-text-dark-grey);
+    user-select: none;
 }
 
 .field:focus {
@@ -25,7 +28,7 @@
 }
 
 .show {
-     color: var(--color-text-dark-grey);
+    color: var(--color-text-dark-grey);
     position: absolute;
     right: 15px;
     top: 31px;

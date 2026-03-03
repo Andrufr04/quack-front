@@ -1,0 +1,65 @@
+.taskCard {
+    background-color: rgb(255, 255, 255);
+    width: 220px;
+    height: 270px;
+    box-shadow: var(--shadow-secondary);
+    border-radius: var(--radius-secondary);
+    padding: 0.3em;
+}
+
+.taskImg {
+    background-color: rgb(143, 143, 143);
+    height: 50%;
+    border-radius: 5px;
+}
+
+.taskInfo {
+    display: flex;
+    flex-direction: column;
+    height: 50%;
+    justify-content: space-between;
+    color: black;
+    padding: 0.5em;
+}
+
+.top {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.icon {
+    color: rgb(255, 255, 255);
+}
+
+.icon svg {
+    width: 40px;
+    height: 40px;
+    filter: drop-shadow(0px 10px 10px rgba(0, 0, 0, 0.25));
+}
+
+.title {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.deadline {
+    font-size: 11px;
+}
+
+.deadlineInfo {
+    display: flex;
+    gap: 0.2em;
+    align-items: end;
+}
+
+.date {
+    display: flex;
+    justify-content: space-between;
+}
+
+.botton {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2em;
+}

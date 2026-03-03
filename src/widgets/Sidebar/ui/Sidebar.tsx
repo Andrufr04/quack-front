@@ -1,15 +1,41 @@
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { navigationButtons, settingsButtons } from "../../../shared/config/sidebarConfig"
 import NavigationButton from "../../../shared/ui/NavigationButton/ui/NavigationButton"
 import style from "./Sidebar.module.css"
 import { SVG_EXPAND } from "../../../shared/ui/icons/icons"
+import { useLocation } from "react-router-dom"
 
 export default function Sidebar() {
     const [expanded, setExpanded] = useState(false)
     const [isHovered, setHovered] = useState(false)
 
+    const location = useLocation()
+
+    useEffect(() => {
+        setExpanded(false)
+    }, [location.pathname])
+
+    const sidebarRef = useRef<HTMLDivElement | null>(null)
+
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (
+                sidebarRef.current &&
+                !sidebarRef.current.contains(event.target as Node)
+            ) {
+                setExpanded(false)
+            }
+        }
+
+        document.addEventListener("mousedown", handleClickOutside)
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside)
+        }
+    }, [])
+
     return <>
-        <div className={`${style.sidebar} ${expanded ? style.expanded : ""}`}
+        <div ref={sidebarRef} className={`${style.sidebar} ${expanded ? style.expanded : ""}`}
             onClick={() => setExpanded(!expanded)}
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}>

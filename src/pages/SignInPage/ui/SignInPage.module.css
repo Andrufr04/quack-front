@@ -23,7 +23,7 @@
 
 .form {
     height: 70vh;
-    width: 50%;
+    width: 47%;
     background: var(--color-form-bg);
     backdrop-filter: var(--blur-form);
     box-shadow: var(--shadow-main);
@@ -50,6 +50,11 @@
     font-size: 11px;
     text-decoration: underline;
     text-underline-offset: 0.18em;
+    cursor: pointer;
+}
+
+.formHelp:hover {
+    color: var(--color-text-dark-grey)
 }
 
 .forgotPassword {
