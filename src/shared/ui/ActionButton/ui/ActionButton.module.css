@@ -8,11 +8,10 @@
     cursor: pointer;
     height: 38px;
     user-select: none;
+    color: var(--color-text-opposite);
 }
 
 .text {
-    color: var(--color-text-opposite);
-    text-transform: uppercase;
     font-size: 14px;
     text-align: center;
 }

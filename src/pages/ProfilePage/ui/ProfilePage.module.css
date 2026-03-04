@@ -1,0 +1,47 @@
+.info {
+    width: 30%;
+    background: var(--color-opaque-secondary);
+    backdrop-filter: var(--blur-main);
+    box-shadow: var(--shadow-main);
+    height: 100%;
+    border-top-left-radius: var(--radius-main);
+    border-top-right-radius: var(--radius-main);
+    padding: 1em;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+}
+
+.profileImg {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    background-color: rgb(107, 107, 107);
+}
+
+.iconPlus {
+    position: absolute;
+    color: var(--color-text-dark-grey);
+    top: 9em;
+    left: 60px;
+}
+
+.name {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.description {
+    font-size: 12px;
+    font-weight: 100;
+    line-height: 1.5;
+}
+
+.showMore {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 12px;
+    cursor: pointer;
+    color: var(--color-accent);
+}

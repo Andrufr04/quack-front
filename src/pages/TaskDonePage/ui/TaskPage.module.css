@@ -1,0 +1,22 @@
+.menu {
+    display: flex;
+    gap: 1em;
+    align-items: center;
+}
+
+.menu a {
+    color: var(--color-text-dark-grey);
+    text-decoration: none;
+}
+
+.current a {
+    color: var(--color-text);
+    text-decoration: underline;
+    text-underline-offset: 5px;
+}
+
+.line {
+    width: 1px;
+    height: 1.5em;
+    background-color: var(--color-text-dark-grey);
+}

@@ -5,11 +5,13 @@ export default function ActionButton({actionButton}: {actionButton: ActionButton
 
     const onClick = () => {
         if (actionButton.enabled) {
-            actionButton.onClick()
+            if (actionButton.onClick) {
+                actionButton.onClick()
+            }
         }
     }
 
-    return <div className={styles.button} onClick={onClick}>
+    return <div style={{height: actionButton.height, background: actionButton.bgcolor, color: actionButton.color}} className={styles.button} onClick={onClick}>
         <div className={styles.text + " bold"}>{actionButton.text}</div>
     </div>
 }

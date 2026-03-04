@@ -1,4 +1,4 @@
-import { useContext, useState } from "react"
+import { useContext, useState} from "react"
 import ActionButton from "../../../shared/ui/ActionButton/ui/ActionButton"
 import { SVG_MOON, SVG_SUN } from "../../../shared/ui/icons/icons"
 import InputForm from "../../../shared/ui/InputForm/ui/InputForm"
@@ -8,27 +8,28 @@ import { AppContext } from "../../../app/providers/AppProvider/model/AppContext"
 import LanguageDropdown from "../../../features/changeLanguage/ui/LanguageDropdown"
 import { login } from "../../../features/auth/api/login"
 import { useNavigate } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 
 export default function SignInPage() {
     const { mode, switchMode } = useContext(AppContext)
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const navigate = useNavigate();
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
+    const navigate = useNavigate()
+    const {t} = useTranslation()
 
     const handleLogin = async () => {
         try {
-            await login(email, password);
+            await login(email, password)
             navigate("/");
         } catch (err) {
-            alert("Login failed");
         }
     };
 
 
     return <div className={styles.page}>
+        <title>Quack | Вхід</title>
+
         <div className={styles.info}></div>
-
-
 
         <div className={styles.settings}>
             <LanguageDropdown />
@@ -42,9 +43,8 @@ export default function SignInPage() {
         </div>
 
         <div className={styles.signIn}>
-            <div className={styles.buttons}></div>
             <div className={styles.form}>
-                <div className={styles.title + " bold"}>Увійти в акаунт</div>
+                <div className={styles.title + " bold"}>{t("signin.title")}</div>
                 <div className={styles.inputGroup}>
                     <InputForm input={{ type: "email", id: "email", title: "Ел. пошта", placeholder: "cooluser@cat.dog", value: email, onChange: e => setEmail(e.target.value)}} />
                     <div>

@@ -1,8 +1,10 @@
 type ActionButtonProps = {
     text: string,
-    onClick: () => void,
+    onClick?: () => void,
     enabled: boolean,
-    height?: string
+    height?: string,
+    bgcolor?: string,
+    color?: string
 }
 
 export type { ActionButtonProps }

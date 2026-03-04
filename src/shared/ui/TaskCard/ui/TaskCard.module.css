@@ -1,5 +1,5 @@
 .taskCard {
-    background-color: rgb(255, 255, 255);
+    background-color: var(--color-bg);
     width: 220px;
     height: 270px;
     box-shadow: var(--shadow-secondary);
@@ -8,7 +8,7 @@
 }
 
 .taskImg {
-    background-color: rgb(143, 143, 143);
+    background-color: var(--temporary-task-bg);
     height: 50%;
     border-radius: 5px;
 }
@@ -18,7 +18,7 @@
     flex-direction: column;
     height: 50%;
     justify-content: space-between;
-    color: black;
+    color: var(--color-text);
     padding: 0.5em;
 }
 
@@ -29,7 +29,8 @@
 }
 
 .icon {
-    color: rgb(255, 255, 255);
+    color: var(--color-bg-task-extender);
+    cursor: pointer;
 }
 
 .icon svg {
@@ -56,10 +57,29 @@
 .date {
     display: flex;
     justify-content: space-between;
+    align-items: end;
 }
 
 .botton {
     display: flex;
     flex-direction: column;
     gap: 0.2em;
+}
+
+.title {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.topic {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;       
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.period {
+    font-size: 12px;
 }

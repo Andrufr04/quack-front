@@ -12,7 +12,10 @@
     --color-ui-secondary: #b6b6b6;
     --color-form-bg: rgba(242, 210, 186, 0.5);
     --color-text-dark-grey: #353535;
+    --color-text-grey: #b6b6b6;
     --color-text-opposite: #ffffff;
+    --color-bg-task-extender: #ffffff;
+    --temporary-task-bg: #b6b6b6;
 
     --blur-main: blur(9px);
     --blur-form: blur(15px);
@@ -22,6 +25,8 @@
 
     --radius-main: 20px;
     --radius-secondary: 10px;
+
+    --bg-img: url("/images/bg-light-mode.PNG");
 }
 
 .dark {
@@ -37,6 +42,10 @@
     --color-text-secondary: #565656;
     --color-ui-secondary: #454545;
     --color-form-bg: rgba(0, 0, 0, 0.5);
-    --color-text-dark-grey: #bababa;
+    --color-text-dark-grey: #6b6b6b;
     --color-text-opposite: #ffffff;
+    --color-bg-task-extender: #3a3a3a;
+    --temporary-task-bg: #3a3a3a;
+    
+    --bg-img: url("/images/bg-dark-mode.PNG");
 }

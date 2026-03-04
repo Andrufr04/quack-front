@@ -23,6 +23,7 @@
 
 .form {
     height: 70vh;
+    max-height: 570px;
     width: 47%;
     background: var(--color-form-bg);
     backdrop-filter: var(--blur-form);
