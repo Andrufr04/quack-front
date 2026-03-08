@@ -1,5 +1,4 @@
-import { languages } from "../../../shared/config/i18n/Languages"
-import styles from "./LanguageDropdown.module.css"
+import { languages } from "../../../shared/config/i18n/languages"
 import { useTranslation } from "react-i18next"
 
 export default function LanguageDropdown() {

@@ -3,12 +3,15 @@ import type { NavigationButtonProps } from "../model/navigationButtonType"
 import style from "./NavigationButton.module.css"
 import { useNavigate } from "react-router-dom"
 
-export default function NavigationButton({navigationButton, visible} : {navigationButton : NavigationButtonProps, visible : boolean}) {
+export default function NavigationButton({navigationButton, visible, onAction} : {navigationButton : NavigationButtonProps, visible : boolean, onAction?: () => void}) {
     const [isHovered, setHovered] = useState(false)
     const navigate = useNavigate()
 
     const onClick = () => {
         navigate(navigationButton.slug)
+        if (onAction) {
+            onAction()
+        }
     }
     
     return <div className={style.navigation} 

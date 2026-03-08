@@ -29,6 +29,8 @@ out
 
 # Environment variables
 .env
+.env.development
+.env.production
 .env.local
 .env.*.local
 

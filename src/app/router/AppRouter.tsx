@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { routes } from './routes'
 import HomePage from "../../pages/HomePage/ui/HomePage";
 import ProfilePage from "../../pages/ProfilePage/ui/ProfilePage";
@@ -8,7 +8,6 @@ import SignInPage from "../../pages/SignInPage/ui/SignInPage";
 import Page404 from "../../pages/Page404/ui/Page404";
 import PublicRoute from "./PublicRoute";
 import PrivateRoute from "./PrivateRoute";
-import TaskCard from "../../shared/ui/TaskCard/ui/TaskCard";
 import TasksPage from "../../pages/TasksPage/ui/TaskPage";
 import TasksExaminationPage from "../../pages/TaskExaminationPage/ui/TaskPage";
 import TasksDonePage from "../../pages/TaskDonePage/ui/TaskPage";

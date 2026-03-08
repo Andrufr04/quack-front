@@ -1,4 +1,8 @@
 {
     "signin.title": "Sign in",
-    "email": "email"
+    "signin.email": "Email",
+    "signin.password": "Password",
+    "signin.forgotPassword": "Forgot password?",
+    "signin.privacy": "Privacy",
+    "signin.login": "Getting started"
 }

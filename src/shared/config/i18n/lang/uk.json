@@ -1,5 +1,8 @@
 {
     "signin.title": "Увійти в акаунт",
-    "signin.email": "Ел. пошта"
+    "signin.email": "Ел. пошта",
+    "signin.password": "Пароль",
+    "signin.forgotPassword": "Забули пароль?",
+    "signin.privacy": "Політика конфіденційності",
+    "signin.login": "Початок роботи"
 }
-

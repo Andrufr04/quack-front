@@ -3,17 +3,24 @@ import { navigationButtons, settingsButtons } from "../../../shared/config/sideb
 import NavigationButton from "../../../shared/ui/NavigationButton/ui/NavigationButton"
 import style from "./Sidebar.module.css"
 import { SVG_EXPAND } from "../../../shared/ui/icons/icons"
-import { useLocation } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 
 export default function Sidebar() {
     const [expanded, setExpanded] = useState(false)
     const [isHovered, setHovered] = useState(false)
+    const navigate = useNavigate()
 
     const location = useLocation()
 
     useEffect(() => {
         setExpanded(false)
     }, [location.pathname])
+
+    const onSignOut = () => {
+        localStorage.removeItem('access_token')
+        localStorage.removeItem('refresh_token')
+        navigate("/signin")
+    }
 
     const sidebarRef = useRef<HTMLDivElement | null>(null)
 
@@ -50,8 +57,11 @@ export default function Sidebar() {
                         : <img src="/icons/logo.svg" alt="Logo" />}
             </div>
             <div className={style.icons}>
-                <div className={style.iconsPages} onClick={(e) => e.stopPropagation()}>{navigationButtons.map(b => <NavigationButton navigationButton={b} visible={expanded} />)}</div>
-                <div className={style.iconsSettings} onClick={(e) => e.stopPropagation()}>{settingsButtons.map(b => <NavigationButton navigationButton={b} visible={expanded} />)}</div>
+                <div className={style.iconsPages} onClick={(e) => e.stopPropagation()}>{navigationButtons.map(b => <NavigationButton key={b.text} navigationButton={b} visible={expanded} />)}</div>
+                <div className={style.iconsSettings} onClick={(e) => e.stopPropagation()}>
+                    <NavigationButton navigationButton={settingsButtons[0]} visible={expanded} />
+                    <NavigationButton navigationButton={settingsButtons[1]} visible={expanded} onAction={onSignOut}/>
+                    </div>
             </div>
         </div>
     </>

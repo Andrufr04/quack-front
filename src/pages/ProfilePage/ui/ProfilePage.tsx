@@ -1,11 +1,90 @@
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { SVG_PLUS } from "../../../shared/ui/icons/icons"
 import RoundButton from "../../../shared/ui/RoundButton/RoundButton"
 import styles from "./ProfilePage.module.css"
+import { apiRequest } from "../../../shared/api/api";
+
+interface ProfileData {
+    name: string;
+    surname: string;
+    description: string;
+    profile_picture: string | null;
+}
 
 export default function ProfilePage() {
-
     const [expanded, setExpanded] = useState(false)
+    const [profile, setProfile] = useState<ProfileData | null>(null)
+
+    const fileInputRef = useRef<HTMLInputElement>(null)
+    const token = localStorage.getItem('access_token')
+
+    useEffect(() => {
+        if (!token) {
+            return
+        }
+
+        const fetchProfile = async () => {
+            try {
+                const response = await apiRequest('/api/profiles/my/', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response) return
+                if (response.ok) {
+                    const data = await response.json()
+                    setProfile(data)
+                }
+            } catch (err) {
+                console.error("Failed to load profile", err)
+            }
+        };
+        fetchProfile()
+    }, [token])
+
+    const handleUploadClick = () => {
+        fileInputRef.current?.click()
+    };
+
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0]
+        if (!file) return
+
+        const formData = new FormData()
+        formData.append('profile_picture', file)
+
+        try {
+            const response = await apiRequest('/api/profiles/my/', {
+                method: 'PATCH',
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: formData
+            })
+            if (!response) return
+            if (response.ok) {
+                const updatedData = await response.json()
+                setProfile(prev => {
+                    if (!prev) return null
+                    return {
+                        ...prev,
+                        profile_picture: getAvatarUrl(updatedData.profile_picture)
+                    }
+                })
+            }
+        } catch (err) {
+            console.error("Upload failed", err)
+        }
+    };
+
+    const getAvatarUrl = (path: string | null) => {
+        if (!path) return '/default-avatar.png'
+        if (path.startsWith('http')) {
+            try {
+                const url = new URL(path)
+                return url.pathname
+            } catch (e) {
+                return path
+            }
+        }
+        return path
+    };
 
     const text = "Цей користувач найкрутіший на платформі Quack. Його багатозначна задача — це створювати максимально круті речі та ламати систему."
 
@@ -15,20 +94,33 @@ export default function ProfilePage() {
 
             <div className={styles.info}>
                 <div>
-                    <div className={styles.iconPlus}>
+                    <div className={styles.iconPlus} onClick={handleUploadClick}>
                         <RoundButton button={{ icon: SVG_PLUS, text: "Додати картинку профілю" }} />
                     </div>
-                    <div className={styles.profileImg}></div>
+
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleFileChange}
+                        style={{ display: 'none' }}
+                        accept="image/*"
+                    />
+
+                    <div className={styles.profileImg} style={{
+                        backgroundImage: `url(${profile ? getAvatarUrl(profile.profile_picture) : "teatsf"})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center'
+                    }}></div>
                 </div>
 
-                <div className={styles.name}>Ім'я</div>
+                <div className={styles.name}>{profile ? profile.name : "Ім'я"}</div>
 
                 <div className={styles.description}>
                     {expanded ? (
                         text
                     ) : (
                         <>
-                            {text.slice(0, 92)}...
+                            {text.slice(0, 85)}...
                             <span
                                 className={styles.showMore}
                                 onClick={() => setExpanded(true)}
