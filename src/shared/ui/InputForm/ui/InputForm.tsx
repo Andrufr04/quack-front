@@ -16,7 +16,8 @@ export default function InputForm({ input }: { input: InputFormProps }) {
             value={input.value}
             onChange={input.onChange}
             placeholder={input.placeholder} 
-            autoComplete={input.type}/>
+            autoComplete={input.type}
+            onKeyDown={input.onKeyDown}/>
         {input.type == "password" && 
             <div className={styles.show} onClick={() => setVisible(!isVisible)}>{isVisible ? SVG_VISIBLE : SVG_INVISIBLE}</div>}
     </div>

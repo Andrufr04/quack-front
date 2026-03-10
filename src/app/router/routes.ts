@@ -3,5 +3,6 @@ export const routes = {
     profile: "/profile",
     signin: "/signin",
     page404: "/page404",
-    tasks: "/tasks"
+    tasks: "/tasks",
+    manageTasks: "/managetasks",
 }

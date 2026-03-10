@@ -4,5 +4,6 @@
     "signin.password": "Пароль",
     "signin.forgotPassword": "Забули пароль?",
     "signin.privacy": "Політика конфіденційності",
-    "signin.login": "Початок роботи"
+    "signin.login": "Початок роботи",
+    "sidebar.home": "Головна сторінка" 
 }

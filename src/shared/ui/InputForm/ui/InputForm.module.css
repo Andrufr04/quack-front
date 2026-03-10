@@ -18,7 +18,7 @@
 }
 
 .field::placeholder {
-    color: var(--color-text-dark-grey);
+    color: var(--color-grey);
     user-select: none;
 }
 
@@ -28,7 +28,7 @@
 }
 
 .show {
-    color: var(--color-text-dark-grey);
+    color: var(--color-grey);
     position: absolute;
     right: 15px;
     top: 31px;

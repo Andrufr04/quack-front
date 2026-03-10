@@ -4,5 +4,6 @@
     "signin.password": "Password",
     "signin.forgotPassword": "Forgot password?",
     "signin.privacy": "Privacy",
-    "signin.login": "Getting started"
+    "signin.login": "Getting started",
+    "sidebar.home": "Home"
 }

@@ -1,5 +1,5 @@
 type ActionButtonProps = {
-    text: string,
+    text: React.ReactNode,
     onClick?: () => void,
     enabled: boolean,
     height?: string,

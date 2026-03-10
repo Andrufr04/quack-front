@@ -16,6 +16,7 @@
     --color-text-opposite: #ffffff;
     --color-bg-task-extender: #ffffff;
     --temporary-task-bg: #b6b6b6;
+    --color-grey: #535353;
 
     --blur-main: blur(9px);
     --blur-form: blur(15px);
@@ -46,6 +47,7 @@
     --color-text-opposite: #ffffff;
     --color-bg-task-extender: #3a3a3a;
     --temporary-task-bg: #3a3a3a;
+    --color-grey: #b1b1b1;
     
     --bg-img: url("/images/bg-dark-mode.PNG");
 }

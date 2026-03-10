@@ -5,11 +5,13 @@ import style from "./Sidebar.module.css"
 import { SVG_EXPAND } from "../../../shared/ui/icons/icons"
 import { useLocation, useNavigate } from "react-router-dom"
 import { isStudent, isTeacher } from "../../../entities/session/lib/jwt"
+import { useTranslation } from "react-i18next"
 
 export default function Sidebar() {
     const [expanded, setExpanded] = useState(false)
     const [isHovered, setHovered] = useState(false)
     const navigate = useNavigate()
+    const { t } = useTranslation();
 
     const location = useLocation()
 

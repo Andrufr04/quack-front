@@ -16,7 +16,9 @@
     width: 130px;
     height: 130px;
     border-radius: 50%;
-    background-color: rgb(107, 107, 107);
+    background-color: rgb(99, 99, 99);
+    background-image: url("/public/images/no-image.png");
+    
 }
 
 .iconPlus {
@@ -29,6 +31,7 @@
 .name {
     font-size: 18px;
     font-weight: bold;
+    margin-top: 1em;
 }
 
 .description {
@@ -45,3 +48,4 @@
     cursor: pointer;
     color: var(--color-accent);
 }
+

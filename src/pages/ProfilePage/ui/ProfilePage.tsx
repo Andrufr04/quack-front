@@ -89,7 +89,7 @@ export default function ProfilePage() {
     };
 
     const getAvatarUrl = (path: string | null) => {
-        if (!path) return ''
+        if (!path) return '/public/images/no-image.png'
         if (path.startsWith('http')) {
             try {
                 const url = new URL(path)
@@ -120,7 +120,7 @@ export default function ProfilePage() {
                     />
 
                     <div className={styles.profileImg} style={{
-                        backgroundImage: `url(${profile ? getAvatarUrl(profile.profile_picture) : ""})`,
+                        backgroundImage: `url(${profile ? getAvatarUrl(profile.profile_picture) : "/public/images/no-image.png"})`,
                         backgroundSize: 'cover',
                         backgroundPosition: 'center'
                     }}></div>

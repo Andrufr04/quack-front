@@ -11,6 +11,8 @@ import PrivateRoute from "./PrivateRoute";
 import TasksPage from "../../pages/TasksPage/ui/TaskPage";
 import TasksExaminationPage from "../../pages/TaskExaminationPage/ui/TaskPage";
 import TasksDonePage from "../../pages/TaskDonePage/ui/TaskPage";
+import ManageTasks from "../../pages/ManageTasksPage/ui/ManageTasks";
+import ManageCheckTasks from "../../pages/ManageCheckTasksPage/ui/ManageCheckTasks";
 
 
 export default function AppRouter() {
@@ -25,6 +27,8 @@ export default function AppRouter() {
                     <Route path="/tasks" element={<TasksPage />} />
                     <Route path="/tasks/examination" element={<TasksExaminationPage />} />
                     <Route path="/tasks/done" element={<TasksDonePage />} />
+                    <Route path="/managetasks" element={<ManageTasks />} />
+                    <Route path="/managechecktasks" element={<ManageCheckTasks />} />
                 <Route
                     path="*"
                     element={<Page404/>}
