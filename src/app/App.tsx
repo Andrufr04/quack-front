@@ -37,6 +37,7 @@ function App() {
       } catch (err) {
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
+        localStorage.removeItem('active_role')
         window.location.href = '/signin';
       }
     };

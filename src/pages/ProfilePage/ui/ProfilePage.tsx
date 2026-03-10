@@ -48,6 +48,17 @@ export default function ProfilePage() {
         const file = event.target.files?.[0]
         if (!file) return
 
+        if (!file.type.startsWith('image/')) {
+            event.target.value = "";
+            return;
+        }
+
+        const maxSize = 5 * 1024 * 1024; // 5 MB
+        if (file.size > maxSize) {
+            event.target.value = "";
+            return;
+        }
+
         const formData = new FormData()
         formData.append('profile_picture', file)
 
@@ -67,6 +78,10 @@ export default function ProfilePage() {
                         profile_picture: getAvatarUrl(updatedData.profile_picture)
                     }
                 })
+            } else {
+                //const errorData = await response.json();
+                //console.log(`Помилка: ${errorData.error || "Не вдалося завантажити"}`);
+                //TODO: Error
             }
         } catch (err) {
             console.error("Upload failed", err)
@@ -74,7 +89,7 @@ export default function ProfilePage() {
     };
 
     const getAvatarUrl = (path: string | null) => {
-        if (!path) return '/default-avatar.png'
+        if (!path) return ''
         if (path.startsWith('http')) {
             try {
                 const url = new URL(path)
@@ -85,8 +100,6 @@ export default function ProfilePage() {
         }
         return path
     };
-
-    const text = "Цей користувач найкрутіший на платформі Quack. Його багатозначна задача — це створювати максимально круті речі та ламати систему."
 
     return (
         <>
@@ -107,7 +120,7 @@ export default function ProfilePage() {
                     />
 
                     <div className={styles.profileImg} style={{
-                        backgroundImage: `url(${profile ? getAvatarUrl(profile.profile_picture) : "teatsf"})`,
+                        backgroundImage: `url(${profile ? getAvatarUrl(profile.profile_picture) : ""})`,
                         backgroundSize: 'cover',
                         backgroundPosition: 'center'
                     }}></div>
@@ -117,10 +130,10 @@ export default function ProfilePage() {
 
                 <div className={styles.description}>
                     {expanded ? (
-                        text
+                        profile?.description
                     ) : (
                         <>
-                            {text.slice(0, 85)}...
+                            {profile?.description.slice(0, 85)}...
                             <span
                                 className={styles.showMore}
                                 onClick={() => setExpanded(true)}

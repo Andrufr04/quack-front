@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react"
-import { navigationButtons, settingsButtons } from "../../../shared/config/sidebarConfig"
+import { navigationButtonsStudent, navigationButtonsTeacher, settingsButtons } from "../../../shared/config/sidebarConfig"
 import NavigationButton from "../../../shared/ui/NavigationButton/ui/NavigationButton"
 import style from "./Sidebar.module.css"
 import { SVG_EXPAND } from "../../../shared/ui/icons/icons"
 import { useLocation, useNavigate } from "react-router-dom"
+import { isStudent, isTeacher } from "../../../entities/session/lib/jwt"
 
 export default function Sidebar() {
     const [expanded, setExpanded] = useState(false)
@@ -19,6 +20,7 @@ export default function Sidebar() {
     const onSignOut = () => {
         localStorage.removeItem('access_token')
         localStorage.removeItem('refresh_token')
+        localStorage.removeItem('active_role')
         navigate("/signin")
     }
 
@@ -57,11 +59,15 @@ export default function Sidebar() {
                         : <img src="/icons/logo.svg" alt="Logo" />}
             </div>
             <div className={style.icons}>
-                <div className={style.iconsPages} onClick={(e) => e.stopPropagation()}>{navigationButtons.map(b => <NavigationButton key={b.text} navigationButton={b} visible={expanded} />)}</div>
+                <div className={style.iconsPages} onClick={(e) => e.stopPropagation()}>{
+                    isStudent() ? navigationButtonsStudent.map(b => <NavigationButton key={b.text} navigationButton={b} visible={expanded} />)
+                    : isTeacher() ? navigationButtonsTeacher.map(b => <NavigationButton key={b.text} navigationButton={b} visible={expanded} />)
+                    : <></>
+                }</div>
                 <div className={style.iconsSettings} onClick={(e) => e.stopPropagation()}>
                     <NavigationButton navigationButton={settingsButtons[0]} visible={expanded} />
-                    <NavigationButton navigationButton={settingsButtons[1]} visible={expanded} onAction={onSignOut}/>
-                    </div>
+                    <NavigationButton navigationButton={settingsButtons[1]} visible={expanded} onAction={onSignOut} />
+                </div>
             </div>
         </div>
     </>
