@@ -24,3 +24,41 @@
 .container {
     margin-top: 2em;
 }
+
+.commentBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.commentInput {
+    min-height: 80px;
+    resize: vertical;
+    border-radius: 8px;
+    border: none;
+    padding: 8px;
+    background: var(--color-opaque-secondary);
+}
+
+.uploadBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.fileLabel {
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    background: var(--color-opaque-secondary);
+    text-align: center;
+}
+
+.fileInput {
+    display: none;
+}
+
+.fileName {
+    font-size: 0.9em;
+    opacity: 0.8;
+}
