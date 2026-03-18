@@ -20,3 +20,10 @@
     height: 1.5em;
     background-color: var(--color-text-dark-grey);
 }
+
+.container {
+    margin-top: 2em;
+    display: flex;
+    gap: 1em;
+    flex-wrap: wrap;
+}

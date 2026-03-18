@@ -1,0 +1,29 @@
+.blur {
+    position: fixed;
+    inset: 0;
+    backdrop-filter: var(--blur-main);
+    filter: grayscale(100%);
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 10em;
+}
+
+.button {
+    margin-top: 2em;
+    width: 15%;
+}
+
+.info {
+    width: 35%;
+    text-align: center;
+    user-select: none;
+    color: #ffffff;
+}
+
+.img {
+    user-select: none;
+}

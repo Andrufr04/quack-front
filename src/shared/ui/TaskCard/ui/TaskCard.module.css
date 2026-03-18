@@ -73,13 +73,14 @@
 }
 
 .deadline {
-    font-size: 11px;
+    font-weight: bold;
 }
 
 .deadlineInfo {
     display: flex;
     gap: 0.2em;
     align-items: end;
+    font-size: 11px;
 }
 
 .date {
@@ -112,4 +113,9 @@
 
 .period {
     font-size: 12px;
+}
+
+.overdue {
+    color: #ff5a5a;
+    font-weight: bold;
 }

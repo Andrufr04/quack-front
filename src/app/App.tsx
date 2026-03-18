@@ -5,7 +5,8 @@ import './styles/normalize.css'
 import './styles/variables.css'
 import '../shared/config/i18n/i18n.ts'
 import { useEffect, useState } from 'react'
-import { API_URL } from '../shared/api/api.ts'
+import { API_URL, handleLogout } from '../shared/api/api.ts'
+import { jwtDecode } from "jwt-decode";
 
 function App() {
   const [isChecking, setIsChecking] = useState(true);
@@ -44,6 +45,20 @@ function App() {
 
     verifyToken();
   }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      try {
+        const { exp }: any = jwtDecode(token);
+        if (Date.now() >= exp * 1000) {
+          handleLogout();
+        }
+      } catch (e) {
+        handleLogout();
+      }
+    }
+  }, [window.location.pathname]);
 
   if (isChecking) return <></>;
 

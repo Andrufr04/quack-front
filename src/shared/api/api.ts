@@ -13,25 +13,35 @@ export const apiRequest = async (url: string, options: RequestInit = {}) => {
         headers['X-Active-Role'] = activeRole || ''
     }
 
+    if (options.body instanceof FormData) {
+        delete headers['Content-Type'];
+    } else if (!headers['Content-Type']) {
+        headers['Content-Type'] = 'application/json';
+    }
+
     try {
-        const response = await fetch(`${API_URL}${url}`, {
+        const response = await fetch(`${API_URL}/api${url}`, {
             ...options,
             headers,
         })
 
         if (response.status === 401) {
-            localStorage.removeItem('access_token')
-            localStorage.removeItem('refresh_token')
-            localStorage.removeItem('active_role')
-            
-            if (!window.location.pathname.includes('/signin')) {
-                window.location.href = '/signin'
-            }
-            return
+            handleLogout();
+            return Promise.reject("Unauthorized");
         }
 
         return response;
     } catch (error) {
         throw error;
+    }
+};
+
+export const handleLogout = () => {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('active_role');
+
+    if (!window.location.pathname.includes('/signin')) {
+        window.location.href = '/signin';
     }
 };

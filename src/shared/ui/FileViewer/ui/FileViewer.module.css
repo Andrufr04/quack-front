@@ -1,0 +1,80 @@
+.viewerContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;    
+    width: 100%;
+    color: var(--color-ui-secondary);
+    user-select: none;
+    max-height: 35%;
+}
+
+.arrowLeft, .arrowRight {
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+}
+
+.arrowLeft {
+    transform: rotate(180deg);
+}
+
+.zoomArea {
+    cursor: zoom-in;
+    transition: transform 0.2s ease;
+    height: 100%;
+    width: 100%;
+}
+
+.zoomArea:hover {
+    filter: brightness(0.95);
+}
+
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: var(--blur-main);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    cursor: zoom-out;
+}
+
+.iconModal {
+    width: 20px;
+    height: 20px;
+    transform: rotate(45deg);
+    cursor: pointer;
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    color: var(--color-text);
+}
+
+.fullViewer {
+    background: var(--color-bg);
+    border-radius: var(--radius-main);
+    box-shadow: var(--shadow-main);
+    padding: 3em;
+    cursor: default;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 90vw;
+    max-height: 90vh;
+    color: var(--color-ui-secondary);
+}
+
+.viewerWrapper {
+    flex: 1;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.fullViewerWrapper {
+    
+}

@@ -25,7 +25,7 @@ export default function ProfilePage() {
 
         const fetchProfile = async () => {
             try {
-                const response = await apiRequest('/api/profiles/my/', {
+                const response = await apiRequest('/profiles/my/', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (!response) return
@@ -63,7 +63,7 @@ export default function ProfilePage() {
         formData.append('profile_picture', file)
 
         try {
-            const response = await apiRequest('/api/profiles/my/', {
+            const response = await apiRequest('/profiles/my/', {
                 method: 'PATCH',
                 headers: { 'Authorization': `Bearer ${token}` },
                 body: formData
@@ -89,7 +89,7 @@ export default function ProfilePage() {
     };
 
     const getAvatarUrl = (path: string | null) => {
-        if (!path) return '/public/images/no-image.png'
+        if (!path) return '/images/no-image.png'
         if (path.startsWith('http')) {
             try {
                 const url = new URL(path)
@@ -120,7 +120,7 @@ export default function ProfilePage() {
                     />
 
                     <div className={styles.profileImg} style={{
-                        backgroundImage: `url(${profile ? getAvatarUrl(profile.profile_picture) : "/public/images/no-image.png"})`,
+                        backgroundImage: `url(${profile ? getAvatarUrl(profile.profile_picture) : "/images/no-image.png"})`,
                         backgroundSize: 'cover',
                         backgroundPosition: 'center'
                     }}></div>

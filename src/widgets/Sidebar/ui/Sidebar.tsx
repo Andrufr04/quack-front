@@ -1,17 +1,18 @@
 import { useEffect, useRef, useState } from "react"
-import { navigationButtonsStudent, navigationButtonsTeacher, settingsButtons } from "../../../shared/config/sidebarConfig"
+import { navigationButtonsAdministration, navigationButtonsStudent, navigationButtonsTeacher, settingsButtons } from "../../../shared/config/sidebarConfig"
 import NavigationButton from "../../../shared/ui/NavigationButton/ui/NavigationButton"
 import style from "./Sidebar.module.css"
 import { SVG_EXPAND } from "../../../shared/ui/icons/icons"
 import { useLocation, useNavigate } from "react-router-dom"
-import { isStudent, isTeacher } from "../../../entities/session/lib/jwt"
-import { useTranslation } from "react-i18next"
+import { isAdministration, isStudent, isTeacher } from "../../../entities/session/lib/jwt"
+import ModeSwitch from "../../ModeSwitch/ui/ModeSwitch"
+//import { useTranslation } from "react-i18next"
 
 export default function Sidebar() {
     const [expanded, setExpanded] = useState(false)
     const [isHovered, setHovered] = useState(false)
     const navigate = useNavigate()
-    const { t } = useTranslation();
+    //const { t } = useTranslation();
 
     const location = useLocation()
 
@@ -64,9 +65,11 @@ export default function Sidebar() {
                 <div className={style.iconsPages} onClick={(e) => e.stopPropagation()}>{
                     isStudent() ? navigationButtonsStudent.map(b => <NavigationButton key={b.text} navigationButton={b} visible={expanded} />)
                     : isTeacher() ? navigationButtonsTeacher.map(b => <NavigationButton key={b.text} navigationButton={b} visible={expanded} />)
+                    : isAdministration() ? navigationButtonsAdministration.map(b => <NavigationButton key={b.text} navigationButton={b} visible={expanded} />)
                     : <></>
                 }</div>
                 <div className={style.iconsSettings} onClick={(e) => e.stopPropagation()}>
+                    <ModeSwitch />
                     <NavigationButton navigationButton={settingsButtons[0]} visible={expanded} />
                     <NavigationButton navigationButton={settingsButtons[1]} visible={expanded} onAction={onSignOut} />
                 </div>

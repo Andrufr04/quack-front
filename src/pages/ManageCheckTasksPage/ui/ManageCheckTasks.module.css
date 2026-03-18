@@ -16,6 +16,13 @@
     text-underline-offset: 5px;
 }
 
+.container {
+    margin-top: 2em;
+    display: flex;
+    gap: 1em;
+    flex-wrap: wrap;
+}
+
 .line {
     width: 1px;
     height: 1.5em;

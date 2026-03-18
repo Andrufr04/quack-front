@@ -1,12 +1,12 @@
-import type { Task } from "../../../../pages/TasksPage/ui/TaskPage"
-import { formatDate } from "../../../lib/formatDate"
+import type { Task } from "../../../../entities/task/model/types"
+import { formatDate, getDaysRemaining } from "../../../lib/formatDate"
 import { SVG_A } from "../../icons/icons"
 import styles from "./TaskCard.module.css"
 
 export default function TaskCard({ onClick, task, mark }: { onClick: () => void, task: Task, mark?: number }) {
 
     const getMarkClass = () => {
-        if (mark) {
+        if (mark && mark > 0) {
             if (mark >= 9 && mark <= 12) return styles.high
             if (mark >= 6 && mark <= 8) return styles.medium
             if (mark >= 1 && mark <= 5) return styles.low
@@ -14,10 +14,13 @@ export default function TaskCard({ onClick, task, mark }: { onClick: () => void,
         return ""
     }
 
+    const deadlineStatus = getDaysRemaining(task.end);
+    const isOverdue = deadlineStatus === "Прострочено";
+
     return <div className={styles.taskCard}>
-        <div className={`${styles.mark} ${getMarkClass()}`}>
+        {(mark || (mark ?? 0) > 0) && <div className={`${styles.mark} ${getMarkClass()}`}>
             {mark}
-        </div>
+        </div>}
         <div className={styles.taskImg}></div>
         <div className={styles.taskInfo}>
             <div className={styles.top}>
@@ -26,14 +29,17 @@ export default function TaskCard({ onClick, task, mark }: { onClick: () => void,
             </div>
             <div className={styles.botton}>
                 <div className={styles.topic}>Тема: {task.theme}</div>
-                <div className={styles.date}>
-                    {/* <div className={styles.period}>01.03-05.03</div> */}
+                {(!mark && mark !== 0) && <div className={styles.date}>
                     <div className={styles.period}>{`${formatDate(task.start)}-${formatDate(task.end)}`}</div>
                     <div className={styles.deadlineInfo}>
-                        <div className={styles.deadline}>Залишилось: </div>
-                        <div>1д</div>
+                        {isOverdue ? <div className={styles.overdue}>{deadlineStatus}</div>
+                            : <>
+                                <div>Залишилось: </div>
+                                <div className={styles.deadline}>{deadlineStatus}</div>
+                            </>}
                     </div>
-                </div>
+                </div>}
+
             </div>
         </div>
     </div>

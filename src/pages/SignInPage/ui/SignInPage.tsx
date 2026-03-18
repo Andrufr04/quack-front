@@ -1,17 +1,14 @@
 import { useContext, useState } from "react";
 import ActionButton from "../../../shared/ui/ActionButton/ui/ActionButton";
-import { SVG_MOON, SVG_SUN } from "../../../shared/ui/icons/icons";
 import InputForm from "../../../shared/ui/InputForm/ui/InputForm";
-import RoundButton from "../../../shared/ui/RoundButton/RoundButton";
 import styles from "./SignInPage.module.css";
-import { AppContext } from "../../../app/providers/AppProvider/model/AppContext";
 import LanguageDropdown from "../../../features/changeLanguage/ui/LanguageDropdown";
 import { login } from "../../../features/auth/api/login";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import ModeSwitch from "../../../widgets/ModeSwitch/ui/ModeSwitch";
 
 export default function SignInPage() {
-    const { mode, switchMode } = useContext(AppContext);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
@@ -42,13 +39,7 @@ export default function SignInPage() {
 
             <div className={styles.settings}>
                 <LanguageDropdown />
-                <RoundButton
-                    button={{
-                        icon: mode === "light" ? SVG_MOON : SVG_SUN,
-                        text: mode === "light" ? "Темна тема" : "Світла тема",
-                        onClick: switchMode,
-                    }}
-                />
+                <ModeSwitch />
             </div>
 
             <div className={styles.signIn}>
@@ -98,8 +89,7 @@ export default function SignInPage() {
                                     t("signin.login")
                                 ),
                                 enabled: !loading,
-                                onClick: handleLogin,
-                                bgcolor: loading ? "#ababab" : ""
+                                onClick: handleLogin
                             }}
                         />
                         <div className={styles.privacy}>

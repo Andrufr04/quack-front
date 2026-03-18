@@ -3,21 +3,15 @@ import styles from "./TaskPage.module.css"
 import TaskCard from "../../../shared/ui/TaskCard/ui/TaskCard"
 import { useEffect, useState } from "react"
 import TaskExtended from "../../../shared/ui/TaskExtended/ui/TaskExtended"
-import { apiRequest } from "../../../shared/api/api"
-
-export interface Task {
-    id: string
-    subject_name: string
-    task_type_name: string
-    theme: string
-    description: string
-    start: string
-    end: string
-}
+import { taskApi } from "../../../entities/task/api/taskApi"
+import type { Task, TaskStatus } from "../../../entities/task/model/types"
+import { isStudent } from "../../../entities/session/lib/jwt"
+import Page403 from "../../Page403/ui/Page403"
 
 export default function TasksPage() {
+    if (!isStudent()) return <Page403/>
     const [selectedTask, setSelectedTask] = useState<Task | null>(null)
-    const [tasks, setTasks] = useState<Task[]>([])
+    const [tasks, setTasks] = useState<TaskStatus[]>([])
 
     function selectTask(task: Task) {
         if (selectedTask == task) {
@@ -28,32 +22,25 @@ export default function TasksPage() {
     }
 
     useEffect(() => {
-        const loadTasks = async () => {
-            const token = localStorage.getItem('access_token')
-
+        const fetchTasks = async () => {
             try {
-                const response = await apiRequest('/api/education/my/', {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`,
-                    },
-                })
-                if (!response) return
-                if (!response.ok) {
-                    console.log(`Помилка сервера: ${response.status}`)
-                    return
+                const data = await taskApi.getStudentTasks(0);
+
+                if (Array.isArray(data)) {
+                    setTasks(data);
+                } else {
+                    setTasks([]);
+                    console.error("Отримано невірний формат даних:", data);
                 }
 
-                const data = await response.json()
-                setTasks(data)
             } catch (err) {
-                console.log(err)
+                setTasks([]);
+                console.error("Не вдалося завантажити завдання:", err);
             }
         };
 
-        loadTasks();
-    }, []);
+        fetchTasks();
+    }, [selectedTask]);
 
     return <>
         <title>Quack | Завдання</title>
@@ -67,9 +54,9 @@ export default function TasksPage() {
         </div>
 
         <div className={styles.container}>
-            {tasks.map(t => <TaskCard key={t.id} task={t} onClick={() => selectTask(t)} mark={7}/>)}
+            {tasks.map(t => <TaskCard key={t.id} task={t.task} onClick={() => selectTask(t.task)} />)}
         </div>
 
-        {selectedTask && <TaskExtended onCloseClick={() => setSelectedTask(null)} task = {selectedTask} />}
+        {selectedTask && <TaskExtended onCloseClick={() => setSelectedTask(null)} task={selectedTask} />}
     </>
 }

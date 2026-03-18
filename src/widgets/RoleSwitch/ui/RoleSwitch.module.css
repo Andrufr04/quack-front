@@ -1,0 +1,95 @@
+.dropdownWrapper {
+  position: relative;
+  display: inline-block;
+  color: var(--color-text);
+  width: 130px;
+  user-select: none;
+}
+
+.dropdown {
+  -webkit-appearance: none; /* убираем стандартную стрелку */
+  -moz-appearance: none;
+  appearance: none;
+
+  background: var(--color-opaque-secondary);
+  backdrop-filter: var(--blur-main);
+  border-radius: 50px;
+  box-shadow: var(--shadow-secondary);
+  padding: 0 2.5em 0 1em; /* справа место под стрелку */
+  height: 36px;
+  cursor: pointer;
+  border: none;
+  outline: none;
+
+  width: 100%; /* чтобы дропдаун был ровно по ширине поля */
+  color: var(--color-text);
+}
+
+/* SVG стрелка справа */
+.arrow {
+  position: absolute;
+  right: 1em;      /* отступ справа */
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none; /* чтобы клик проходил на select */
+  width: 1em;
+  height: 1em;
+  fill: var(--color-text-dark-grey); /* цвет стрелки */
+}
+
+.dropdownWrapper {
+  position: relative;
+  display: inline-block;
+
+  color: var(--color-text);
+}
+
+.dropdown {
+  background: var(--color-opaque-secondary);
+  backdrop-filter: var(--blur-main);
+  border-radius: 50px;
+  padding: 0.5em 2.5em 0.5em 1em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  color: var(--color-text);
+}
+
+.arrow {
+  width: 1em;
+  height: 1em;
+  pointer-events: none;
+}
+
+/* кастомный дропдаун */
+.dropdownList {
+  position: absolute;
+  top: 100%;
+  left: 0;
+   background: var(--color-opaque-secondary);
+  backdrop-filter: var(--blur-main);
+  box-shadow: var(--shadow-secondary);
+  border-radius: 12px; /* скругление */
+  margin-top: 0.5em;
+  list-style: none;
+  padding: 0.3em 0;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+  width: 100%;
+  z-index: 10;
+  color: var(--color-text);
+}
+
+.dropdownItem {
+  padding: 0.5em 1em;
+  cursor: pointer;
+  color: white;
+  border-radius: 8px; /* скругляем сами элементы */
+  color: var(--color-text);
+}
+
+.dropdownItem:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
+}

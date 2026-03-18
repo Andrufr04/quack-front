@@ -23,6 +23,9 @@
 
 .container {
     margin-top: 2em;
+    display: flex;
+    gap: 1em;
+    flex-wrap: wrap;
 }
 
 .commentBlock {

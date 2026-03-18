@@ -11,7 +11,11 @@ export default function ActionButton({actionButton}: {actionButton: ActionButton
         }
     }
 
-    return <div style={{height: actionButton.height, background: actionButton.bgcolor, color: actionButton.color}} className={styles.button} onClick={onClick}>
+    return <div style={{
+        height: actionButton.height, 
+        background: actionButton.enabled ? actionButton.bgcolor : "#ababab", 
+        color: actionButton.color,
+        cursor: actionButton.enabled ? "pointer" : "not-allowed"}} className={styles.button} onClick={onClick}>
         <div className={styles.text + " bold"}>{actionButton.text}</div>
     </div>
 }

@@ -13,9 +13,171 @@
     gap: 1em
 }
 
+.top {
+    display: flex;
+    justify-content: space-between;
+}
+
+.subject {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.date {
+    font-size: 12px;
+}
+
+.description {
+    display: flex;
+    gap: 0.5em;
+}
+
+.descriptionTitle {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.topic {
+    display: flex;
+    gap: 0.5em;
+    color: var(--color-text-grey);
+}
+
+.topicTitle {
+    font-size: 14px;
+    color: var(--color-text-grey);
+}
+
 .icon {
     width: 20px;
     height: 20px;
     transform: rotate(45deg);
     cursor: pointer;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.label {
+    font-size: 14px;
+}
+
+.required {
+    color: #ff5a5a;
+}
+
+.successText {
+    color: #32c671;
+}
+
+.textarea {
+    width: 100%;
+    min-height: 110px;
+    border: none;
+    border-radius: 10px;
+    padding: 10px;
+    resize: none;
+    background: var(--color-opaque-secondary);
+    background-color: #e3e3e3;
+}
+
+.success {
+    outline: 2px solid #32c671;
+}
+
+.fileWrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    background: var(--color-opaque-secondary);
+    cursor: pointer;
+    background-color: #e3e3e3;
+    color: var(--color-text);
+}
+
+.fileInput {
+    display: none;
+}
+
+.fileButton {
+    background: #f2f2f2;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.fileName {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.zoomArea {
+    cursor: zoom-in;
+    transition: transform 0.2s ease;
+}
+
+.zoomArea:hover {
+    filter: brightness(0.95);
+}
+
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: var(--blur-main);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    cursor: zoom-out;
+}
+
+.iconModal {
+    width: 20px;
+    height: 20px;
+    transform: rotate(45deg);
+    cursor: pointer;
+    position: absolute;
+    top: -24px;
+    right: -24px;
+}
+
+.fullViewer {
+    width: 75%;
+    height: 90%;
+    background: var(--color-bg);
+    border-radius: var(--radius-main);
+    box-shadow: var(--shadow-main);
+    padding: 10px;
+    cursor: default;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-self: center;
+}
+
+.viewerWrapper {
+    height: 25vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.descriptionInfo {
+    max-height: calc(5 * 1.5em); 
+    line-height: 1.5em;
+    overflow-y: auto;
+    overflow-x: auto;
+    white-space: pre;
+    flex: 1;
+}
+
+.descriptionInfo::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
 }
