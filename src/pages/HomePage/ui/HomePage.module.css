@@ -1,5 +1,211 @@
 .demoContainer {
     margin-top: 200px;
     margin-left: 200px;
-    width: 300px;
+    width: 350px;
+}
+
+.LeaderBoard {
+    background-color: var(--color-bg);
+    width: 20%;
+    border-radius: 14px;
+    padding: 1em;
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+}
+
+.title {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.currency {
+    display: flex;
+    margin-left: 50px;
+}
+
+.iconDuck {
+    height: 30px;
+    color: rgb(255, 208, 0);
+    stroke: #000;
+    stroke-width: 4px;
+    position: relative;
+    left: 20px;
+}
+
+.iconCoin {
+    height: 25px;
+    color: rgb(255, 208, 0);
+    position: relative;
+    left: 15px;
+}
+
+.balance {
+    display: flex;
+    align-items: center;
+}
+
+.amount {
+    background-color: rgb(198, 245, 255);
+    padding: 3px 10px 3px 30px;
+    border-radius: 0 10px 10px 0;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+}
+
+.LeaderBoard {
+    background-color: var(--color-bg);
+    width: 20%;
+    border-radius: 14px;
+    padding: 1em;
+    height: 400px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+
+    overflow: hidden; /* 🔥 чтобы не ломалась верстка */
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+
+    overflow-y: auto;   /* 🔥 включает скролл */
+    flex: 1;            /* 🔥 занимает всё оставшееся место */
+}
+
+.demoContainer {
+    margin-top: 200px;
+    margin-left: 200px;
+    width: 400px;
+}
+
+.LeaderBoard {
+    background-color: var(--color-bg);
+    width: 350px;
+    border-radius: 20px;
+    padding: 16px;
+    height: 520px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+/* 🔥 Заголовок */
+.title {
+    text-align: center;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+
+
+/* 📜 список */
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    overflow-y: auto;
+    flex: 1;
+    padding-right: 4px;
+}
+
+/* 👤 элемент списка */
+.list div {
+    background: white;
+    padding: 8px 10px;
+    border-radius: 10px;
+
+    font-size: 14px;
+
+    display: flex;
+    justify-content: space-between;
+
+    transition: 0.2s;
+}
+
+/* ✨ hover эффект */
+.list div:hover {
+    transform: translateX(4px);
+    background: #f0f4ff;
+}
+
+/* 🥇 топ 3 */
+.list div:nth-child(1) {
+    background: #fff7cc;
+    font-weight: 600;
+}
+
+.list div:nth-child(2) {
+    background: #f0f0f0;
+}
+
+.list div:nth-child(3) {
+    background: #ffe0cc;
+}
+
+/* 🔥 красивый скролл */
+.list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.list::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.2);
+    border-radius: 10px;
+}
+
+.average {
+    background-color: #f0f0f0;
+}
+
+.block {
+  background: #fff;             /* белый фон */
+  border-radius: 15px;          /* скругление */
+  padding: 16px;                /* внутренние отступы */
+  width: 150px;                 /* фиксированная ширина */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); /* лёгкая тень */
+}
+
+.title {
+  font-weight: 500;
+}
+
+.circleWrapper {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  margin-top: 10px;
+}
+
+.circleText {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.widgets {
+    display: flex;
+    gap: 1em;
 }

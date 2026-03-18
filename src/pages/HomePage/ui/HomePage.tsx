@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import styles from "./HomePage.module.css";
 import { apiRequest } from "../../../shared/api/api";
 import { isStudent, isTeacher } from "../../../entities/session/lib/jwt";
+import { SVG_COIN, SVG_DUCK } from "../../../shared/ui/icons/icons";
 
 interface LessonInfo {
     is_current: boolean;
@@ -21,14 +22,109 @@ export default function HomePage() {
         <title>Quack | Головна</title>
         {
             isStudent() ? <StudentPage />
-            : isTeacher() ? <TeacherPage />
-            : <></>
+                : isTeacher() ? <TeacherPage />
+                    : <></>
         }
     </div>
 }
 
 function StudentPage() {
-    return <></>
+    return <div className={styles.widgets}>
+        <div className={styles.LeaderBoard}>
+            <div className={styles.title}>Таблиця лідерів</div>
+            <div className={styles.currency}>
+                <div className={styles.balance}>
+                    <div className={styles.iconDuck}>{SVG_DUCK}</div>
+                    <div className={styles.amount}>100</div>
+                </div>
+                <div className={styles.balance}>
+                    <div className={styles.iconCoin}>{SVG_COIN}</div>
+                    <div className={styles.amount}>100</div>
+                </div>
+            </div>
+            <div className={styles.list}>
+                <div>1. Анна бебебебе</div>
+                <div>2. Анна бебебебе</div>
+                <div>3. Анна бебебебе</div>
+                <div>4. Анна бебебебе</div>
+                <div>5. Анна бебебебе</div>
+                <div>6. Анна бебебебе</div>
+                <div>1. Анна бебебебе</div>
+                <div>2. Анна бебебебе</div>
+                <div>3. Анна бебебебе</div>
+                <div>4. Анна бебебебе</div>
+                <div>5. Анна бебебебе</div>
+                <div>6. Анна бебебебе</div>
+                <div>1. Анна бебебебе</div>
+                <div>2. Анна бебебебе</div>
+                <div>3. Анна бебебебе</div>
+                <div>4. Анна бебебебе</div>
+                <div>5. Анна бебебебе</div>
+                <div>6. Анна бебебебе</div>
+            </div>
+        </div>
+
+        <div
+            style={{
+                background: "#fff",      // белый фон
+                borderRadius: "15px",    // скругление
+                padding: "16px",         // внутренние отступы
+                width: "150px",          // можно под твой дизайн
+                height: "150px",
+                boxShadow: "0 5px 15px rgba(0,0,0,0.1)", // лёгкая тень
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center"
+            }}
+        >
+            <div className={styles.title} >Середня оцінка</div>
+
+            <div style={{ position: "relative", width: "100px", height: "100px", marginTop: "10px" }}>
+                {/* Фон круга */}
+                <svg width="100" height="100">
+                    <circle
+                        cx="50"
+                        cy="50"
+                        r="40"
+                        stroke="#eee"
+                        strokeWidth="8"
+                        fill="transparent"
+                    />
+                    {/* Прогресс */}
+                    <circle
+                        cx="50"
+                        cy="50"
+                        r="40"
+                        stroke="#00cc66"
+                        strokeWidth="8"
+                        fill="transparent"
+                        strokeLinecap="round"
+                        strokeDasharray={2 * Math.PI * 40}
+                        strokeDashoffset={2 * Math.PI * 40 * (1 - 4 / 12)}
+                        transform="rotate(-90 50 50)"
+                    />
+                </svg>
+
+                {/* Оценка внутри круга */}
+                <div
+                    style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "100%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontWeight: 600,
+                        fontSize: "18px",
+                    }}
+                >
+                    10.6
+                </div>
+            </div>
+        </div>
+    </div>
 }
 
 function TeacherPage() {
