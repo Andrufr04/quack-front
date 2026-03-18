@@ -47,3 +47,15 @@ body {
     justify-content: center;
     align-items: center;
 }
+
+.wrapper {
+  height: 80vh;        /* или 400px / 500px как хочешь */
+  overflow-y: auto;    /* 🔥 вертикальный скролл */
+  position: relative;
+}
+
+.timeColumn div {
+  display: flex;
+  align-items: flex-start; /* или center */
+  font-size: 12px;
+}

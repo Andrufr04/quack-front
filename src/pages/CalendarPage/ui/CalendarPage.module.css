@@ -9,6 +9,7 @@
 
 .timeColumn {
   width: 60px;
+  height: 1360px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -39,6 +40,9 @@
 
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .days {
@@ -68,4 +72,35 @@
 
 .weekend {
     color: var(--color-main);
+}
+
+.calendar {
+    width: 90%;
+}
+
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+}
+
+.iconNext {
+    transform: rotate(90deg);
+}
+
+.iconPrevious {
+    transform: rotate(-90deg);
+}
+
+.title {
+    white-space: nowrap;      /* не переносить строку */
+    overflow: hidden;         /* скрыть лишнее */
+    text-overflow: ellipsis;  /* добавить ... */
+}
+
+.wrapper {
+  height: 80vh;        /* или 400px / 500px как хочешь */
+  overflow-y: auto;    /* 🔥 вертикальный скролл */
+  position: relative;
 }
