@@ -13,6 +13,7 @@ import TasksExaminationPage from "../../pages/TaskExaminationPage/ui/TaskPage";
 import TasksDonePage from "../../pages/TaskDonePage/ui/TaskPage";
 import ManageTasks from "../../pages/ManageTasksPage/ui/ManageTasks";
 import ManageCheckTasks from "../../pages/ManageCheckTasksPage/ui/ManageCheckTasks";
+import ManageLesson from "../../pages/ManageLessons/ui/ManageLessons";
 
 
 export default function AppRouter() {
@@ -29,6 +30,7 @@ export default function AppRouter() {
                     <Route path="/tasks/done" element={<TasksDonePage />} />
                     <Route path="/managetasks" element={<ManageTasks />} />
                     <Route path="/managechecktasks" element={<ManageCheckTasks />} />
+                    <Route path="/managelesson" element={<ManageLesson />} />
                 <Route
                     path="*"
                     element={<Page404/>}

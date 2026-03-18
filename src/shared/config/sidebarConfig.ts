@@ -1,4 +1,4 @@
-import { SVG_CALENDAR, SVG_CHATS, SVG_FOLDER, SVG_HOME, SVG_LOGOUT, SVG_NEWS, SVG_PROFILE, SVG_SETTINGS, SVG_TASKS } from "../ui/icons/icons";
+import { SVG_CALENDAR, SVG_CHATS, SVG_FOLDER, SVG_HOME, SVG_LOGOUT, SVG_NEWS, SVG_PEOPLE, SVG_PROFILE, SVG_SETTINGS, SVG_TASKS } from "../ui/icons/icons";
 import type { NavigationButtonProps } from "../ui/NavigationButton/model/navigationButtonType";
 
 export const navigationButtonsStudent: NavigationButtonProps[] = [
@@ -17,6 +17,7 @@ export const navigationButtonsTeacher: NavigationButtonProps[] = [
     {icon : SVG_CHATS, text : "Чати", slug : "/chats"},
     {icon : SVG_TASKS, text : "Завдання", slug : "/managetasks"},
     {icon : SVG_CALENDAR, text : "Розклад", slug : "/calendar"},
+    {icon: SVG_PEOPLE, text : "Відмітити присутніх", slug: "/managelesson"}
 ]
 
 export const settingsButtons: NavigationButtonProps[] = [
