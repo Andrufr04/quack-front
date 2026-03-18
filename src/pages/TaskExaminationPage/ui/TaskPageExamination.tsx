@@ -9,7 +9,7 @@ import TaskExtendedChecked from "../../../shared/ui/TaskExtendedChecked/ui/TaskE
 import Page403 from "../../Page403/ui/Page403"
 import TaskExtendedExamination from "../../../shared/ui/TaskExtendedExamination/ui/TaskExtendedExamination"
 
-export default function TasksDonePage() {
+export default function TasksExaminationPage() {
     if (!isStudent()) return <Page403/>
     const [selectedTask, setSelectedTask] = useState<TaskStatus | null>(null)
     const [tasks, setTasks] = useState<TaskStatus[]>([])

@@ -9,12 +9,17 @@ import Page404 from "../../pages/Page404/ui/Page404";
 import PublicRoute from "./PublicRoute";
 import PrivateRoute from "./PrivateRoute";
 import TasksPage from "../../pages/TasksPage/ui/TaskPage";
-import TasksExaminationPage from "../../pages/TaskExaminationPage/ui/TaskPage";
 import TasksDonePage from "../../pages/TaskDonePage/ui/TaskPage";
 import ManageTasks from "../../pages/ManageTasksPage/ui/ManageTasks";
 import ManageCheckTasks from "../../pages/ManageCheckTasksPage/ui/ManageCheckTasks";
 import ManageLesson from "../../pages/ManageLessons/ui/ManageLessons";
 import { CalendarPage } from "../../pages/CalendarPage/ui/CalendarPage";
+import ManageSchedule from "../../pages/ManageSchedule/ui/ManageSchedule";
+import ManageScheduleDelete from "../../pages/ManageScheduleDeletePage/ui/ManageScheduleDeletePage";
+import ManageAccountsCreatePage from "../../pages/ManageAccountsCreatePage/ui/ManageAccountsCreatePage";
+import ManageAccountsPage from "../../pages/ManageAccountsPage/ui/ManageAccountsPage";
+import ManageGroupsPage from "../../pages/ManageGroupsPage/ui/ManageGroupsPage";
+import TasksExaminationPage from "../../pages/TaskExaminationPage/ui/TaskPageExamination";
 
 
 export default function AppRouter() {
@@ -32,6 +37,11 @@ export default function AppRouter() {
                     <Route path="/managetasks" element={<ManageTasks />} />
                     <Route path="/managechecktasks" element={<ManageCheckTasks />} />
                     <Route path="/managelesson" element={<ManageLesson />} />
+                    <Route path="/manageschedule" element={<ManageSchedule />} />
+                    <Route path="/managescheduledelete" element={<ManageScheduleDelete />} />
+                    <Route path="/manageaccountscreate" element={<ManageAccountsCreatePage />} />
+                    <Route path="/manageaccounts" element={<ManageAccountsPage />} />
+                    <Route path="/managegroups" element={<ManageGroupsPage />} />
                     <Route path="/calendar" element={<CalendarPage />} />
                 <Route
                     path="*"

@@ -20,6 +20,13 @@ export const navigationButtonsTeacher: NavigationButtonProps[] = [
     {icon: SVG_PEOPLE, text : "Відмітити присутніх", slug: "/managelesson"}
 ]
 
+export const navigationButtonsAdministration: NavigationButtonProps[] = [
+    {icon : SVG_HOME, text : "Головна сторінка", slug : "/"},
+    {icon : SVG_PROFILE, text : "Профіль", slug : "/profile"},
+    {icon : SVG_CHATS, text : "Чати", slug : "/chats"},
+    {icon : SVG_CALENDAR, text : "Розклад", slug : "/manageschedule"},
+]
+
 export const settingsButtons: NavigationButtonProps[] = [
     {icon : SVG_SETTINGS, text : "Налаштування", slug : "/setting"},
     {icon : SVG_LOGOUT, text : "Вихід", slug : "/"},
