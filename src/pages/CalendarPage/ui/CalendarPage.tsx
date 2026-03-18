@@ -37,7 +37,6 @@ const lessons: Lesson[] = [
         end: "8:30",
         day: 2,
     },
-    ,
     {
         id: "5",
         title: "Фізика csdjfha;shd;fjea",
