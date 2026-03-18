@@ -14,6 +14,7 @@ import TasksDonePage from "../../pages/TaskDonePage/ui/TaskPage";
 import ManageTasks from "../../pages/ManageTasksPage/ui/ManageTasks";
 import ManageCheckTasks from "../../pages/ManageCheckTasksPage/ui/ManageCheckTasks";
 import ManageLesson from "../../pages/ManageLessons/ui/ManageLessons";
+import { CalendarPage } from "../../pages/CalendarPage/ui/CalendarPage";
 
 
 export default function AppRouter() {
@@ -31,6 +32,7 @@ export default function AppRouter() {
                     <Route path="/managetasks" element={<ManageTasks />} />
                     <Route path="/managechecktasks" element={<ManageCheckTasks />} />
                     <Route path="/managelesson" element={<ManageLesson />} />
+                    <Route path="/calendar" element={<CalendarPage />} />
                 <Route
                     path="*"
                     element={<Page404/>}

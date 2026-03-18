@@ -1,0 +1,71 @@
+.wrapper {
+  display: flex;
+  height: 80vh;
+  padding: 16px;
+  backdrop-filter: var(--blur-main);
+  background-color: var(--color-opaque-secondary);
+  border-radius: 0 0 14px 14px ;
+}
+
+.timeColumn {
+  width: 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: #666;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  flex: 1;
+  position: relative;
+}
+
+.dayColumn {
+  position: relative;
+  border-left: 1px solid rgba(0,0,0,0.05);
+}
+
+/* Пара */
+.lesson {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+
+  background: var(--color-bg);
+  border-radius: 12px;
+  padding: 8px;
+
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  font-size: 12px;
+}
+
+.days {
+    display: flex;
+    padding-left: 76px;
+    padding: 20px 20px 20px 76px;
+    background-color: var(--color-bg);
+    color: var(--color-grey);
+    border-radius: 14px 14px 0 0;
+}
+
+.day {
+    display: flex;
+    width: 14.285714%; /* DONT CHANGE THIS FUCKING NUMBER */
+    flex-direction: column;
+    align-items: center;
+}
+
+.dayOfWeek {
+
+}
+
+.date {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.weekend {
+    color: var(--color-main);
+}
