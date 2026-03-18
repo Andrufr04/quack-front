@@ -17,6 +17,7 @@
     --color-bg-task-extender: #ffffff;
     --temporary-task-bg: #b6b6b6;
     --color-grey: #535353;
+    --color-gray: #cfcfcf;
 
     --blur-main: blur(9px);
     --blur-form: blur(15px);
@@ -33,6 +34,7 @@
 .dark {
     --color-text: #ffffff;
     --color-bg: #1e1e1e;
+    --color-gray: #454545;
 
     --color-hover-icon-bg: rgba(236, 135, 53, 0.3);
     --color-hover-icon: #ec8735;

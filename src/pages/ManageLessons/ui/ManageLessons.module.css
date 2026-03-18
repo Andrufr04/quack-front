@@ -26,7 +26,7 @@
 th, td {
   padding: 10px;
   text-align: center;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--color-gray);
 }
 
 .attendanceRow {
@@ -53,7 +53,7 @@ th, td {
 .red { background-color: #f44336; }
 
 .active {
-  border: 2px solid #333;
+  border: 2px solid var(--color-text);
   opacity: 1;
 }
 
@@ -64,13 +64,13 @@ select {
 
 .icon {
   cursor: pointer;
-  color: #888;
+  color: var(--color-gray);
   transition: color 0.2s;
 }
 
 .iconActive {
   cursor: pointer;
-  color: #2196f3;
+  color: #f7cf06;
   font-weight: bold;
 }
 
@@ -88,7 +88,7 @@ select {
   justify-content: space-between;
   align-items: center;
   padding: 20px 20px 0 20px;
-  background-color: #ffffff;
+  background-color: var(--color-bg);
 
 }
 
@@ -96,6 +96,7 @@ select {
   padding: 8px;
   border-radius: 6px;
   border: 1px solid #ccc;
+  background-color: var(--color-bg);
   width: 60%;
 }
 
@@ -107,7 +108,7 @@ select {
 .table {
   width: 100%;
   border-collapse: collapse;
-  background-color: #fff;
+  background-color: var(--color-bg);
   border-radius: 0 0 20px 20px;
 }
 
@@ -120,11 +121,10 @@ th, td {
 
 .topicButton {
   padding: 8px 16px;
-  border-radius: 10px;
+  border-radius: 8px;
   border: none;
-  background-color: var(--color-main);
-  font-weight: bold;
-  color: white;
+  background-color: var(--color-gray);
+  color: rgb(0, 0, 0);
   cursor: pointer;
 }
 
@@ -159,10 +159,10 @@ td:nth-child(2) {
 
 .tab {
   padding: 8px 16px;
-  border-radius: 10px 10px 0 0;
+  border-radius: 14px 14px 0 0;
   cursor: pointer;
-  background-color: #d8d8d8; /* сіра за замовчуванням */
-  color: #000;
+  background-color: var(--color-gray); /* сіра за замовчуванням */
+  color: #000000;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -172,6 +172,7 @@ td:nth-child(2) {
 /* Активна вкладка — поточна пара */
 .tabActive {
   background-color: #ffffff;
+  color: var(--color-text);
 }
 
 /* --- Обмеження тексту в таблиці --- */
@@ -193,14 +194,14 @@ td:nth-child(2) {
 .table {
   width: 100%;
   border-collapse: collapse;
-  background-color: #fff;
+  background-color: var(--color-bg);
   border-radius: 0 0 10px 10px;
 }
 
 th, td {
   padding: 10px;
   height: 50px;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--color-gray);
   text-align: center;
 }
 
@@ -221,7 +222,6 @@ td:not(:nth-child(2)) {
   align-items: end;
   width: 100%;
   margin-bottom: 16px;
-
 }
 
 .topicInput {
@@ -243,6 +243,7 @@ td:not(:nth-child(2)) {
 
 .topicButton {
     width: 300px;
+    color: var(--color-text);
 }
 
 /* Контейнер вкладок на всю ширину */
@@ -256,7 +257,6 @@ td:not(:nth-child(2)) {
   flex: 1; /* розтягує вкладку рівномірно */
   padding: 8px 16px;
   cursor: pointer;
-  font-weight: bold;
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
@@ -274,7 +274,6 @@ td:not(:nth-child(2)) {
   flex: 1 1 0; /* розтягується рівномірно */
   padding: 8px 16px;
   cursor: pointer;
-  font-weight: bold;
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
@@ -298,7 +297,7 @@ html, body, #root {
 }
 
 .tableWrapper {
-  border-radius: 0 0 10px 10px;
+  border-radius: 0 0 14px 14px;
   overflow: hidden; /* обрезает углы */
 }
 
@@ -307,26 +306,29 @@ html, body, #root {
   overflow-y: auto; /* скрол внутри */
 }
 
-
-
-
 .tab {
   flex: 1 1 0;
   padding: 8px 16px;
   cursor: pointer;
-  font-weight: bold;
   text-align: center;
 
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-
+  background-color: var(--color-gray);
   transition: flex 0.3s ease, background 0.2s;
+  color: var(--color-text);
 }
 .tab:hover {
   flex: 2.5 1 0; /* увеличивается */
 }
 .tabActive {
   flex: 2.5 1 0;
-  background-color: #fff;
+  background-color: var(--color-bg);
+  font-weight: bold;
+}
+
+.mark {
+  background-color: var(--color-gray);
+  color: var(--color-text);
 }

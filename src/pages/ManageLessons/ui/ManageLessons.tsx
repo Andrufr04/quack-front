@@ -1,6 +1,7 @@
 import { useState } from "react";
 import styles from "./ManageLessons.module.css";
 import ActionButton from "../../../shared/ui/ActionButton/ui/ActionButton";
+import { SVG_DUCK } from "../../../shared/ui/icons/icons";
 
 type Student = {
     id: number;
@@ -96,7 +97,7 @@ export default function ManageLesson() {
                                 <th>Студент</th>
                                 <th>Присутність</th>
                                 <th>Оцінка</th>
-                                <th>К</th>
+                                <th>Заохочення</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -124,7 +125,7 @@ export default function ManageLesson() {
                                         </div>
                                     </td>
                                     <td>
-                                        <select
+                                        <select className={styles.mark}
                                             value={student.grade ?? ""}
                                             onChange={(e) => handleGrade(student.id, Number(e.target.value))}
                                         >
@@ -138,7 +139,7 @@ export default function ManageLesson() {
                                         className={student.iconActive ? styles.iconActive : styles.icon}
                                         onClick={() => toggleIcon(student.id)}
                                     >
-                                        К
+                                        {SVG_DUCK}
                                     </td>
                                 </tr>
                             ))}
