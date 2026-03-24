@@ -4,6 +4,7 @@ import Page403 from "../../Page403/ui/Page403"
 import { apiRequest } from "../../../shared/api/api"
 import { isAdministration } from "../../../entities/session/lib/jwt"
 import { Link } from "react-router-dom"
+import toast from "react-hot-toast"
 
 interface SimpleEntity {
     id: string;
@@ -56,7 +57,9 @@ export default function ManageSchedule() {
             body: JSON.stringify(formData)
         })
         if (res?.ok) {
-            alert("Пару додано!")
+            toast.success("Пару додано!")
+        } else {
+            toast.error("Пару не було створено!")
         }
     }
 

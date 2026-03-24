@@ -17,6 +17,23 @@ interface LessonInfo {
     };
 }
 
+interface LeaderboardUser {
+    id: string;
+    full_name: string;
+    ducks: number;
+    coins: number;
+}
+
+interface StudentStats {
+    leaderboard: LeaderboardUser[];
+    my_stats: {
+        ducks: number;
+        coins: number;
+        average_grade: number;
+    };
+    group_name: string | null
+}
+
 export default function HomePage() {
     return <div>
         <title>Quack | Головна</title>
@@ -29,40 +46,46 @@ export default function HomePage() {
 }
 
 function StudentPage() {
+    const [stats, setStats] = useState<StudentStats | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        apiRequest('/education/student/dashboard-stats/')
+            .then(res => res?.json())
+            .then(data => setStats(data))
+            .finally(() => setLoading(false));
+    }, []);
+
+    const radius = 40;
+    const circumference = 2 * Math.PI * radius;
+    const avgGrade = stats?.my_stats.average_grade || 0;
+    // Офсет (макс оцінка 12)
+    const strokeDashoffset = circumference * (1 - avgGrade / 12);
+
     return <div className={styles.widgets}>
-        <div className={styles.LeaderBoard}>
+        {stats?.group_name && <div className={styles.LeaderBoard}>
             <div className={styles.title}>Таблиця лідерів</div>
             <div className={styles.currency}>
                 <div className={styles.balance}>
                     <div className={styles.iconDuck}>{SVG_DUCK}</div>
-                    <div className={styles.amount}>100</div>
+                    <div className={styles.amount}>{stats?.my_stats.ducks || 0}</div>
                 </div>
                 <div className={styles.balance}>
                     <div className={styles.iconCoin}>{SVG_COIN}</div>
-                    <div className={styles.amount}>100</div>
+                    <div className={styles.amount}>{stats?.my_stats.coins || 0}</div>
                 </div>
             </div>
             <div className={styles.list}>
-                <div>1. Анна бебебебе</div>
-                <div>2. Анна бебебебе</div>
-                <div>3. Анна бебебебе</div>
-                <div>4. Анна бебебебе</div>
-                <div>5. Анна бебебебе</div>
-                <div>6. Анна бебебебе</div>
-                <div>1. Анна бебебебе</div>
-                <div>2. Анна бебебебе</div>
-                <div>3. Анна бебебебе</div>
-                <div>4. Анна бебебебе</div>
-                <div>5. Анна бебебебе</div>
-                <div>6. Анна бебебебе</div>
-                <div>1. Анна бебебебе</div>
-                <div>2. Анна бебебебе</div>
-                <div>3. Анна бебебебе</div>
-                <div>4. Анна бебебебе</div>
-                <div>5. Анна бебебебе</div>
-                <div>6. Анна бебебебе</div>
+                {stats?.leaderboard.map((user, index) => (
+                    <div key={user.id}>
+                        {index + 1}. {user.full_name}
+                        <span className={styles.leaderScore}>
+                            ({user.coins})
+                        </span>
+                    </div>
+                ))}
             </div>
-        </div>
+        </div>}
 
         <div
             style={{
@@ -85,7 +108,7 @@ function StudentPage() {
                     <circle
                         cx="50"
                         cy="50"
-                        r="40"
+                        r={radius}
                         stroke="#eee"
                         strokeWidth="8"
                         fill="transparent"
@@ -94,14 +117,15 @@ function StudentPage() {
                     <circle
                         cx="50"
                         cy="50"
-                        r="40"
-                        stroke="#00cc66"
+                        r={radius}
+                        stroke={avgGrade >= 10 ? "#00cc66" : avgGrade >= 7 ? "#ffcc00" : "#ff4d4d"}
                         strokeWidth="8"
                         fill="transparent"
                         strokeLinecap="round"
-                        strokeDasharray={2 * Math.PI * 40}
-                        strokeDashoffset={2 * Math.PI * 40 * (1 - 4 / 12)}
+                        strokeDasharray={circumference}
+                        strokeDashoffset={strokeDashoffset}
                         transform="rotate(-90 50 50)"
+                        style={{ transition: "stroke-dashoffset 0.5s ease" }}
                     />
                 </svg>
 
@@ -120,7 +144,7 @@ function StudentPage() {
                         fontSize: "18px",
                     }}
                 >
-                    10.6
+                    {avgGrade.toFixed(1)}
                 </div>
             </div>
         </div>
@@ -140,35 +164,58 @@ function TeacherPage() {
             .finally(() => setLoading(false));
     }, []);
 
-    if (loading) return <div>Завантаження...</div>;
+    if (loading) return <div className={styles.loader}>Завантаження...</div>;
 
     return (
-        <div className={styles.container}>
-            <title>Quack | Головна</title>
-
+        <div className={styles.widgets}>
             {!data ? (
-                <div className={styles.empty}>На сьогодні пар більше немає 🦆</div>
+                <div className={styles.emptyWidget}>
+                    <div className={styles.duckIconLarge}>{SVG_DUCK}</div>
+                    <p>На сьогодні пар більше немає</p>
+                </div>
             ) : (
-                <div className={styles.card}>
-                    <div className={data.is_current ? styles.badgeNow : styles.badgeNext}>
-                        {data.is_current ? "Зараз іде пара" : "Наступна пара"}
+                <div className={styles.teacherLessonCard}>
+                    <div className={styles.cardHeader}>
+                        <span className={data.is_current ? styles.statusNow : styles.statusNext}>
+                            {data.is_current ? "• Прямо зараз" : "Наступна"}
+                        </span>
+                        <span className={styles.classroomBadge}>{data.lesson.classroom}</span>
                     </div>
 
-                    <h1 className={styles.title}>{data.lesson.subject}</h1>
-                    <p className={styles.subtitle}>{data.lesson.type} • Гр. {data.lesson.group}</p>
-
-                    <div className={styles.infoRow}>
-                        <span>🕒 {new Date(data.lesson.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} -
-                            {new Date(data.lesson.end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                        <span>📍 {data.lesson.classroom}</span>
+                    <div className={styles.mainInfo}>
+                        <h2 className={styles.subjectTitle}>{data.lesson.subject}</h2>
+                        <div className={styles.typeTag}>{data.lesson.type}</div>
                     </div>
 
-                    <div className={styles.studentsSection}>
-                        <h3>Список студентів ({data.lesson.students.length}):</h3>
-                        <div className={styles.studentList}>
-                            {data.lesson.students.map(s => (
-                                <div key={s.id} className={styles.studentItem}>{s.name}</div>
+                    <div className={styles.detailsRow}>
+                        <div className={styles.detailItem}>
+                            <span className={styles.label}>Група</span>
+                            <span className={styles.value}>{data.lesson.group}</span>
+                        </div>
+                        <div className={styles.detailItem}>
+                            <span className={styles.label}>Час</span>
+                            <span className={styles.value}>
+                                {new Date(data.lesson.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                -
+                                {new Date(data.lesson.end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div className={styles.studentsWidget}>
+                        <div className={styles.studentsHeader}>
+                            <span>Студенти</span>
+                            <div className={styles.studentsAmount}>{data.lesson.students.length}</div>
+                        </div>
+                        <div className={styles.miniStudentList}>
+                            {data.lesson.students.slice(0, 5).map(s => (
+                                <div key={s.id} className={styles.miniStudentItem}>
+                                    {s.name}
+                                </div>
                             ))}
+                            {data.lesson.students.length > 5 && (
+                                <div className={styles.moreStudents}>+{data.lesson.students.length - 5}</div>
+                            )}
                         </div>
                     </div>
                 </div>

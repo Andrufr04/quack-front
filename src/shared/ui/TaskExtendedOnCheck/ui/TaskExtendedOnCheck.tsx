@@ -5,6 +5,7 @@ import styles from "./TaskExtendedOnCheck.module.css"
 import ActionButton from "../../ActionButton/ui/ActionButton";
 import type { TeacherTaskToCheck } from "../../../../entities/task/model/types";
 import { taskApi } from "../../../../entities/task/api/taskApi";
+import toast from "react-hot-toast";
 
 export default function TaskExtendedOnCheck({ onCloseClick, task }: { onCloseClick: () => void, task: TeacherTaskToCheck }) {
     const [isZoomed, setIsZoomed] = useState(false);
@@ -32,9 +33,11 @@ export default function TaskExtendedOnCheck({ onCloseClick, task }: { onCloseCli
 
             if (result) {
                 onCloseClick(); // Закриваємо модалку, щоб список оновився
+                toast.success("Завдання оцінено!")
                 window.location.reload()
             }
         } catch (error) {
+            toast.error("Помилка оцінювання!")
             console.error("Помилка оцінювання:", error);
         } finally {
             setLoading(false);
@@ -82,7 +85,7 @@ export default function TaskExtendedOnCheck({ onCloseClick, task }: { onCloseCli
                                 if (num >= 1 && num <= 12) setMark(num);
                             }
                         }}
-                        placeholder="0"
+                        placeholder="1"
                     />
                 </div>
 

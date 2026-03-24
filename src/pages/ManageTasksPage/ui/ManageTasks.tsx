@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 import { useEffect, useState } from "react"
 import styles from "./ManageTasks.module.css"
 import { taskApi } from "../../../entities/task/api/taskApi"
@@ -7,15 +7,18 @@ import Page403 from "../../Page403/ui/Page403"
 
 export default function ManageTasks() {
     if (!isTeacher()) return <Page403 />
+    const location = useLocation();
+    const prefill = location.state as { groupId?: string, subjectId?: string, theme?: string } | null;
+
     const [groupsList, setGroupsList] = useState<{ id: string, name: string }[]>([])
     const [subjectsList, setSubjectsList] = useState<{ id: string, name: string }[]>([])
     const [typesList, setTypesList] = useState<{ id: string, name: string }[]>([])
 
-    const [group, setGroup] = useState<string>("")
-    const [subject, setSubject] = useState<string>("")
+    const [group, setGroup] = useState<string>(prefill?.groupId ?? "")
+    const [subject, setSubject] = useState<string>(prefill?.subjectId ?? "")
     const [type, setType] = useState<string>("")
     const [deadline, setDeadline] = useState<string>("")
-    const [theme, setTheme] = useState<string>("")
+    const [theme, setTheme] = useState<string>(prefill?.theme ?? "")
     const [description, setDescription] = useState<string>("")
     const [files, setFiles] = useState<File[]>([])
 

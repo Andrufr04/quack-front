@@ -1,20 +1,21 @@
+import { isStudent, isTeacher } from "../../../entities/session/lib/jwt";
 import { SVG_ARROW_DOWN } from "../../../shared/ui/icons/icons";
 import RoundButton from "../../../shared/ui/RoundButton/RoundButton";
+import Page403 from "../../Page403/ui/Page403";
 import styles from "./CalendarPage.module.css";
 import { useRef, useEffect, useState } from "react";
+import { apiRequest } from "../../../shared/api/api";
 
-const START_DAY = 8 * 60; // 08:00
-const END_DAY = 20 * 60;  // например до 20:00
-
+const START_DAY = 8 * 60;
+const END_DAY = 20 * 60;
 const TOTAL_MINUTES = END_DAY - START_DAY;
-const PX_PER_MINUTE = 1; // можна 1.2 / 0.8 підлаштувати
 
 export type Lesson = {
     id: string;
     title: string;
-    start: string; // "10:20"
-    end: string;   // "11:40"
-    day: number;   // 0-6
+    start: string;
+    end: string;
+    day: number;
 };
 
 const timeToMinutes = (time: string) => {
@@ -22,113 +23,175 @@ const timeToMinutes = (time: string) => {
     return h * 60 + m;
 };
 
-const lessons: Lesson[] = [
-    {
-        id: "1",
-        title: "Фізика",
-        start: "10:20",
-        end: "19:40",
-        day: 3,
-    },
-    {
-        id: "2",
-        title: "Фізика csdjfha;shd;fjea",
-        start: "8:00",
-        end: "8:30",
-        day: 2,
-    },
-    {
-        id: "5",
-        title: "Фізика csdjfha;shd;fjea",
-        start: "14:00",
-        end: "15:30",
-        day: 5,
-    },
-];
+const getLocalDateString = () => {
+    const d = new Date();
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+    return d.toISOString().split('T')[0];
+};
 
-
-type Props = {
-    lessons: Lesson[];
+const MONTH_SHORT_NAMES: Record<number, string> = {
+    0: "січ", // Січень
+    1: "лют", // Лютий
+    2: "бер", // Березень
+    3: "квіт", // Квітень
+    4: "трав", // Травень
+    5: "черв", // Червень
+    6: "лип", // Липень
+    7: "серп", // Серпень
+    8: "вер", // Вересень
+    9: "жовт", // Жовтень
+    10: "лист", // Листопад
+    11: "груд", // Грудень
 };
 
 export const CalendarPage = () => {
+    if (!isStudent() && !isTeacher()) return <Page403 />;
+
     const wrapperRef = useRef<HTMLDivElement>(null);
-    const [pxPerMinute, setPxPerMinute] = useState(1);
+    const [lessons, setLessons] = useState<Lesson[]>([]);
+    const [currentDate, setCurrentDate] = useState(new Date()); // Стан поточного тижня
+    const [weekDays, setWeekDays] = useState<{ name: string, date: number, fullDate: string }[]>([]);
+    const [nowMinutes, setNowMinutes] = useState<number | null>(null);
 
     useEffect(() => {
-        if (wrapperRef.current) {
-            const height = wrapperRef.current.clientHeight;
-            setPxPerMinute((height / TOTAL_MINUTES) * 2.5);
-        }
+        const updateNow = () => {
+            const now = new Date();
+            const minutes = now.getHours() * 60 + now.getMinutes();
+            // Відображаємо лінію лише якщо зараз робочий час календаря
+            if (minutes >= START_DAY && minutes <= END_DAY) {
+                setNowMinutes(minutes);
+            } else {
+                setNowMinutes(null);
+            }
+        };
+
+        updateNow();
+        const interval = setInterval(updateNow, 60000); // Оновлюємо щохвилини
+        return () => clearInterval(interval);
     }, []);
+
+    useEffect(() => {
+        const start = new Date(currentDate);
+        start.setDate(currentDate.getDate() - currentDate.getDay()); // Знаходимо неділю
+
+        const days = ["Неділя", "Понеділок", "Вівторок", "Середа", "Четвер", "П'ятниця", "Субота"];
+        const week = days.map((name, i) => {
+            const d = new Date(start);
+            d.setDate(start.getDate() + i);
+            return {
+                name,
+                date: d.getDate(),
+                fullDate: d.toISOString().split('T')[0]
+            };
+        });
+        setWeekDays(week);
+        fetchLessons(week[0].fullDate); // Тягнемо дані для цього тижня
+    }, [currentDate]);
+
+    const getYear = () => {
+        if (!weekDays.length) return "";
+
+        const lastDay = new Date(weekDays[6].fullDate);
+        const year = lastDay.getFullYear();
+
+        return `${year}`;
+    };
+
+    const getCalendarHeader = () => {
+        if (!weekDays.length) return "";
+
+        const firstDay = new Date(weekDays[0].fullDate);
+        const lastDay = new Date(weekDays[6].fullDate);
+
+        const firstMonthIdx = firstDay.getMonth();
+        const lastMonthIdx = lastDay.getMonth();
+
+        // Отримуємо скорочення зі словника
+        const firstMonthStr = MONTH_SHORT_NAMES[firstMonthIdx];
+
+        if (firstMonthIdx !== lastMonthIdx) {
+            const lastMonthStr = MONTH_SHORT_NAMES[lastMonthIdx];
+            // Формат: січ - лют 2026
+            return `${firstMonthStr}-${lastMonthStr}`;
+        }
+
+        // Формат: січ 2026
+        return `${firstMonthStr}`;
+    };
+
+    const fetchLessons = async (date: string) => {
+        const res = await apiRequest(`/education/calendar/lessons/?date=${date}`);
+        if (res.ok) {
+            const data = await res.json();
+            setLessons(data);
+        }
+    };
+
+    const changeWeek = (direction: number) => {
+        const next = new Date(currentDate);
+        next.setDate(currentDate.getDate() + (direction * 7));
+        setCurrentDate(next);
+    };
+
+    const pxPerMinute = 1.2;
 
     return (
         <div className={styles.container}>
-            <div className={styles.iconNext}><RoundButton button={{icon: SVG_ARROW_DOWN, text: "Наступний тиждень"}} /></div>
+            {/* Кнопка Назад (повертаємо іконку вгору через стиль) */}
+            <div className={styles.iconPrevious} onClick={() => changeWeek(-1)}>
+                <RoundButton button={{ icon: SVG_ARROW_DOWN, text: "Минулий тиждень" }} />
+            </div>
+
             <div className={styles.calendar}>
                 <div className={styles.days}>
-                    <div className={`${styles.day} ${styles.weekend}`}>
-                        <div className={styles.dayOfWeek}>Неділя</div>
-                        <div className={styles.date}>13</div>
+                    <div className={styles.headerInfo}>
+                        <div>{getCalendarHeader()}</div>
+                        <div className={styles.year}>{getYear()}</div>
                     </div>
-                    <div className={styles.day}>
-                        <div className={styles.dayOfWeek}>Понеділок</div>
-                        <div className={styles.date}>13</div>
-                    </div>
-                    <div className={styles.day}>
-                        <div className={styles.dayOfWeek}>Вівторок</div>
-                        <div className={styles.date}>13</div>
-                    </div>
-                    <div className={styles.day}>
-                        <div className={styles.dayOfWeek}>Середа</div>
-                        <div className={styles.date}>13</div>
-                    </div>
-                    <div className={styles.day}>
-                        <div className={styles.dayOfWeek}>Четверг</div>
-                        <div className={styles.date}>13</div>
-                    </div>
-                    <div className={styles.day}>
-                        <div className={styles.dayOfWeek}>П'ятниця</div>
-                        <div className={styles.date}>13</div>
-                    </div>
-                    <div className={`${styles.weekend} ${styles.day}`}>
-                        <div className={styles.dayOfWeek}>Субота</div>
-                        <div className={styles.date}>13</div>
-                    </div>
+
+                    {weekDays.map((day, idx) => (
+                        <div key={idx} className={`${styles.day} ${idx === 0 || idx === 6 ? styles.weekend : ""}`}>
+                            <div className={styles.dayOfWeek}>{day.name}</div>
+                            <div className={styles.date}>{day.date}</div>
+                        </div>
+                    ))}
                 </div>
 
-
                 <div className={styles.wrapper} ref={wrapperRef}>
-                    {/* Ліва колонка з часом */}
-                    <div className={styles.timeColumn}>
-                        {Array.from({ length: 12 }).map((_, i) => {
-                            const hour = 8 + i;
-                            return <div key={i}>{hour}:00</div>;
-                        })}
+                    {/* ТУТ МИ РОБИМО ФОНОВУ СІТКУ */}
+                    <div className={styles.backgroundGrid}>
+                        {Array.from({ length: 13 }).map((_, i) => (
+                            <div key={i} className={styles.gridRow} style={{ height: `${60 * pxPerMinute}px` }}>
+                                <div className={styles.timeLabel}>{8 + i}:00</div>
+                                <div className={styles.gridLine}></div>
+                            </div>
+                        ))}
                     </div>
 
-                    {/* Дні */}
-                    <div className={styles.grid}>
-                        {[0, 1, 2, 3, 4, 5, 6].map((day) => (
-                            <div key={day} className={styles.dayColumn}>
+                    {/* ТУТ РОЗМІЩУЮТЬСЯ КАРТКИ */}
+                    <div className={styles.eventsGrid}>
+                        {[0, 1, 2, 3, 4, 5, 6].map((dayIdx) => (
+                            <div key={dayIdx} className={styles.dayColumn}>
                                 {lessons
-                                    .filter(l => l.day === day)
+                                    .filter(l => l.day === dayIdx)
                                     .map((lesson) => {
                                         const start = timeToMinutes(lesson.start);
                                         const end = timeToMinutes(lesson.end);
-
                                         const top = (start - START_DAY) * pxPerMinute;
                                         const height = (end - start) * pxPerMinute;
 
+                                        const todayStr = getLocalDateString();
+                                        const columnDate = weekDays[dayIdx]?.fullDate;
+
+                                        const isActive =
+                                            columnDate === todayStr && // Чи це сьогодні?
+                                            nowMinutes !== null &&     // Чи зараз робочий час?
+                                            nowMinutes >= start &&  // Чи пара вже почалась?
+                                            nowMinutes < end;       // Чи пара ще не закінчилась?
+
                                         return (
-                                            <div
-                                                key={lesson.id}
-                                                className={styles.lesson}
-                                                style={{
-                                                    top,
-                                                    height,
-                                                }}
-                                            >
+                                            <div key={lesson.id} className={`${styles.lesson} ${isActive ? styles.activeLesson : ""}`}
+                                                style={{ top, height }}>
                                                 <div className={styles.title}>{lesson.title}</div>
                                                 <div>{lesson.start} - {lesson.end}</div>
                                             </div>
@@ -139,7 +202,11 @@ export const CalendarPage = () => {
                     </div>
                 </div>
             </div>
-            <div className={styles.iconPrevious}><RoundButton button={{icon: SVG_ARROW_DOWN, text: "Наступний тиждень"}} /></div>
+
+            {/* Кнопка Вперед */}
+            <div className={styles.iconNext} onClick={() => changeWeek(1)}>
+                <RoundButton button={{ icon: SVG_ARROW_DOWN, text: "Наступний тиждень" }} />
+            </div>
         </div>
     );
 };

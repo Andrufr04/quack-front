@@ -74,7 +74,7 @@ export default function TaskExtendedExamination({ onCloseClick, task }: { onClos
             {docs.length > 0 && <FileViewer docs={docs} />}
 
             <div className={styles.extendedBottom}>
-                <div className={styles.field}>
+                {/* <div className={styles.field}>
 
                     <div className={`${styles.label} ${isValid ? styles.successText : styles.required}`}>
                         *оберіть опис, файл або обидва
@@ -127,7 +127,7 @@ export default function TaskExtendedExamination({ onCloseClick, task }: { onClos
                         onClick: handleUpload,
                         bgcolor: (!isValid || loading) ? "#ababab" : ""
                     }}
-                />
+                /> */}
             </div>
         </div>
     </>

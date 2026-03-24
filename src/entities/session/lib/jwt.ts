@@ -4,6 +4,7 @@ interface JwtPayload {
     roles: string[]
     exp: number
     user_id: string
+    group_id?: string | null // Додали це поле
 }
 
 /*
@@ -28,6 +29,21 @@ export const getSessionInfo = () => {
         };
     } catch (error) {
         return null
+    }
+};
+
+// Також можна додати зручну функцію для отримання ID групи:
+export const getGroupId = (): string | null => {
+    const session = getSessionInfo();
+    const token = localStorage.getItem("access_token");
+    
+    if (!session || !token) return null;
+    
+    try {
+        const decoded = jwtDecode<JwtPayload>(token);
+        return decoded.group_id || null;
+    } catch {
+        return null;
     }
 };
 

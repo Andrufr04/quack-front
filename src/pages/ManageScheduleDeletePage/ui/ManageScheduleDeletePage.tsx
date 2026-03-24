@@ -42,7 +42,6 @@ export default function ManageScheduleDelete() {
     }
 
     const handleDelete = async (id: string) => {
-        if (!confirm("Видалити цю пару з розкладу?")) return
         const res = await apiRequest(`/education/lessons/detail/${id}/`, { method: 'DELETE' })
         if (res?.ok) fetchLessons()
     }
@@ -75,7 +74,7 @@ export default function ManageScheduleDelete() {
 
                     <button onClick={fetchLessons} className={styles.searchBtn}>Пошук</button>
                 </div>
-
+                <div className={styles.tableWrapper}>
                 <table className={styles.table}>
                     <thead>
                         <tr>
@@ -119,6 +118,7 @@ export default function ManageScheduleDelete() {
                         ))}
                     </tbody>
                 </table>
+                </div>
             </div>
         </>
     )

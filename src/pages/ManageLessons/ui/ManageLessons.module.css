@@ -76,7 +76,7 @@ select {
 
 /* ManageLessons.module.css */
 .container {
-  padding: 16px;
+  padding: 1em 4em;
   margin: auto;
   min-height: 100%;
   display: flex;

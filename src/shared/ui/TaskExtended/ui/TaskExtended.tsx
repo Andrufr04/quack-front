@@ -6,6 +6,7 @@ import styles from "./TaskExtended.module.css"
 import type { Task } from "../../../../entities/task/model/types"
 import { FileViewer } from "../../FileViewer/ui/FileViewer"
 import { taskApi } from "../../../../entities/task/api/taskApi"
+import toast from "react-hot-toast"
 
 export default function TaskExtended({ onCloseClick, task }: { onCloseClick: () => void, task: Task }) {
     const [description, setDescription] = useState("")
@@ -35,9 +36,10 @@ export default function TaskExtended({ onCloseClick, task }: { onCloseClick: () 
 
             if (result) {
                 onCloseClick(); // Закриваємо модалку після успіху
-                // Тут можна ще додати refresh списку завдань через контекст або props
+                toast.success("Завдання завантажено!")
             }
         } catch (error) {
+            toast.error("Помилка при завантаженні!")
             console.error("Помилка при завантаженні:", error);
         } finally {
             setLoading(false);

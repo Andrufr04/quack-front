@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import styles from './ManageGroupsPage.module.css';
 import { apiRequest } from '../../../shared/api/api';
+import { isAdministration } from '../../../entities/session/lib/jwt';
+import Page403 from '../../Page403/ui/Page403';
+import { Link } from 'react-router-dom';
 
 export default function ManageGroupsPage() {
+    if (!isAdministration()) return <Page403 />
+
     const [groups, setGroups] = useState<any[]>([]);
     const [curators, setCurators] = useState<any[]>([]);
     const [newName, setNewName] = useState("");
     const [selectedCurator, setSelectedCurator] = useState("");
-    
+
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editName, setEditName] = useState("");
     const [editCurator, setEditCurator] = useState("");
@@ -44,50 +49,86 @@ export default function ManageGroupsPage() {
     };
 
     return (
-        <div className={styles.container}>
-            <h2>Керування групами</h2>
-            
-            <form onSubmit={handleCreate} className={styles.createRow}>
-                <input 
-                    value={newName} 
-                    onChange={e => setNewName(e.target.value)} 
-                    placeholder="Назва групи"
-                    required
-                />
-                <select value={selectedCurator} onChange={e => setSelectedCurator(e.target.value)}>
-                    <option value="">Без куратора</option>
-                    {curators.map(c => <option key={c.id} value={c.id}>{c.full_name}</option>)}
-                </select>
-                <button type="submit">Створити</button>
-            </form>
-
-            <div className={styles.table}>
-                {groups.map(g => (
-                    <div key={g.id} className={styles.row}>
-                        {editingId === g.id ? (
-                            <>
-                                <input value={editName} onChange={e => setEditName(e.target.value)} />
-                                <select value={editCurator} onChange={e => setEditCurator(e.target.value)}>
-                                    <option value="">Без куратора</option>
-                                    {curators.map(c => <option key={c.id} value={c.id}>{c.full_name}</option>)}
-                                </select>
-                                <button onClick={() => handleUpdate(g.id)}>Зберегти</button>
-                                <button onClick={() => setEditingId(null)}>Скасувати</button>
-                            </>
-                        ) : (
-                            <>
-                                <span className={styles.name}>{g.name}</span>
-                                <span className={styles.curator}>Куратор: {g.curator_name}</span>
-                                <button onClick={() => {
-                                    setEditingId(g.id);
-                                    setEditName(g.name);
-                                    setEditCurator(g.curator_id || "");
-                                }}>Редагувати</button>
-                            </>
-                        )}
-                    </div>
-                ))}
+        <>
+            <div className={styles.menu}>
+                <Link to="/manageaccounts">Облікові записи</Link>
+                <div className={styles.line}></div>
+                <div className={styles.current}><Link to="/managegroups">Групи</Link></div>
             </div>
-        </div>
+            <div className={styles.container}>
+                <div className={styles.header}>
+                    <h2 className={styles.title}>Керування групами</h2>
+                    <form onSubmit={handleCreate} className={styles.createForm}>
+                        <input
+                            className={styles.topicInput}
+                            value={newName}
+                            onChange={e => setNewName(e.target.value)}
+                            placeholder="Назва нової групи"
+                            required
+                        />
+                        <select
+                            className={styles.selectCurator}
+                            value={selectedCurator}
+                            onChange={e => setSelectedCurator(e.target.value)}
+                        >
+                            <option value="">Без куратора</option>
+                            {curators.map(c => <option key={c.id} value={c.id}>{c.full_name}</option>)}
+                        </select>
+                        <button type="submit" className={styles.topicButton}>Створити</button>
+                    </form>
+                </div>
+
+                <div className={styles.tableWrapper}>
+                    <div className={styles.tableContainer}>
+                        <table className={styles.table}>
+                            <thead>
+                                <tr>
+                                    <th>Назва групи</th>
+                                    <th>Куратор</th>
+                                    <th>Дії</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {groups.map(g => (
+                                    <tr key={g.id}>
+                                        {editingId === g.id ? (
+                                            <>
+                                                <td>
+                                                    <input className={styles.editInput} value={editName} onChange={e => setEditName(e.target.value)} />
+                                                </td>
+                                                <td>
+                                                    <select className={styles.mark} value={editCurator} onChange={e => setEditCurator(e.target.value)}>
+                                                        <option value="">Без куратора</option>
+                                                        {curators.map(c => <option key={c.id} value={c.id}>{c.full_name}</option>)}
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <div className={styles.actionBtns}>
+                                                        <button className={styles.saveBtn} onClick={() => handleUpdate(g.id)}>OK</button>
+                                                        <button className={styles.cancelBtn} onClick={() => setEditingId(null)}>✖</button>
+                                                    </div>
+                                                </td>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <td className={styles.groupName}>{g.name}</td>
+                                                <td className={styles.curatorName}>{g.curator_name}</td>
+                                                <td>
+                                                    <button className={styles.editBtn} onClick={() => {
+                                                        setEditingId(g.id);
+                                                        setEditName(g.name);
+                                                        setEditCurator(g.curator_id || "");
+                                                    }}>Редагувати</button>
+                                                </td>
+                                            </>
+                                        )}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </>
     );
 }

@@ -25,7 +25,7 @@
 
 .currency {
     display: flex;
-    margin-left: 50px;
+    justify-content: center;
 }
 
 .iconDuck {
@@ -47,6 +47,10 @@
 .balance {
     display: flex;
     align-items: center;
+}
+
+.balance:first-child {
+    margin-left: -8%;
 }
 
 .amount {
@@ -208,4 +212,143 @@
 .widgets {
     display: flex;
     gap: 1em;
+}
+
+.teacherLessonCard {
+    background: white;
+    width: 300px;
+    border-radius: 20px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f0f0f0;
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.statusNow {
+    color: #00cc66;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.statusNext {
+    color: #f7a75c;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.classroomBadge {
+    background: #f0f4ff;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.subjectTitle {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+    color: #1a1a1a;
+    line-height: 1.2;
+}
+
+.typeTag {
+    font-size: 12px;
+    color: #888;
+    margin-top: 4px;
+}
+
+.detailsRow {
+    display: flex;
+    gap: 20px;
+    background: #fafafa;
+    padding: 12px;
+    border-radius: 12px;
+}
+
+.detailItem {
+    display: flex;
+    flex-direction: column;
+}
+
+.label {
+    font-size: 10px;
+    text-transform: uppercase;
+    color: #aaa;
+    letter-spacing: 0.5px;
+}
+
+.value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Секція студентів всередині віджета */
+.studentsWidget {
+    border-top: 1px solid #eee;
+    padding-top: 12px;
+}
+
+.studentsHeader {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.studentsAmount {
+    color: #00cc66;
+    padding: 0 6px;
+    border-radius: 4px;
+}
+
+.miniStudentList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.miniStudentItem {
+    background: #f0f0f0;
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    color: #555;
+}
+
+.moreStudents {
+    font-size: 11px;
+    padding: 3px 8px;
+    color: #999;
+    font-weight: bold;
+}
+
+.emptyWidget {
+    background: white;
+    width: 300px;
+    height: 200px;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: #888;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+}
+
+.duckIconLarge {
+    height: 50px;
+    opacity: 0.3;
 }

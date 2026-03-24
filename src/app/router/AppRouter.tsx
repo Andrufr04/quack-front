@@ -20,11 +20,15 @@ import ManageAccountsCreatePage from "../../pages/ManageAccountsCreatePage/ui/Ma
 import ManageAccountsPage from "../../pages/ManageAccountsPage/ui/ManageAccountsPage";
 import ManageGroupsPage from "../../pages/ManageGroupsPage/ui/ManageGroupsPage";
 import TasksExaminationPage from "../../pages/TaskExaminationPage/ui/TaskPageExamination";
+import { Toaster } from "react-hot-toast";
+import { Tooltip } from 'react-tooltip'
 
 
 export default function AppRouter() {
     return (
         <BrowserRouter>
+            <Toaster toastOptions={{style: {backgroundColor: "var(--color-bg)", color: "var(--color-text)"}}}/>
+            <Tooltip id="my-tooltip" />
             <Routes>
                 <Route path={routes.signin} element={<PublicRoute><SignInPage /></PublicRoute>} />
                 <Route path="/" element={<PrivateRoute><MainLayout /></PrivateRoute>}>

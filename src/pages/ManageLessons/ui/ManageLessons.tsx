@@ -1,69 +1,159 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "./ManageLessons.module.css";
-import ActionButton from "../../../shared/ui/ActionButton/ui/ActionButton";
 import { SVG_DUCK } from "../../../shared/ui/icons/icons";
-
-type Student = {
-    id: number;
-    name: string;
-    attendance: "green" | "yellow" | "red" | null;
-    grade: number | null;
-    iconActive: boolean;
-};
-
-const initialStudents: Student[] = [
-    { id: 1, name: "Аліса Чувирло", attendance: null, grade: null, iconActive: false },
-    { id: 2, name: "Богдан Богомдан", attendance: null, grade: null, iconActive: false },
-    { id: 3, name: "Віка Зтопмодель", attendance: null, grade: null, iconActive: false },
-    { id: 4, name: "Віка Зтопмодель", attendance: null, grade: null, iconActive: false },
-    { id: 5, name: "Віка Зтопмодель", attendance: null, grade: null, iconActive: false },
-    { id: 6, name: "Віка Зтопмодель", attendance: null, grade: null, iconActive: false },
-    { id: 7, name: "Віка Зтопмодель", attendance: null, grade: null, iconActive: false },
-    { id: 8, name: "Віка Зтопмодель", attendance: null, grade: null, iconActive: false },
-    { id: 9, name: "Віка Зтопмодель", attendance: null, grade: null, iconActive: false },
-    { id: 10, name: "Віка Зтопмодель", attendance: null, grade: null, iconActive: false },
-    { id: 11, name: "Віка Зтопмодель", attendance: null, grade: null, iconActive: false },
-
-];
+import { apiRequest } from "../../../shared/api/api";
+import { isTeacher } from "../../../entities/session/lib/jwt";
+import Page403 from "../../Page403/ui/Page403";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 export default function ManageLesson() {
-    const [students, setStudents] = useState(initialStudents);
+    if (!isTeacher()) return <Page403 />
+    const navigate = useNavigate();
+
+    const [lessons, setLessons] = useState<any[]>([]);
+    const [currentTab, setCurrentTab] = useState<number | null>(null);
+    const [students, setStudents] = useState<any[]>([]);
     const [topic, setTopic] = useState("");
-    const [currentTab, setCurrentTab] = useState(0); // 0 = перша пара
+    const [loading, setLoading] = useState(true);
 
     const maxChars = 200;
 
-    const handleAttendance = (id: number, type: "green" | "yellow" | "red") => {
-        setStudents((prev) =>
-            prev.map((s) =>
-                s.id === id ? { ...s, attendance: s.attendance === type ? null : type } : s
-            )
-        );
+    // 1. Завантаження пар на сьогодні
+    useEffect(() => {
+        const fetchLessons = async () => {
+            const res = await apiRequest('/education/teacher/lessons-today/');
+            const data = await res?.json();
+            if (data) {
+                setLessons(data);
+
+                // Визначаємо поточну пару за часом
+                const now = new Date();
+                const activeIdx = data.findIndex((l: any) => {
+                    const start = new Date(l.start_time);
+                    const end = new Date(l.end_time);
+                    return now >= start && now <= end;
+                });
+                setCurrentTab(activeIdx !== -1 ? activeIdx : 0);
+            }
+            setLoading(false);
+        };
+        fetchLessons();
+    }, []);
+
+    // 2. Завантаження студентів при зміні вкладки (пари)
+    useEffect(() => {
+        if (currentTab !== null && lessons[currentTab]) {
+            const lessonId = lessons[currentTab].id;
+            apiRequest(`/education/lessons/${lessonId}/students/`)
+                .then(res => res?.json())
+                .then(data => {
+                    setStudents(data.students);
+                    setTopic(lessons[currentTab].theme || "");
+                });
+        }
+    }, [currentTab, lessons]);
+
+    const handleAttendance = async (studentId: string, status: number) => {
+        const lessonId = lessons[currentTab!].id;
+        const res = await apiRequest(`/education/attendance/`, {
+            method: 'POST',
+            body: JSON.stringify({ lesson_id: lessonId, student_id: studentId, status })
+        });
+        if (res?.ok) {
+            setStudents(prev => prev.map(s => s.id === studentId ? { ...s, attendance_status: status } : s));
+        } else {
+            const errorData = await res?.json();
+            if (errorData?.error === "badtime") {
+                toast.error("Пара ще не почалась!");
+            }
+        }
     };
 
-    const handleGrade = (id: number, grade: number) => {
-        setStudents((prev) =>
-            prev.map((s) => (s.id === id ? { ...s, grade } : s))
-        );
+    const handleGrade = async (studentId: string, grade: number) => {
+        if (currentTab === null) return;
+        const lessonId = lessons[currentTab].id;
+
+        const res = await apiRequest(`/education/grade-student/`, {
+            method: 'POST',
+            body: JSON.stringify({ lesson_id: lessonId, student_id: studentId, grade })
+        });
+
+        if (res?.ok) {
+            // Оновлюємо стан, щоб селект відразу показав нову оцінку
+            setStudents(prev => prev.map(s => s.id === studentId ? { ...s, grade } : s));
+            toast.success("Оцінку виставлено");
+        } else {
+            const errorData = await res?.json();
+            if (errorData?.error === "badtime") {
+                toast.error("Пара ще не почалась!");
+            }
+        }
     };
 
-    const toggleIcon = (id: number) => {
-        setStudents((prev) =>
-            prev.map((s) => (s.id === id ? { ...s, iconActive: !s.iconActive } : s))
-        );
+    // Функція перемикання заохочення
+    const toggleDuck = async (studentId: string) => {
+        if (currentTab === null) return;
+        const lessonId = lessons[currentTab].id;
+
+        const res = await apiRequest(`/education/lessons/${lessonId}/students/${studentId}/toggle-duck/`, {
+            method: 'POST'
+        });
+
+        if (res?.ok) {
+            const result = await res.json();
+            setStudents(prev => prev.map(s =>
+                s.id === studentId ? { ...s, duck_active: result.active } : s
+            ));
+        } else {
+            const errorData = await res?.json();
+            if (errorData?.error === "badtime") {
+                toast.error("Пара ще не почалась!");
+            }
+        }
+    };
+
+    // Функція збереження теми (onBlur)
+    const saveTheme = async () => {
+        if (currentTab === null) return;
+        const lessonId = lessons[currentTab].id;
+
+        await apiRequest(`/education/lessons/${lessonId}/update-theme/`, {
+            method: 'POST',
+            body: JSON.stringify({ theme: topic })
+        });
+
+        // Оновлюємо локальний стан списку пар, щоб при перемиканні вкладок тема була актуальна
+        setLessons(prev => prev.map((l, idx) => idx === currentTab ? { ...l, theme: topic } : l));
+    };
+
+    const handleGoToTasks = () => {
+        if (currentTab === null || !lessons[currentTab]) return;
+
+        const lesson = lessons[currentTab];
+
+        navigate("/managetasks", {
+            state: {
+                groupId: lesson.study_group,  
+                subjectId: lesson.subject,    
+                theme: topic || lesson.theme, 
+            }
+        });
     };
 
     return (
         <div className={styles.container}>
             {/* Вкладка */}
             <div className={styles.tabs}>
-                {["12:00-13:20 - КН-П-67", "13:30-14:50 - КН-П-44", "13:30-14:50 - КН-П-44", "13:30-14:50 - КН-П-44", "13:30-14:50 - КН-П-44", "13:30-14:50 - КН-П-44", "13:30-14:50 - КН-П-44", "13:30-14:50 - КН-П-44", "13:30-14:50 - КН-П-44", "13:30-14:50 - КН-П-44", "13:30-14:50 - КН-П-44", "13:30-14:50 - КН-П-44", "13:30-14:50 - КН-П-44"].map((tab, idx) => (
+                {lessons.map((l, idx) => (
                     <div
-                        key={idx}
+                        key={l.id}
                         className={`${styles.tab} ${currentTab === idx ? styles.tabActive : ""}`}
                         onClick={() => setCurrentTab(idx)}
                     >
-                        {tab}
+                        {new Date(l.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        -
+                        {new Date(l.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {l.study_group_name}
                     </div>
                 ))}
             </div>
@@ -77,14 +167,15 @@ export default function ManageLesson() {
                         placeholder="Введіть тему заняття"
                         value={topic}
                         onChange={(e) => setTopic(e.target.value)}
-                        maxLength={maxChars} // необов'язково, але можна обмежити
+                        onBlur={saveTheme}
+                        maxLength={maxChars}
                     />
                     <span className={`${styles.charCounter} ${topic.length > maxChars ? styles.exceed : ""}`}>
                         {topic.length}/{maxChars}
                     </span>
                 </div>
 
-                <button className={styles.topicButton}>Завантажити завдання</button>
+                <button className={styles.topicButton} onClick={handleGoToTasks}>Завантажити завдання</button>
             </div>
 
             {/* Таблиця */}
@@ -101,44 +192,28 @@ export default function ManageLesson() {
                             </tr>
                         </thead>
                         <tbody>
-                            {students.map((student, idx) => (
-                                <tr key={student.id}>
+                            {students.map((s, idx) => (
+                                <tr key={s.id}>
                                     <td>{idx + 1}</td>
-                                    <td>{student.name}</td>
+                                    <td>{s.full_name}</td>
                                     <td>
                                         <div className={styles.attendanceRow}>
-                                            <div
-                                                className={`${styles.attBox} ${styles.green} ${student.attendance === "green" ? styles.active : ""
-                                                    }`}
-                                                onClick={() => handleAttendance(student.id, "green")}
-                                            ></div>
-                                            <div
-                                                className={`${styles.attBox} ${styles.yellow} ${student.attendance === "yellow" ? styles.active : ""
-                                                    }`}
-                                                onClick={() => handleAttendance(student.id, "yellow")}
-                                            ></div>
-                                            <div
-                                                className={`${styles.attBox} ${styles.red} ${student.attendance === "red" ? styles.active : ""
-                                                    }`}
-                                                onClick={() => handleAttendance(student.id, "red")}
-                                            ></div>
+                                            <div className={`${styles.attBox} ${styles.green} ${s.attendance_status === 1 ? styles.active : ""}`} onClick={() => handleAttendance(s.id, 1)}></div>
+                                            <div className={`${styles.attBox} ${styles.yellow} ${s.attendance_status === 2 ? styles.active : ""}`} onClick={() => handleAttendance(s.id, 2)}></div>
+                                            <div className={`${styles.attBox} ${styles.red} ${s.attendance_status === 0 ? styles.active : ""}`} onClick={() => handleAttendance(s.id, 0)}></div>
                                         </div>
                                     </td>
                                     <td>
-                                        <select className={styles.mark}
-                                            value={student.grade ?? ""}
-                                            onChange={(e) => handleGrade(student.id, Number(e.target.value))}
+                                        <select
+                                            className={styles.mark}
+                                            value={s.grade || ""}
+                                            onChange={(e) => handleGrade(s.id, Number(e.target.value))}
                                         >
-                                            <option value="" disabled>-</option>
-                                            {[...Array(12)].map((_, i) => (
-                                                <option key={i + 1} value={i + 1}>{i + 1}</option>
-                                            ))}
+                                            <option value="">-</option>
+                                            {[...Array(12)].map((_, i) => <option key={i + 1} value={i + 1}>{i + 1}</option>)}
                                         </select>
                                     </td>
-                                    <td
-                                        className={student.iconActive ? styles.iconActive : styles.icon}
-                                        onClick={() => toggleIcon(student.id)}
-                                    >
+                                    <td className={s.duck_active ? styles.iconActive : styles.icon} onClick={() => toggleDuck(s.id)}>
                                         {SVG_DUCK}
                                     </td>
                                 </tr>

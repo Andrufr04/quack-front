@@ -1,11 +1,35 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import styles from "./RoleSwitch.module.css";
 import { SVG_ARROW_DOWN } from "../../../shared/ui/icons/icons";
 import { switchRole } from "../../../features/auth/api/roleSwitch";
+import { useLocation } from "react-router-dom";
 
 export default function RoleSwitch() {
     const [open, setOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null); // Реф для всього контейнера
+    const location = useLocation(); // Хук для поточної локації
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setOpen(false);
+            }
+        };
+
+        if (open) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+        
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [open]);
+
+    // 2. Закриваємо при зміні сторінки (якщо користувач перейшов кудись)
+    useEffect(() => {
+        setOpen(false);
+    }, [location]);
 
     const token = localStorage.getItem('access_token');
     const activeRole = localStorage.getItem('active_role') || "";

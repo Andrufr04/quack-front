@@ -69,7 +69,7 @@ export default function Sidebar() {
                     : <></>
                 }</div>
                 <div className={style.iconsSettings} onClick={(e) => e.stopPropagation()}>
-                    <ModeSwitch />
+                    {/* <ModeSwitch /> */}
                     <NavigationButton navigationButton={settingsButtons[0]} visible={expanded} />
                     <NavigationButton navigationButton={settingsButtons[1]} visible={expanded} onAction={onSignOut} />
                 </div>

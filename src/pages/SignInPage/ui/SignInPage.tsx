@@ -7,6 +7,7 @@ import { login } from "../../../features/auth/api/login";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import ModeSwitch from "../../../widgets/ModeSwitch/ui/ModeSwitch";
+import toast from "react-hot-toast";
 
 export default function SignInPage() {
     const [email, setEmail] = useState("");
@@ -20,9 +21,15 @@ export default function SignInPage() {
         setLoading(true);
         try {
             await login(email, password);
+            toast.success("Ви увійшли в акаунт!")
             navigate("/");
         } catch (err) {
             console.error(err);
+            if (email.trim() === "" || password.trim() === "") {
+                toast.error("Порожнє поле вводу!")
+            } else {
+                toast.error("В доступі відмовлено!")
+            }
             setLoading(false);
         }
     };

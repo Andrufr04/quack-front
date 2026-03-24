@@ -1,3 +1,13 @@
+.tableWrapper {
+    width: 100%;
+    max-height: 76vh; /* Або будь-яка висота, яка тобі підходить */
+    overflow-y: auto;  /* Вертикальний скрол */
+    overflow-x: auto;  /* Горизонтальний скрол, якщо колонок забагато */
+    border: 1px solid #eee; /* Щоб візуально відокремити межі */
+    border-radius: 8px;
+    background-color: white;
+}
+
 .container {
     padding: 20px;
 }
@@ -24,6 +34,8 @@
     height: 1.5em;
     background-color: var(--color-text-dark-grey);
 }
+
+
 
 .filters {
     display: flex;
@@ -55,7 +67,8 @@
     font-size: 14px;
 }
 
-.miniInput, .miniSelect {
+.miniInput,
+.miniSelect {
     border: 1px solid #ddd;
     padding: 4px 8px;
     border-radius: 4px;
