@@ -1,21 +1,46 @@
+import { SVG_PLUS } from "../../../shared/ui/icons/icons";
 import styles from "./SettingsPage.module.css"
 import { useState, useEffect } from "react";
 
 export default function SettingsPage() {
-    return <div className={styles.container}>
-        <div className={styles.settings}>
-            <div className={styles.tabs}>
-                <div className={styles.tab}>Тема</div>
-                <div className={styles.tab}>Інтерфейс</div>
-                <div className={styles.tab}>Профіль</div>
-            </div>
+    // 1. Создаем стейт для вкладок. По умолчанию открыта 'theme'
+    const [activeTab, setActiveTab] = useState('theme');
 
-            <div className={styles.line}></div>
-            <div className={styles.options}>
-                <ThemeSettings></ThemeSettings>
+    return (
+        <div className={styles.container}>
+            <div className={styles.settings}>
+                <div className={styles.tabs}>
+                    <div 
+                        className={`${styles.tab} ${activeTab === 'theme' ? styles.activeTab : ''}`}
+                        onClick={() => setActiveTab('theme')}
+                    >
+                        Тема
+                    </div>
+                    <div 
+                        className={`${styles.tab} ${activeTab === 'interface' ? styles.activeTab : ''}`}
+                        onClick={() => setActiveTab('interface')}
+                    >
+                        Інтерфейс
+                    </div>
+                    <div 
+                        className={`${styles.tab} ${activeTab === 'profile' ? styles.activeTab : ''}`}
+                        onClick={() => setActiveTab('profile')}
+                    >
+                        Профіль
+                    </div>
+                </div>
+
+                <div className={styles.line}></div>
+
+                <div className={styles.options}>
+                    {/* 2. Условный рендеринг: показываем компонент в зависимости от activeTab */}
+                    {activeTab === 'theme' && <ThemeSettings />}
+                    {activeTab === 'interface' && <div>Тут будут настройки интерфейса</div>}
+                    {activeTab === 'profile' && <ProfileSettings />}
+                </div>
             </div>
         </div>
-    </div>
+    );
 }
 
 function ThemeSettings() {
@@ -115,6 +140,63 @@ function ColorGrid({ selectedColor, onColorSelect }: { selectedColor: string, on
                     onClick={() => onColorSelect(color)}
                 ></div>
             ))}
+        </div>
+    );
+}
+
+function ProfileSettings() {
+    const [description, setDescription] = useState("");
+    const maxChars = 500;
+
+    return (
+        <div className={styles.profileSettings}>
+            {/* Смена Аватара */}
+            <div className={styles.settingItem}>
+                <div className={styles.title}>Фото профілю</div>
+                <div className={styles.avatarUpload}>
+                    <div className={styles.avatarPreview}>
+                        <div className={styles.uploadIcon}>{SVG_PLUS}</div>
+                    </div>
+                    <input type="file" className={styles.fileInput} accept="image/*" />
+                </div>
+            </div>
+            {/* Смена Баннера */}
+            <div className={styles.settingItem}>
+                <div className={styles.title}>Банер профілю</div>
+                <div className={styles.bannerUpload}>
+                    <div className={styles.bannerPreview}>
+                        <div className={styles.uploadIcon}>{SVG_PLUS}</div>
+                    </div>
+                    <input type="file" className={styles.fileInput} accept="image/*" />
+                </div>
+            </div>
+
+            {/* Смена Описания */}
+            <div className={styles.settingItem}>
+                <div className={styles.title}>Про себе</div>
+                <div className={styles.textareaWrapper}>
+                    <textarea 
+                        className={styles.textarea} 
+                        placeholder="Розкажіть щось цікаве..."
+                        value={description}
+                        maxLength={maxChars}
+                        onChange={(e) => setDescription(e.target.value)}
+                    />
+                    {/* Счетчик символов */}
+                    <div className={styles.charCounter}>
+                        {description.length}/{maxChars}
+                    </div>
+                </div>
+            </div>
+
+            {/* Кнопка сохранить */}
+            <div className={styles.containerSave}>
+                <div className={styles.saveContainer}>
+                    <button className={styles.saveBtn}>
+                        Зберегти зміни
+                    </button>
+                </div>
+            </div>
         </div>
     );
 }

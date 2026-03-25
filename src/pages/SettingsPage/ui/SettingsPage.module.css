@@ -42,14 +42,14 @@
 .themeSettings {
     display: flex;
     flex-direction: column;
-    gap: 1em;
+    gap: 2em;
     width: 100%;
 }
 
 .themeSettingsPart {
     display: flex;
     flex-direction: column;
-    gap: 0.5em;
+    gap: 1em;
 }
 
 .radioGroup {
@@ -157,4 +157,169 @@
 
 .options {
     width: 100%;
+}
+
+.profileSettings {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 100%;
+    animation: fadeIn 0.3s ease;
+}
+
+.settingItem {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+/* --- БАННЕР --- */
+.bannerUpload {
+    position: relative;
+    width: 100%;
+    height: 120px;
+    background: var(--color-opaque-secondary);
+    border: 1px dashed var(--color-gray);
+    border-radius: var(--radius-main);
+    cursor: pointer;
+    overflow: hidden;
+    transition: border-color 0.2s;
+}
+
+.bannerUpload:hover {
+    border-color: var(--color-main);
+}
+
+.bannerPreview {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* --- АВАТАР --- */
+.avatarUpload {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--color-opaque-secondary);
+    border: 1px dashed var(--color-gray);
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.avatarUpload:hover {
+    transform: scale(1.05);
+    border-color: var(--color-main);
+}
+
+.avatarPreview {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* --- ИКОНКИ И ИНПУТЫ --- */
+.uploadIcon {
+    width: 20px;
+    opacity: 0.5;
+    color: var(--color-text);
+}
+
+.fileInput {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* --- ТЕКСТОВОЕ ПОЛЕ --- */
+.textarea {
+    width: 100%;
+    min-height: 100px;
+    background: var(--color-opaque-secondary);
+    border: 1px solid var(--color-gray);
+    border-radius: var(--radius-secondary);
+    padding: 0.8rem;
+    color: var(--color-text);
+    font-family: inherit;
+    font-size: 14px;
+    resize: none;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.textarea:focus {
+    border-color: var(--color-main);
+}
+
+/* --- КНОПКА (СПРАВА СНИЗУ) --- */
+.containerSave {
+    display: flex;
+    justify-content: flex-end; /* Выравнивание вправо */
+    margin-top: 1rem;
+}
+
+
+.tab {
+    padding: 0.5em 1em;
+    cursor: pointer;
+    opacity: 0.6; /* Неактивные вкладки чуть тусклее */
+    margin-bottom: 0.5em;
+}
+
+.tab:hover {
+    background-color: var(--color-opaque-secondary);
+    border-radius: var(--radius-secondary);
+    opacity: 1;
+}
+
+/* СТИЛЬ ДЛЯ ВЫБРАННОЙ ВКЛАДКИ */
+.activeTab {
+    opacity: 1;
+    background-color: var(--color-opaque-secondary);
+    border-radius: var(--radius-secondary);
+    color: var(--color-main); /* Можно выделить основным цветом текст */
+    font-weight: 600;
+}
+
+.textareaWrapper {
+    position: relative;
+    width: 100%;
+}
+
+.textarea {
+    width: 100%;
+    min-height: 200px;
+    background: var(--color-opaque-secondary);
+    border: 1px solid var(--color-gray);
+    border-radius: var(--radius-secondary);
+    padding: 0.8rem;
+    padding-bottom: 2rem; /* Оставляем место снизу, чтобы текст не перекрывал счетчик */
+    color: var(--color-text);
+    font-family: inherit;
+    font-size: 14px;
+    resize: none;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.charCounter {
+    position: absolute;
+    bottom: 10px;
+    right: 12px;
+    font-size: 11px;
+    color: var(--color-text);
+    opacity: 0.5;
+    pointer-events: none; /* Чтобы счетчик не мешал кликать по textarea */
+}
+
+/* Когда лимит достигнут, можно подсветить счетчик (опционально) */
+.textarea:focus + .charCounter {
+    opacity: 0.8;
 }

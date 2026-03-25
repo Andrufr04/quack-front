@@ -63,19 +63,10 @@ function App() {
   useEffect(() => {
     // 1. Пытаемся достать сохраненный цвет
     const savedColor = localStorage.getItem('color');
-    // 2. Пытаемся достать сохраненную тему
-    const savedTheme = localStorage.getItem('theme');
 
     // Если цвет есть — применяем его сразу к переменной
     if (savedColor) {
       document.documentElement.style.setProperty('--color-main', savedColor);
-    }
-
-    // Если тема есть — вешаем её как атрибут на body (или html)
-    if (savedTheme) {
-      document.body.setAttribute('data-theme', savedTheme);
-      // Или если ты используешь классы:
-      // document.body.className = savedTheme === 'dark' ? 'dark-theme' : 'light-theme';
     }
   }, []); // Пустой массив значит "выполни один раз при загрузке сайта"
 
