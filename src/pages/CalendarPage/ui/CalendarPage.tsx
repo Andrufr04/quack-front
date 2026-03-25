@@ -8,14 +8,15 @@ import { apiRequest } from "../../../shared/api/api";
 
 const START_DAY = 8 * 60;
 const END_DAY = 20 * 60;
-const TOTAL_MINUTES = END_DAY - START_DAY;
 
 export type Lesson = {
     id: string;
     title: string;
+    type: string;  // Додали тип (Лекція, Практика, Заняття)
     start: string;
     end: string;
-    day: number;
+    day: number;   // Залишаємо, може знадобитися для іншої логіки
+    date: string;  // 🔥 ДОДАЛИ ДАТУ (формат "YYYY-MM-DD")
 };
 
 const timeToMinutes = (time: string) => {
@@ -23,8 +24,8 @@ const timeToMinutes = (time: string) => {
     return h * 60 + m;
 };
 
-const getLocalDateString = () => {
-    const d = new Date();
+const getLocalDateString = (dateObj: Date = new Date()) => {
+    const d = new Date(dateObj);
     d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
     return d.toISOString().split('T')[0];
 };
@@ -81,7 +82,7 @@ export const CalendarPage = () => {
             return {
                 name,
                 date: d.getDate(),
-                fullDate: d.toISOString().split('T')[0]
+                fullDate: getLocalDateString(d) 
             };
         });
         setWeekDays(week);
@@ -170,35 +171,42 @@ export const CalendarPage = () => {
 
                     {/* ТУТ РОЗМІЩУЮТЬСЯ КАРТКИ */}
                     <div className={styles.eventsGrid}>
-                        {[0, 1, 2, 3, 4, 5, 6].map((dayIdx) => (
-                            <div key={dayIdx} className={styles.dayColumn}>
-                                {lessons
-                                    .filter(l => l.day === dayIdx)
-                                    .map((lesson) => {
-                                        const start = timeToMinutes(lesson.start);
-                                        const end = timeToMinutes(lesson.end);
-                                        const top = (start - START_DAY) * pxPerMinute;
-                                        const height = (end - start) * pxPerMinute;
+                        {[0, 1, 2, 3, 4, 5, 6].map((dayIdx) => {
+                            // Дістаємо точну дату цієї колонки
+                            const columnDate = weekDays[dayIdx]?.fullDate;
 
-                                        const todayStr = getLocalDateString();
-                                        const columnDate = weekDays[dayIdx]?.fullDate;
+                            return (
+                                <div key={dayIdx} className={styles.dayColumn}>
+                                    {lessons
+                                        // 🔥 Броня: тепер пара стане тільки в свою точну дату
+                                        .filter(l => l.date === columnDate)
+                                        .map((lesson) => {
+                                            const startMin = timeToMinutes(lesson.start);
+                                            const endMin = timeToMinutes(lesson.end);
+                                            const top = (startMin - START_DAY) * pxPerMinute;
+                                            const height = (endMin - startMin) * pxPerMinute;
 
-                                        const isActive =
-                                            columnDate === todayStr && // Чи це сьогодні?
-                                            nowMinutes !== null &&     // Чи зараз робочий час?
-                                            nowMinutes >= start &&  // Чи пара вже почалась?
-                                            nowMinutes < end;       // Чи пара ще не закінчилась?
+                                            const todayStr = getLocalDateString();
+                                            const isActive =
+                                                columnDate === todayStr && 
+                                                nowMinutes !== null &&     
+                                                nowMinutes >= startMin &&  
+                                                nowMinutes < endMin;       
 
-                                        return (
-                                            <div key={lesson.id} className={`${styles.lesson} ${isActive ? styles.activeLesson : ""}`}
-                                                style={{ top, height }}>
-                                                <div className={styles.title}>{lesson.title}</div>
-                                                <div>{lesson.start} - {lesson.end}</div>
-                                            </div>
-                                        );
-                                    })}
-                            </div>
-                        ))}
+                                            return (
+                                                <div 
+                                                    key={lesson.id} 
+                                                    className={`${styles.lesson} ${isActive ? styles.activeLesson : ""}`}
+                                                    style={{ top, height }}
+                                                >
+                                                    <div className={styles.title}>{lesson.title}</div>
+                                                    <div>{lesson.start} - {lesson.end}</div>
+                                                </div>
+                                            );
+                                        })}
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             </div>

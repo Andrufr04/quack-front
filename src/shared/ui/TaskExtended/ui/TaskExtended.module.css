@@ -127,6 +127,6 @@
     max-height: calc(5 * 1.5em); 
     line-height: 1.5em;
     overflow-y: auto;
-    white-space: pre;
+    white-space: pre-wrap;
     flex: 1;
 }

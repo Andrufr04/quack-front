@@ -16,7 +16,6 @@ import ManageLesson from "../../pages/ManageLessons/ui/ManageLessons";
 import { CalendarPage } from "../../pages/CalendarPage/ui/CalendarPage";
 import ManageSchedule from "../../pages/ManageSchedule/ui/ManageSchedule";
 import ManageScheduleDelete from "../../pages/ManageScheduleDeletePage/ui/ManageScheduleDeletePage";
-import ManageAccountsCreatePage from "../../pages/ManageAccountsCreatePage/ui/ManageAccountsCreatePage";
 import ManageAccountsPage from "../../pages/ManageAccountsPage/ui/ManageAccountsPage";
 import ManageGroupsPage from "../../pages/ManageGroupsPage/ui/ManageGroupsPage";
 import TasksExaminationPage from "../../pages/TaskExaminationPage/ui/TaskPageExamination";
@@ -43,7 +42,6 @@ export default function AppRouter() {
                     <Route path="/managelesson" element={<ManageLesson />} />
                     <Route path="/manageschedule" element={<ManageSchedule />} />
                     <Route path="/managescheduledelete" element={<ManageScheduleDelete />} />
-                    <Route path="/manageaccountscreate" element={<ManageAccountsCreatePage />} />
                     <Route path="/manageaccounts" element={<ManageAccountsPage />} />
                     <Route path="/managegroups" element={<ManageGroupsPage />} />
                     <Route path="/calendar" element={<CalendarPage />} />
