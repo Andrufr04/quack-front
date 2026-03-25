@@ -1,9 +1,13 @@
+.profile {
+    display: flex;
+    gap: 2%;
+}
+
 .info {
     width: 30%;
     background: var(--color-opaque-secondary);
     backdrop-filter: var(--blur-main);
-    box-shadow: var(--shadow-main);
-    height: 100%;
+    height: 95.7vh;
     border-top-left-radius: var(--radius-main);
     border-top-right-radius: var(--radius-main);
     padding: 1em;
@@ -18,6 +22,7 @@
     border-radius: 50%;
     background-color: rgb(99, 99, 99);
     background-image: url("/images/no-image.png");
+    box-shadow: var(--shadow-main);
     
 }
 
@@ -40,12 +45,383 @@
     line-height: 1.5;
 }
 
-.showMore {
-    background: none;
-    border: none;
-    padding: 0;
-    font-size: 12px;
-    cursor: pointer;
-    color: var(--color-accent);
+.descriptionWrapper {
+    width: 100%;
 }
 
+.text {
+    /* Базовая высота строки. Обязательно задаем явно! */
+    line-height: 1.5em; 
+}
+
+/* --- СОСТОЯНИЕ: СВЕРНУТО --- */
+.collapsed {
+    overflow: hidden;
+    /* 1.5em (высота строки) * 2 строки = 3em */
+    max-height: 3em; 
+}
+
+/* Этот псевдоэлемент "толкает" кнопку вниз до нужной строки */
+.collapsed::before {
+    content: '';
+    float: right;
+    /* ИСПРАВЛЕНИЕ: жестко задаем высоту двух строк */
+    height: 3em; 
+    margin-bottom: -1.5em;
+}
+
+/* Сама кнопка, которая "плавает" справа */
+.showMore {
+    float: right;
+    clear: right;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+.showMore:hover {
+    color: var(--color-main);
+}
+
+/* --- СОСТОЯНИЕ: РАЗВЕРНУТО --- */
+.expanded {
+    max-height: none;
+}
+
+.text {
+    line-height: 1.5em; 
+    /* Заставляет браузер обрезать текст на любом символе */
+    word-break: break-all; 
+}
+
+.posts {
+    width: 68%;
+    height: 90vh;
+    overflow-y: auto;
+}
+
+.post {
+    background-color: var(--color-bg);
+    min-height: 100px;
+    backdrop-filter: var(--blur-main);
+    border-radius: var(--radius-main);
+    background: var(--color-opaque-secondary);
+    padding: 1em;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+    box-shadow: var(--shadow-main);
+}
+
+.postHeader {
+    display: flex;
+    gap: 0.5em;
+    align-items: center;
+}
+
+.postProfileImg {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgb(99, 99, 99);
+    background-image: url("/images/no-image.png");
+    box-shadow: var(--shadow-main);
+}
+
+.postName {
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.title {
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.postWrapper {
+    width: 100%;
+}
+
+.postCollapsed {
+    overflow: hidden;
+    /* 1.5em (высота строки) * 2 строки = 3em */
+    max-height: 15em; 
+}
+
+/* Этот псевдоэлемент "толкает" кнопку вниз до нужной строки */
+.postCollapsed::before {
+    content: '';
+    float: right;
+    /* ИСПРАВЛЕНИЕ: жестко задаем высоту двух строк */
+    height: 15em; 
+    margin-bottom: -1.5em;
+}
+
+.postExpanded {
+    max-height: none;
+}
+
+.postImgs {
+    display: grid;
+    gap: 4px; /* Расстояние между фотками (черные полосы на твоем скрине) */
+    width: 100%;
+    aspect-ratio: 16 / 5; /* Задаем пропорцию всей галереи, чтобы она не была слишком вытянутой */
+    border-radius: 8px; /* Скруглим углы всей галерее, если нужно */
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+/* Наш серый див-заглушка */
+.imgPlaceholder {
+    background-color: #888888;
+    width: 100%;
+    height: 100%;
+}
+
+/* --- ПАТТЕРНЫ СЕТОК --- */
+
+/* 1 фото: одна колонка */
+.layout1 {
+    grid-template-columns: 1fr;
+}
+
+/* 2 фото: две одинаковые колонки */
+.layout2 {
+    grid-template-columns: 1fr 1fr;
+}
+
+/* 3 фото: левое большое, два правых поменьше */
+.layout3 {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+}
+.layout3 .imgPlaceholder:first-child {
+    grid-row: span 2; /* Первая фотка растягивается на 2 строки вниз */
+}
+
+/* 4 фото: классический квадрат 2x2 */
+.layout4 {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+}
+
+/* 5 фото (и более): твой оранжевый блок */
+.layout5 {
+    /* Левая колонка шире (2fr), две правые поменьше (по 1fr) */
+    grid-template-columns: 2fr 1fr 1fr; 
+    grid-template-rows: 1fr 1fr;
+}
+.layout5 .imgPlaceholder:first-child {
+    grid-row: span 2; /* Первая фотка слева на всю высоту */
+}
+
+.block {
+    height: 7em;
+}
+
+.newPostGradient {
+    position: absolute;
+    z-index: 2;
+    right: 6%;
+    bottom: 2%;
+    height: 10em;
+    width: 60%;
+    background: linear-gradient(
+    0deg, 
+    color-mix(in srgb, var(--color-bg) 80%, transparent) 42.91%, 
+    color-mix(in srgb, var(--color-bg) 47.8%, transparent) 53.75%, 
+    color-mix(in srgb, var(--color-bg) 0%, transparent) 68.53%
+);
+    pointer-events: none;
+}
+
+.newPostContainer {
+    min-height: 40px;
+    width: 60%;
+    position: absolute;
+    z-index: 3;
+    right: 6%;
+    bottom: 2%;
+    border: 1px solid var(--color-gray);
+    background-color: var(--color-bg);
+    border-radius: 0.5em;
+    display: flex;
+    flex-direction: column;
+    padding: 0.5em 1em;
+    gap: 1em;
+    box-shadow: var(--shadow-main);
+    justify-content: center;
+}
+
+.attachedImg {
+    background-color: aqua;
+    width: 100px;
+    height: 100px;
+    position: relative;
+    border-radius: 0.5em;
+}
+
+.deleteImg {
+    transform: rotate(45deg);
+    right: 4px;
+    top: 2px;
+    width: 20px;
+    position: absolute;
+    color: var(--color-bg);
+    display: none;
+    cursor: pointer;
+}
+
+.attachedImg:hover .deleteImg {
+    display: block;
+}
+
+.inputContainer {
+    
+    display: flex;
+    gap: 1em;
+}
+
+.input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #ffffff;
+    font-size: 14px;
+    font-family: inherit;
+    padding: 4px 0;
+    width: 100%;
+}
+
+/* Цвет плейсхолдера */
+.input::placeholder {
+    color: #888888;
+}
+
+.inputIcon {
+    width: 18px;
+    cursor: pointer;
+}
+
+.postFooter {
+    display: flex;
+    justify-content: end;
+    height: 30px;
+    color: var(--color-grey);
+    gap: 0.5em;
+}
+
+.postActions {
+    background: var(--color-opaque-secondary);
+    backdrop-filter: var(--blur-main);
+    width: 200px;
+    height: 30px;
+    box-shadow: var(--shadow-main);
+    border-radius: 50px;
+    display: flex;
+    justify-content: space-between;
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-top: 4px;
+}
+
+.postActionIcons {
+    display: flex;
+    gap: 0.8em;
+}
+
+.postActionIcon {
+    width: 16px;
+    cursor: pointer;
+}
+
+.postActionIcon:hover {
+    color: var(--color-main);
+}
+
+.postContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+}
+
+.reasctions {
+    display: flex;
+    gap: 0.5em;
+    align-items: center;
+    font-size: 12px;
+}
+
+/* --- Всплывающее окно реакций --- */
+.reactionPopup {
+    position: absolute;
+    /* Поднимаем окно ровно над иконкой (плюс небольшой отступ в 10px) */
+    bottom: calc(100% + 10px);
+    /* 1. СДВИГАЕМ ОКНО ВЛЕВО (подбери значение, если нужно больше/меньше) */
+    left: -70px;
+    background-color: var(--color-bg);
+    border-radius: 30px; /* Сильное закругление, как пилюля */
+    padding: 10px 14px;
+    display: flex;
+    gap: 12px;
+    box-shadow: var(--shadow-main);
+    z-index: 10;
+    
+    
+    /* Анимация плавного появления */
+    animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* Треугольный "хвостик", указывающий на иконку */
+.reactionPopup::after {
+    content: '';
+    position: absolute;
+    bottom: -8px; /* Выступает вниз */
+    left: 12px; /* Сдвигаем левее, чтобы указывал ровно на иконку смайлика */
+    
+    /* Рисуем треугольник с помощью рамок */
+    border-width: 8px 8px 0;
+    border-style: solid;
+    border-color: var(--color-bg) transparent transparent transparent;
+    /* 2. ВОЗВРАЩАЕМ ХВОСТИК НА МЕСТО */
+    /* Было 12px. Мы сдвинули окно на -40px. Значит тут делаем 12 + 40 = 52px */
+    left: 80px;
+}
+
+/* Серые кружки (заглушки для эмодзи) */
+.reactionCircle {
+    width: 20px;
+    height: 20px;
+    background-color: #d9d9d9;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+/* Эффект увеличения при наведении на эмодзи */
+.reactionCircle:hover {
+    transform: scale(1.15);
+}
+
+.reactionsContainer {
+    height: 30px;
+    display: flex;
+    gap: 0.3em;
+}
+
+.reaction {
+    background: var(--color-opaque-secondary);
+    backdrop-filter: var(--blur-main);
+    height: 30px;
+    min-width: 60px;
+    display: flex;
+    gap: 0.5em;
+    align-items: center;
+    padding-left: 1em;
+    padding-right: 1em;
+    border-radius: 100px;
+    padding-top: 3px;
+}
+
+.emoji {
+    width: 14px;
+}
