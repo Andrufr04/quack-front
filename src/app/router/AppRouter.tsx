@@ -21,6 +21,7 @@ import ManageGroupsPage from "../../pages/ManageGroupsPage/ui/ManageGroupsPage";
 import TasksExaminationPage from "../../pages/TaskExaminationPage/ui/TaskPageExamination";
 import { Toaster } from "react-hot-toast";
 import { Tooltip } from 'react-tooltip'
+import SettingsPage from "../../pages/SettingsPage/ui/SettingsPage";
 
 
 export default function AppRouter() {
@@ -45,6 +46,7 @@ export default function AppRouter() {
                     <Route path="/manageaccounts" element={<ManageAccountsPage />} />
                     <Route path="/managegroups" element={<ManageGroupsPage />} />
                     <Route path="/calendar" element={<CalendarPage />} />
+                    <Route path="/settings" element={<SettingsPage />} />
                 <Route
                     path="*"
                     element={<Page404/>}

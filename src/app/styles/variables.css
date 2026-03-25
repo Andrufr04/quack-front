@@ -2,7 +2,7 @@
     --color-main: #ec8735;
     --color-text: #000000;
     --color-bg: #ffffff;
-    --color-hover-icon-bg: #ec8735;
+    --color-hover-icon-bg: var(--color-main);
     --color-hover-icon: #ffffff;
     --color-icon-text: #b6b6b6;
     --color-hover-icon-text: #ffffff;
@@ -38,11 +38,12 @@
     --color-bg: #1e1e1e;
     --color-gray: #454545;
 
-    --color-hover-icon-bg: rgba(236, 135, 53, 0.3);
-    --color-hover-icon: #ec8735;
+    --color-hover-icon-bg: color-mix(in srgb, var(--color-main) 30%, transparent);
+;
+    --color-hover-icon: var(--color-main);
     --color-icon-text: #ffffff;
     --color-hover-icon-text: #ffffff;
-    --color-menu-icon: #ec8735;
+    --color-menu-icon: var(--color-main);
     --color-opaque-secondary: rgba(0, 0, 0, 0.5);
     --color-text-secondary: #565656;
     --color-ui-secondary: #454545;

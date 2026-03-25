@@ -1,0 +1,160 @@
+.container {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text);
+}
+
+.settings {
+    width: 70%;
+    height: 92vh;
+    background-color: var(--color-opaque-secondary);
+    box-shadow: var(--shadow-main);
+    border-radius: var(--radius-main);
+    backdrop-filter: var(--blur-form);
+    display: flex;
+    padding: 2em;
+    gap: 2em;
+}
+
+.tabs {
+    width: 28%;
+    display: flex;
+    flex-direction: column;
+}
+
+.tab {
+    padding: 0.5em 1em;
+}
+
+.tab:hover {
+    background-color: var(--color-opaque-secondary);
+    border-radius: var(--radius-secondary);
+}
+
+.line {
+    width: 100%;
+    width: 1px;
+    background-color: var(--color-opaque-secondary);
+}
+
+.themeSettings {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    width: 100%;
+}
+
+.themeSettingsPart {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+}
+
+.radioGroup {
+    display: flex;
+    gap: 20px; /* Расстояние между двумя кнопками */
+    align-items: center; /* Выравнивание по центру по вертикали */
+}
+
+.radioLabel {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Расстояние между самим кружочком и текстом */
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.radioInput {
+    cursor: pointer;
+    margin: 0; /* Убираем стандартные отступы браузера */
+    accent-color: var(--color-main);
+}
+
+.title {
+    font-weight: bold;
+}
+
+/* Контейнер: сетка 5 колонок */
+.colorGrid {
+    display: grid;
+    grid-template-columns: repeat(5, 22px); /* 5 кружочков по 36px */
+    gap: 10px; /* Отступы между кружочками */
+    margin-top: 0.5em;
+}
+
+/* Сам кружок с цветом */
+.colorCircle {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.2s ease, outline 0.2s ease;
+    border: 2px solid transparent; /* Подготовка для рамки */
+}
+
+/* Эффект при наведении мышкой (немного увеличивается) */
+.colorCircle:hover {
+    transform: scale(1.1);
+}
+
+/* КЛАСС ДЛЯ ВЫБРАННОГО ЦВЕТА */
+.selectedColor {
+    transform: scale(1.15); /* Увеличиваем сильнее */
+    border: 2px solid var(--color-bg); /* Делаем отступ цветом фона (чтобы была щель) */
+    outline: 2px solid var(--color-main); /* Внешнее кольцо обводки */
+}
+
+/* --- КНОПКА СОХРАНЕНИЯ --- */
+.saveContainer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.saveBtn {
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    transition: all 0.2s ease;
+    /* Убедись, что шрифты наследуются правильно */
+    font-family: inherit; 
+}
+
+/* Состояние: Есть изменения (Кнопка активна) */
+.saveBtn:not(:disabled) {
+    background-color: var(--color-main);
+    color: #ffffff; /* Белый текст на яркой кнопке */
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.saveBtn:not(:disabled):hover {
+    opacity: 0.9;
+}
+
+/* Состояние: Нет изменений (Кнопка неактивна) */
+.saveBtn:disabled {
+    background-color: var(--color-opaque-secondary);
+    color: var(--color-text);
+    opacity: 0.6;
+    cursor: default;
+}
+
+.themeSettingsContainer {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.containerSave {
+    width: 100%;
+    
+}
+
+.options {
+    width: 100%;
+}

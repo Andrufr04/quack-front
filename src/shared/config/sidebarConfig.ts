@@ -29,6 +29,6 @@ export const navigationButtonsAdministration: NavigationButtonProps[] = [
 ]
 
 export const settingsButtons: NavigationButtonProps[] = [
-    {icon : SVG_SETTINGS, text : "Налаштування", slug : "/setting"},
+    {icon : SVG_SETTINGS, text : "Налаштування", slug : "/settings"},
     {icon : SVG_LOGOUT, text : "Вихід", slug : "/"},
 ]
