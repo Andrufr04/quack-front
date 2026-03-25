@@ -105,6 +105,7 @@ export default function ManageLesson() {
             setStudents(prev => prev.map(s =>
                 s.id === studentId ? { ...s, duck_active: result.active } : s
             ));
+            toast.success("Качку видано");
         } else {
             const errorData = await res?.json();
             if (errorData?.error === "badtime") {
@@ -115,16 +116,29 @@ export default function ManageLesson() {
 
     // Функція збереження теми (onBlur)
     const saveTheme = async () => {
-        if (currentTab === null) return;
-        const lessonId = lessons[currentTab].id;
+        if (currentTab === null || !lessons[currentTab]) return;
 
-        await apiRequest(`/education/lessons/${lessonId}/update-theme/`, {
+        const currentLesson = lessons[currentTab];
+        const originalTheme = currentLesson.theme || "";
+
+        // 🔥 ПЕРЕВІРКА: якщо текст не змінився (видаляємо зайві пробіли по краях для надійності)
+        if (topic.trim() === originalTheme.trim()) {
+            return; // Просто виходимо з функції, нічого не відправляємо
+        }
+
+        const lessonId = currentLesson.id;
+
+        const res = await apiRequest(`/education/lessons/${lessonId}/update-theme/`, {
             method: 'POST',
-            body: JSON.stringify({ theme: topic })
+            body: JSON.stringify({ theme: topic.trim() }) // Зберігаємо без зайвих пробілів
         });
 
-        // Оновлюємо локальний стан списку пар, щоб при перемиканні вкладок тема була актуальна
-        setLessons(prev => prev.map((l, idx) => idx === currentTab ? { ...l, theme: topic } : l));
+        if (res?.ok) {
+            setLessons(prev => prev.map((l, idx) => idx === currentTab ? { ...l, theme: topic.trim() } : l));
+            toast.success("Тему збережено");
+        } else {
+            toast.error("Помилка при збережені теми!");
+        }
     };
 
     const handleGoToTasks = () => {
@@ -134,12 +148,32 @@ export default function ManageLesson() {
 
         navigate("/managetasks", {
             state: {
-                groupId: lesson.study_group,  
-                subjectId: lesson.subject,    
-                theme: topic || lesson.theme, 
+                groupId: lesson.study_group,
+                subjectId: lesson.subject,
+                theme: topic || lesson.theme,
             }
         });
     };
+
+    if (loading) {
+        return (
+            <div className={styles.emptyContainer}>
+                <div className={styles.loading}>
+                    <img className={styles.img} src="/gifs/loading.svg" alt="loading" style={{ width: 60, height: 60 }} />
+                </div>
+            </div>
+        );
+    }
+
+    if (lessons.length === 0) {
+        return (
+            <div className={styles.emptyContainer}>
+                <div className={styles.emptyMessage}>
+                    🎉 На сьогодні пар немає! Можна відпочивати.
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className={styles.container}>

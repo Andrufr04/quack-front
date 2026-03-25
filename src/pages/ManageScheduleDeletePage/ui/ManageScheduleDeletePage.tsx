@@ -75,49 +75,63 @@ export default function ManageScheduleDelete() {
                     <button onClick={fetchLessons} className={styles.searchBtn}>Пошук</button>
                 </div>
                 <div className={styles.tableWrapper}>
-                <table className={styles.table}>
-                    <thead>
-                        <tr>
-                            <th>Час</th>
-                            <th>Група</th>
-                            <th>Предмет</th>
-                            <th>Викладач</th>
-                            <th>Аудиторія</th>
-                            <th>Дії</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {lessons.map(l => (
-                            <tr key={l.id}>
-                                <td>{new Date(l.start).toLocaleString([], { weekday: 'short', hour: '2-digit', minute: '2-digit' })}</td>
-                                <td>{l.group_name}</td>
-                                <td>{l.subject_name}</td>
-                                <td>
-                                    <select
-                                        className={styles.miniSelect}
-                                        defaultValue={l.teacher_id}
-                                        onChange={(e) => apiRequest(`/education/lessons/detail/${l.id}/`, {
-                                            method: 'PATCH',
-                                            body: JSON.stringify({ teacher: e.target.value })
-                                        })}
-                                    >
-                                        {teachers.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
-                                    </select>
-                                </td>
-                                <td>
-                                    <input
-                                        className={styles.miniInput}
-                                        defaultValue={l.classroom}
-                                        onBlur={(e) => handleUpdateClassroom(l.id, e.target.value)}
-                                    />
-                                </td>
-                                <td>
-                                    <button onClick={() => handleDelete(l.id)} className={styles.deleteBtn}>Видалити</button>
-                                </td>
+                    <table className={styles.table}>
+                        <thead>
+                            <tr>
+                                <th>Час</th>
+                                <th>Група</th>
+                                <th>Предмет</th>
+                                <th>Викладач</th>
+                                <th>Аудиторія</th>
+                                <th>Дії</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {lessons.map(l => (
+                                <tr key={l.id}>
+                                    <td>
+                                        {new Date(l.start).toLocaleString('uk-UA', {
+                                            day: '2-digit',
+                                            month: '2-digit',
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                            hour12: false
+                                        }).replace(',', '')}
+                                        -
+                                        {new Date(l.end).toLocaleString('uk-UA', {
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                            hour12: false
+                                        })}
+                                    </td>
+                                    <td>{l.group_name}</td>
+                                    <td>{l.subject_name}</td>
+                                    <td>
+                                        <select
+                                            className={styles.miniSelect}
+                                            defaultValue={l.teacher_id}
+                                            onChange={(e) => apiRequest(`/education/lessons/detail/${l.id}/`, {
+                                                method: 'PATCH',
+                                                body: JSON.stringify({ teacher: e.target.value })
+                                            })}
+                                        >
+                                            {teachers.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input
+                                            className={styles.miniInput}
+                                            defaultValue={l.classroom}
+                                            onBlur={(e) => handleUpdateClassroom(l.id, e.target.value)}
+                                        />
+                                    </td>
+                                    <td>
+                                        <button onClick={() => handleDelete(l.id)} className={styles.deleteBtn}>Видалити</button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </>

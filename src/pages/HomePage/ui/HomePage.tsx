@@ -3,6 +3,7 @@ import styles from "./HomePage.module.css";
 import { apiRequest } from "../../../shared/api/api";
 import { isStudent, isTeacher } from "../../../entities/session/lib/jwt";
 import { SVG_COIN, SVG_DUCK } from "../../../shared/ui/icons/icons";
+import { isDark } from "../../../shared/lib/localStorage";
 
 interface LessonInfo {
     is_current: boolean;
@@ -77,7 +78,7 @@ function StudentPage() {
             </div>
             <div className={styles.list}>
                 {stats?.leaderboard.map((user, index) => (
-                    <div key={user.id}>
+                    <div key={user.id} className={isDark() ? styles.dark : ""}>
                         {index + 1}. {user.full_name}
                         <span className={styles.leaderScore}>
                             ({user.coins})
@@ -87,19 +88,7 @@ function StudentPage() {
             </div>
         </div>}
 
-        <div
-            style={{
-                background: "#fff",      // белый фон
-                borderRadius: "15px",    // скругление
-                padding: "16px",         // внутренние отступы
-                width: "150px",          // можно под твой дизайн
-                height: "150px",
-                boxShadow: "0 5px 15px rgba(0,0,0,0.1)", // лёгкая тень
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center"
-            }}
-        >
+        <div className={styles.widget} style={{width: "150px", height: "150px" }}>
             <div className={styles.title} >Середня оцінка</div>
 
             <div style={{ position: "relative", width: "100px", height: "100px", marginTop: "10px" }}>
@@ -109,7 +98,7 @@ function StudentPage() {
                         cx="50"
                         cy="50"
                         r={radius}
-                        stroke="#eee"
+                        stroke="var(--color-ui-widget-bg)"
                         strokeWidth="8"
                         fill="transparent"
                     />

@@ -18,6 +18,8 @@
     --temporary-task-bg: #b6b6b6;
     --color-grey: #535353;
     --color-gray: #cfcfcf;
+    --color-ui-widget-bg: #eee;
+    --color-leaderboard: #dcf5ff;
 
     --blur-main: blur(9px);
     --blur-form: blur(15px);
@@ -50,6 +52,8 @@
     --color-bg-task-extender: #3a3a3a;
     --temporary-task-bg: #3a3a3a;
     --color-grey: #b1b1b1;
+    --color-ui-widget-bg: #353535;
+    --color-leaderboard: #3088ab;
     
     --bg-img: url("/images/bg-dark-mode.PNG");
 }

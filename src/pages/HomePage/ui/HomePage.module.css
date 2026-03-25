@@ -4,17 +4,6 @@
     width: 350px;
 }
 
-.LeaderBoard {
-    background-color: var(--color-bg);
-    width: 20%;
-    border-radius: 14px;
-    padding: 1em;
-    height: 400px;
-    display: flex;
-    flex-direction: column;
-    gap: 1em;
-}
-
 .title {
     display: flex;
     justify-content: center;
@@ -54,69 +43,38 @@
 }
 
 .amount {
-    background-color: rgb(198, 245, 255);
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, var(--color-leaderboard) 20%);
     padding: 3px 10px 3px 30px;
     border-radius: 0 10px 10px 0;
 }
 
-.list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5em;
-}
-
 .LeaderBoard {
-    background-color: var(--color-bg);
-    width: 20%;
-    border-radius: 14px;
-    padding: 1em;
-    height: 400px;
-
-    display: flex;
-    flex-direction: column;
-    gap: 1em;
-
-    overflow: hidden; /* 🔥 чтобы не ломалась верстка */
-}
-
-.list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5em;
-
-    overflow-y: auto;   /* 🔥 включает скролл */
-    flex: 1;            /* 🔥 занимает всё оставшееся место */
-}
-
-.demoContainer {
-    margin-top: 200px;
-    margin-left: 200px;
-    width: 400px;
-}
-
-.LeaderBoard {
-    background-color: var(--color-bg);
+    background: var(--color-bg);
     width: 350px;
-    border-radius: 20px;
+    border-radius: var(--radius-main);
     padding: 16px;
     height: 520px;
-
     display: flex;
     flex-direction: column;
     gap: 14px;
-
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
     overflow: hidden;
+}
+
+.widget {
+    background: var(--color-bg);
+    border-radius: var(--radius-main);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 /* 🔥 Заголовок */
 .title {
     text-align: center;
-    font-weight: 600;
+    font-weight: 500;
     font-size: 14px;
 }
-
-
 
 /* 📜 список */
 .list {
@@ -131,7 +89,7 @@
 
 /* 👤 элемент списка */
 .list div {
-    background: white;
+    background: var(--color-ui-widget-bg);
     padding: 8px 10px;
     border-radius: 10px;
 
@@ -146,7 +104,6 @@
 /* ✨ hover эффект */
 .list div:hover {
     transform: translateX(4px);
-    background: #f0f4ff;
 }
 
 /* 🥇 топ 3 */
@@ -163,50 +120,27 @@
     background: #ffe0cc;
 }
 
+.list .dark:nth-child(1) {
+    background: #c08d01;
+    font-weight: 600;
+}
+
+.list .dark:nth-child(2) {
+    background: #969696;
+}
+
+.list .dark:nth-child(3) {
+    background: #5c3a21;
+}
+
 /* 🔥 красивый скролл */
 .list::-webkit-scrollbar {
     width: 6px;
 }
 
 .list::-webkit-scrollbar-thumb {
-    background: rgba(0,0,0,0.2);
+    background: rgba(0, 0, 0, 0.2);
     border-radius: 10px;
-}
-
-.average {
-    background-color: #f0f0f0;
-}
-
-.block {
-  background: #fff;             /* белый фон */
-  border-radius: 15px;          /* скругление */
-  padding: 16px;                /* внутренние отступы */
-  width: 150px;                 /* фиксированная ширина */
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); /* лёгкая тень */
-}
-
-.title {
-  font-weight: 500;
-}
-
-.circleWrapper {
-  position: relative;
-  width: 100px;
-  height: 100px;
-  margin-top: 10px;
-}
-
-.circleText {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 18px;
 }
 
 .widgets {
@@ -215,7 +149,7 @@
 }
 
 .teacherLessonCard {
-    background: white;
+    background: var(--color-bg);
     width: 300px;
     border-radius: 20px;
     padding: 20px;
@@ -223,7 +157,6 @@
     flex-direction: column;
     gap: 16px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-    border: 1px solid #f0f0f0;
 }
 
 .cardHeader {
@@ -240,13 +173,13 @@
 }
 
 .statusNext {
-    color: #f7a75c;
+    color: #ec8735;
     font-size: 12px;
     font-weight: 600;
 }
 
 .classroomBadge {
-    background: #f0f4ff;
+    background: var(--color-ui-widget-bg);
     padding: 4px 10px;
     border-radius: 8px;
     font-size: 12px;
@@ -257,7 +190,7 @@
     font-size: 18px;
     font-weight: 700;
     margin: 0;
-    color: #1a1a1a;
+    color: var(--color-text);
     line-height: 1.2;
 }
 
@@ -270,7 +203,7 @@
 .detailsRow {
     display: flex;
     gap: 20px;
-    background: #fafafa;
+    background: var(--color-ui-widget-bg);
     padding: 12px;
     border-radius: 12px;
 }
@@ -283,19 +216,19 @@
 .label {
     font-size: 10px;
     text-transform: uppercase;
-    color: #aaa;
+    color: var(--color-text);
     letter-spacing: 0.5px;
 }
 
 .value {
     font-size: 14px;
     font-weight: 600;
-    color: #333;
+    color: var(--color-text);
 }
 
 /* Секція студентів всередині віджета */
 .studentsWidget {
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--color-ui-widget-bg);
     padding-top: 12px;
 }
 
@@ -320,11 +253,11 @@
 }
 
 .miniStudentItem {
-    background: #f0f0f0;
+    background: var(--color-ui-widget-bg);
     font-size: 11px;
     padding: 3px 8px;
     border-radius: 6px;
-    color: #555;
+    color: var(--color-text);
 }
 
 .moreStudents {
@@ -335,7 +268,7 @@
 }
 
 .emptyWidget {
-    background: white;
+    background: var(--color-bg);
     width: 300px;
     height: 200px;
     border-radius: 20px;

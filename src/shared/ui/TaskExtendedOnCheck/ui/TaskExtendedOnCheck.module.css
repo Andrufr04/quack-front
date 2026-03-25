@@ -1,16 +1,24 @@
 .TaskExtended {
     background-color: var(--color-bg);
-    height: 100vh;
     width: 530px;
     position: fixed;
     right: 0;
     top: 0;
+    height: 100vh;
     z-index: 2;
     border-top-left-radius: var(--radius-main);
+    border-bottom-left-radius: var(--radius-main); /* Додано для симетрії */
     padding: 2em;
     display: flex;
     flex-direction: column;
-    gap: 1em
+    justify-content: space-between; /* Розтягує контент по краях */
+}
+
+/* Групування блоків */
+.extendedTop, .extendedBottom {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
 }
 
 .top {
@@ -48,6 +56,14 @@
     color: var(--color-text-grey);
 }
 
+.info {
+    color: var(--color-text); /* Щоб відповідь студента була контрастнішою */
+    white-space: pre-wrap;
+    max-height: calc(5 * 1.5em); 
+    line-height: 1.5em;
+    overflow-y: auto;
+}
+
 .icon {
     width: 20px;
     height: 20px;
@@ -73,15 +89,29 @@
     color: #32c671;
 }
 
-.textarea {
+.textarea, .markInput {
     width: 100%;
-    min-height: 110px;
     border: none;
     border-radius: 10px;
-    padding: 10px;
-    resize: none;
+    padding: 10px 14px;
     background: var(--color-opaque-secondary);
     background-color: #e3e3e3;
+    color: var(--color-text);
+    font-size: 14px;
+    transition: outline 0.2s;
+}
+
+.textarea {
+    min-height: 90px;
+    resize: none;
+}
+
+.markInput {
+    height: 40px;
+}
+
+.markInput:focus, .textarea:focus {
+    outline: 2px solid var(--color-main);
 }
 
 .success {
@@ -119,6 +149,8 @@
 .zoomArea {
     cursor: zoom-in;
     transition: transform 0.2s ease;
+    width: 100%;
+    height: 100%;
 }
 
 .zoomArea:hover {
@@ -145,6 +177,7 @@
     position: absolute;
     top: -24px;
     right: -24px;
+    color: white; /* Щоб було видно на темному фоні */
 }
 
 .fullViewer {
@@ -157,6 +190,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    width: 80vw;
+    height: 80vh;
 }
 
 .viewerWrapper {
@@ -164,6 +199,9 @@
     width: 100%;
     display: flex;
     justify-content: center;
+    overflow: hidden;
+    border-radius: 10px;
+    background-color: var(--color-opaque-secondary);
 }
 
 .descriptionInfo {
@@ -171,11 +209,29 @@
     line-height: 1.5em;
     overflow-y: auto;
     overflow-x: auto;
-    white-space: pre;
+    white-space: pre-wrap; /* Дозволяє тексту переноситися, якщо він задовгий */
     flex: 1;
+    margin: 0;
+    font-family: inherit; /* Щоб pre не використовував системний моноширинний шрифт */
+    color: var(--color-text);
 }
 
 .descriptionInfo::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
+}
+
+.descriptionInfo::-webkit-scrollbar-thumb {
+    background: var(--color-text-grey);
+    border-radius: 10px;
+}
+
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.img {
+    object-fit: contain;
 }
