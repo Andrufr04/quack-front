@@ -10,6 +10,13 @@ export default function AppProvider({ children }: { children: React.ReactNode })
         localStorage.setItem("mode", newMode)
     }
 
+    const setMode = (mode: string) => {
+        if (mode === "light" || mode === "dark") {
+            setModeState(mode)
+            localStorage.setItem("mode", mode)
+        }
+    }
+
     useEffect(() => {
         const savedMode = localStorage.getItem("mode")
         if (savedMode) {
@@ -27,7 +34,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
 
 
     return (
-        <AppContext.Provider value={{ mode, switchMode }}>
+        <AppContext.Provider value={{ mode, switchMode, setMode }}>
             {children}
         </AppContext.Provider>
     )

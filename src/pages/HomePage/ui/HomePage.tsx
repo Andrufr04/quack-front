@@ -4,6 +4,7 @@ import { apiRequest } from "../../../shared/api/api";
 import { isStudent, isTeacher } from "../../../entities/session/lib/jwt";
 import { SVG_COIN, SVG_DUCK } from "../../../shared/ui/icons/icons";
 import { isDark } from "../../../shared/lib/localStorage";
+import { Link } from "react-router-dom";
 
 interface LessonInfo {
     is_current: boolean;
@@ -79,7 +80,7 @@ function StudentPage() {
             <div className={styles.list}>
                 {stats?.leaderboard.map((user, index) => (
                     <div key={user.id} className={isDark() ? styles.dark : ""}>
-                        {index + 1}. {user.full_name}
+                        {index + 1}. <Link to={`/profile/${user.id}`} className={isDark() ? styles.userDark : styles.user}>{user.full_name}</Link>
                         <span className={styles.leaderScore}>
                             ({user.coins})
                         </span>

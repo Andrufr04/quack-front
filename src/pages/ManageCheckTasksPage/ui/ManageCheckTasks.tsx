@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import styles from "./ManageCheckTasks.module.css";
 import { taskApi } from "../../../entities/task/api/taskApi";
@@ -18,7 +18,7 @@ export default function ManageCheckTasks() {
     const [selectedTask, setSelectedTask] = useState<TeacherTaskToCheck | null>(null)
 
     function selectTask(task: TeacherTaskToCheck) {
-        if (selectedTask == task) {
+        if (selectedTask === task) {
             setSelectedTask(null)
             return
         }
@@ -29,19 +29,34 @@ export default function ManageCheckTasks() {
         taskApi.getTeacherGroups().then(setGroups)
     }, []);
 
+    // 1. Виносимо fetchWorks у useCallback, щоб його можна було викликати звідусіль
+    const fetchWorks = useCallback(async () => {
+        try {
+            const data = await taskApi.getTasksToCheck(selectedGroup === "Всі" ? "" : selectedGroup);
+            setWorks(data);
+        } catch (err) {
+            console.error("Помилка завантаження робіт:", err);
+        }
+    }, [selectedGroup]);
+
     // 2. Завантажуємо роботи при зміні групи
     useEffect(() => {
-        const fetchWorks = async () => {
-            try {
-                // Передаємо selectedGroup на бекенд
-                const data = await taskApi.getTasksToCheck(selectedGroup === "Всі" ? "" : selectedGroup);
-                setWorks(data);
-            } catch (err) {
-                console.error("Помилка завантаження робіт:", err);
+        fetchWorks();
+    }, [fetchWorks]);
+
+    // 3. 🔥 МАГІЯ СОКЕТІВ (Слухаємо нові роботи від студентів) 🔥
+    useEffect(() => {
+        const handleNewSubmission = (e: any) => {
+            const notif = e.detail;
+            // title="Нова робота на перевірку!" (як ми писали на бекенді)
+            if (notif.category === 'education' && notif.title.includes('Нова робота')) {
+                fetchWorks();
             }
         };
-        fetchWorks();
-    }, [selectedGroup]);
+
+        window.addEventListener('new_notification', handleNewSubmission);
+        return () => window.removeEventListener('new_notification', handleNewSubmission);
+    }, [fetchWorks]);
 
     useEffect(() => {
         if (selectRef.current) {
@@ -58,6 +73,12 @@ export default function ManageCheckTasks() {
             document.body.removeChild(tempSpan);
         }
     }, [selectedGroup]);
+
+    // 4. Функція, яка спрацює ПІСЛЯ успішної оцінки в модалці
+    const handleGradeSuccess = () => {
+        setSelectedTask(null); // Закриваємо модалку
+        fetchWorks();          // Тихо оновлюємо список робіт
+    };
 
     return (<>
         <div className={styles.menuPlus}>
@@ -82,7 +103,13 @@ export default function ManageCheckTasks() {
             {works.map(t => <TaskCardOnCheck key={t.id} task={t} onClick={() => selectTask(t)} />)}
         </div>
 
-        {selectedTask && <TaskExtendedOnCheck onCloseClick={() => setSelectedTask(null)} task={selectedTask} />}
+        {selectedTask && (
+            <TaskExtendedOnCheck 
+                onCloseClick={() => setSelectedTask(null)} 
+                onSuccess={handleGradeSuccess} // 🔥 Передаємо новий пропс
+                task={selectedTask} 
+            />
+        )}
     </>
     );
 }

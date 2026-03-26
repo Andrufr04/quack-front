@@ -14,7 +14,7 @@ export default function TasksPage() {
     const [tasks, setTasks] = useState<TaskStatus[]>([])
 
     function selectTask(task: Task) {
-        if (selectedTask == task) {
+        if (selectedTask === task) {
             setSelectedTask(null)
             return
         }
@@ -22,6 +22,7 @@ export default function TasksPage() {
     }
 
     useEffect(() => {
+        // 1. Виносимо логіку завантаження в окрему константу, щоб викликати її звідусіль
         const fetchTasks = async () => {
             try {
                 const data = await taskApi.getStudentTasks(0);
@@ -32,14 +33,32 @@ export default function TasksPage() {
                     setTasks([]);
                     console.error("Отримано невірний формат даних:", data);
                 }
-
             } catch (err) {
                 setTasks([]);
                 console.error("Не вдалося завантажити завдання:", err);
             }
         };
 
+        // Завантажуємо при монтуванні (або зміні selectedTask)
         fetchTasks();
+
+        // 2. 🔥 СТВОРЮЄМО СЛУХАЧА ДЛЯ WEBSOCKET СПОВІЩЕНЬ 🔥
+        const handleNewNotification = (e: any) => {
+            const notif = e.detail;
+            
+            // Якщо прилетіло нове завдання - оновлюємо список миттєво!
+            if (notif.category === 'education' && notif.title.includes('Нове завдання')) {
+                fetchTasks();
+            }
+        };
+
+        // Підписуємось на подію, яку стріляє useNotifications
+        window.addEventListener('new_notification', handleNewNotification);
+
+        // 3. Відписуємось, коли сторінка закривається (щоб не було витоку пам'яті)
+        return () => {
+            window.removeEventListener('new_notification', handleNewNotification);
+        };
     }, [selectedTask]);
 
     return <>

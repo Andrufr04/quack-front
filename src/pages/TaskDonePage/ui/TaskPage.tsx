@@ -22,6 +22,7 @@ export default function TasksDonePage() {
     }
 
     useEffect(() => {
+        // Виносимо логіку завантаження, щоб викликати її знову при події
         const fetchTasks = async () => {
             try {
                 const data = await taskApi.getStudentTasks(2);
@@ -39,7 +40,25 @@ export default function TasksDonePage() {
             }
         };
 
+        // Завантажуємо при старті сторінки
         fetchTasks();
+
+        // 🔥 МАГІЯ СОКЕТІВ ТУТ 🔥
+        const handleNewNotification = (e: any) => {
+            const notif = e.detail;
+            
+            // Якщо прилетіло сповіщення про перевірене завдання - оновлюємо список
+            // В бекенді ми писали: title="Роботу оцінено!"
+            if (notif.category === 'education' && notif.title.toLowerCase().includes('оцінено')) {
+                fetchTasks();
+            }
+        };
+
+        window.addEventListener('new_notification', handleNewNotification);
+
+        return () => {
+            window.removeEventListener('new_notification', handleNewNotification);
+        };
     }, []);
 
     return <>

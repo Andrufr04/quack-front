@@ -96,7 +96,8 @@ export default function SignInPage() {
                                     t("signin.login")
                                 ),
                                 enabled: !loading,
-                                onClick: handleLogin
+                                onClick: handleLogin,
+                                bgcolor: "#ec8735"
                             }}
                         />
                         <div className={styles.privacy}>

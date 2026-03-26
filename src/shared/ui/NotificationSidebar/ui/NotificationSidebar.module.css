@@ -1,0 +1,144 @@
+.overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+}
+
+.Sidebar {
+    background-color: var(--color-bg);
+    width: 480px; /* Трохи вужча за TaskExtended, бо це просто сповіщення */
+    position: fixed;
+    right: 0;
+    top: 0;
+    height: 100vh;
+    z-index: 5;
+    border-top-left-radius: var(--radius-main);
+    border-bottom-left-radius: var(--radius-main);
+    padding: 2em;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5em;
+    box-shadow: var(--shadow-main);
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+}
+
+.title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--color-text);
+}
+
+.icon {
+    width: 20px;
+    height: 20px;
+    transform: rotate(45deg);
+    cursor: pointer;
+    color: var(--color-text);
+}
+
+/* Вкладки (Навчання / Соціальне) */
+.tabs {
+    display: flex;
+    gap: 1em;
+    padding-bottom: 0.5em;
+}
+
+.tab {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    padding: 0.5em 1em;
+    border-radius: var(--radius-secondary);
+    transition: all 0.2s;
+}
+
+.tabActive {
+    color: var(--color-text);   
+}
+
+/* Список сповіщень */
+.notificationList {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.emptyMsg {
+    text-align: center;
+    color: var(--color-text-grey);
+    margin-top: 2em;
+    font-size: 14px;
+}
+
+/* Картка сповіщення */
+.notificationCard {
+    background-color: var(--color-opaque-secondary);
+    border-radius: var(--radius-secondary);
+    padding: 1em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-left: 4px solid transparent; /* Місце для індикатора */
+}
+
+.unread {
+    border: 2px solid var(--color-main);
+}
+
+.unread .cardTitle {
+    font-weight: bold;
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+    gap: 10px;
+}
+
+.cardTitle {
+    font-size: 14px;
+    color: var(--color-text);
+    font-weight: 600;
+}
+
+.cardTime {
+    font-size: 11px;
+    color: var(--color-text-grey);
+    white-space: nowrap;
+}
+
+.cardMessage {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    line-height: 1.4;
+    
+    /* Магія: обрізає текст і ставить 3 крапки в закритому стані */
+    display: -webkit-box;
+    line-clamp: 1;
+    -webkit-line-clamp: 1; /* Скільки рядків показувати */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Відкритий стан */
+.expanded {
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-opaque-secondary);
+    cursor: default; /* Щоб показати, що воно вже відкрите */
+}
+
+.expanded .cardMessage {
+    display: block; /* Знімаємо обрізку тексту */
+    color: var(--color-text);
+}

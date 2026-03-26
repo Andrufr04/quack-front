@@ -4,4 +4,10 @@
     background: var(--bg-img);
     width: 100%;
     background-size: cover;
+    overflow-y: auto;
+    scrollbar-color: transparent transparent;
+}
+
+* {
+    scrollbar-color: var(--color-ui-secondary) transparent;
 }

@@ -7,7 +7,8 @@ import type { TeacherTaskToCheck } from "../../../../entities/task/model/types";
 import { taskApi } from "../../../../entities/task/api/taskApi";
 import toast from "react-hot-toast";
 
-export default function TaskExtendedOnCheck({ onCloseClick, task }: { onCloseClick: () => void, task: TeacherTaskToCheck }) {
+// 🔥 Додали onSuccess у типізацію пропсів
+export default function TaskExtendedOnCheck({ onCloseClick, onSuccess, task }: { onCloseClick: () => void, onSuccess: () => void, task: TeacherTaskToCheck }) {
     const [isZoomed, setIsZoomed] = useState(false);
     const [comment, setComment] = useState("");
     const [loading, setLoading] = useState(false);
@@ -31,9 +32,8 @@ export default function TaskExtendedOnCheck({ onCloseClick, task }: { onCloseCli
             });
 
             if (result) {
-                onCloseClick();
                 toast.success("Завдання оцінено!");
-                window.location.reload();
+                onSuccess(); // 🔥 Викликаємо функцію замість перезавантаження сторінки
             }
         } catch (error) {
             toast.error("Помилка оцінювання!");
