@@ -1,5 +1,5 @@
 import { useContext, useEffect, useRef, useState } from "react"
-import { SVG_ADDREACTION, SVG_CLIP, SVG_COMMENT, SVG_PLUS, SVG_SEND, SVG_SHARE } from "../../../shared/ui/icons/icons"
+import { SVG_A, SVG_ADDREACTION, SVG_ARROW_DOWN, SVG_CLIP, SVG_COMMENT, SVG_PLUS, SVG_SEND, SVG_SHARE } from "../../../shared/ui/icons/icons"
 import RoundButton from "../../../shared/ui/RoundButton/RoundButton"
 import styles from "./ProfilePage.module.css"
 import { apiRequest } from "../../../shared/api/api";
@@ -47,7 +47,7 @@ export default function ProfilePage() {
     const postFileInputRef = useRef<HTMLInputElement>(null);
 
     // 🔥 НОВЕ: Реф для скидання висоти textarea
-    const textareaRef = useRef<HTMLTextAreaElement>(null); 
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     // 🔥 НОВЕ: Стейт для кешування URL картинок, щоб не блимали
     const [filePreviews, setFilePreviews] = useState<string[]>([]);
@@ -240,8 +240,8 @@ export default function ProfilePage() {
     useEffect(() => {
         // Якщо у профілі є банер — беремо його. Якщо ні — ставимо стандартну картинку.
         // Використовуємо getAvatarUrl, щоб правильно сформувати посилання.
-        const bannerUrl = profile?.banner_picture 
-            ? getAvatarUrl(profile.banner_picture) 
+        const bannerUrl = profile?.banner_picture
+            ? getAvatarUrl(profile.banner_picture)
             : mode === "dark" ? "/images/bg-dark-mode.PNG" : "/images/bg-light-mode.PNG";
 
         // Накладаємо лінійний градієнт поверх картинки
@@ -282,101 +282,143 @@ export default function ProfilePage() {
 
     const emojis = ['👍', '🔥', '❤️', '😂', '🤯'];
 
+    // 1. Додай цей стейт до інших useState
+    const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+
+    // 2. Ефект для блокування скролу при відкритій модалці
+    useEffect(() => {
+        if (selectedPost) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+    }, [selectedPost]);
+
+    const [currentImgIndex, setCurrentImgIndex] = useState(0);
+
+    // Скидаємо індекс на 0 при відкритті нової модалки
+    useEffect(() => {
+        if (selectedPost) setCurrentImgIndex(0);
+    }, [selectedPost]);
+
+    const [isFullScreen, setIsFullScreen] = useState(false);
+    const [modalPostExpanded, setModalPostExpanded] = useState(false);
+    const [isModalPostLong, setIsModalPostLong] = useState(false);
+    const modalPostRef = useRef<HTMLDivElement>(null);
+    const [fullScreenMode, setFullScreenMode] = useState(false);
+
+    // Ефект для перевірки довжини тексту В МОДАЛЦІ
+    useEffect(() => {
+        if (selectedPost && modalPostRef.current) {
+            const check = () => {
+                if (modalPostRef.current) {
+                    const lineHeight = parseFloat(window.getComputedStyle(modalPostRef.current).lineHeight) || 24;
+                    setIsModalPostLong(modalPostRef.current.scrollHeight > lineHeight * 10.5);
+                }
+            };
+            setTimeout(check, 50); // Даємо час на рендер
+        } else {
+            setModalPostExpanded(false); // Скидаємо при закритті
+        }
+    }, [selectedPost]);
+
+    const [commentText, setCommentText] = useState("");
+
     return (
         <div className={styles.profile}>
             <title>Quack | Профіль</title>
 
             {isOwnProfile && <><div className={styles.newPostGradient}></div>
-            <div className={styles.newPostContainer}>
-                <div className={styles.attachments}>
-                    {postFiles.map((f, i) => (
-                        <div key={i} className={styles.attachedImg} style={{ backgroundImage: `url(${URL.createObjectURL(f)})`, backgroundSize: 'cover' }}>
-                            <div className={styles.deleteImg} onClick={() => setPostFiles(prev => prev.filter((_, idx) => idx !== i))}>
-                                {SVG_PLUS}
+                <div className={styles.newPostContainer}>
+                    <div className={styles.attachments}>
+                        {postFiles.map((f, i) => (
+                            <div key={i} className={styles.attachedImg} style={{ backgroundImage: `url(${URL.createObjectURL(f)})`, backgroundSize: 'cover' }}>
+                                <div className={styles.deleteImg} onClick={() => setPostFiles(prev => prev.filter((_, idx) => idx !== i))}>
+                                    {SVG_PLUS}
+                                </div>
                             </div>
-                        </div>
-                    ))}
-                </div>
-                <div className={styles.inputContainer}>
-                    <div className={styles.inputIcon} onClick={() => postFileInputRef.current?.click()}>
-                        {SVG_CLIP}
+                        ))}
                     </div>
-                    <input
-                        type="file"
-                        multiple
-                        hidden
-                        ref={postFileInputRef}
-                        accept="image/*"
-                        onChange={(e) => {
-                            const files = Array.from(e.target.files || []);
-                            const limit = 10 * 1024 * 1024; // 10 МБ
-                            
-                            // Фільтруємо файли
-                            const validFiles = files.filter(file => {
-                                if (!file.type.startsWith('image/')) {
-                                    toast.error(`Файл ${file.name} не є зображенням.`);
-                                    return false;
-                                }
-                                if (file.size > limit) {
-                                    toast.error(`Файл ${file.name} завеликий (макс 10 МБ).`);
-                                    return false;
-                                }
-                                return true;
-                            });
+                    <div className={styles.inputContainer}>
+                        <div className={styles.inputIcon} onClick={() => postFileInputRef.current?.click()}>
+                            {SVG_CLIP}
+                        </div>
+                        <input
+                            type="file"
+                            multiple
+                            hidden
+                            ref={postFileInputRef}
+                            accept="image/*"
+                            onChange={(e) => {
+                                const files = Array.from(e.target.files || []);
+                                const limit = 10 * 1024 * 1024; // 10 МБ
 
-                            // Беремо тільки перші 5 ВАЛІДНИХ файлів
-                            // (якщо вже є завантажені, додаємо нові до існуючих, але не більше 5 загалом)
-                            setPostFiles(prev => {
-                                const combined = [...prev, ...validFiles];
-                                if (combined.length > 5) {
-                                    toast.error("Можна додати максимум 5 фото.");
-                                }
-                                return combined.slice(0, 5);
-                            });
+                                // Фільтруємо файли
+                                const validFiles = files.filter(file => {
+                                    if (!file.type.startsWith('image/')) {
+                                        toast.error(`Файл ${file.name} не є зображенням.`);
+                                        return false;
+                                    }
+                                    if (file.size > limit) {
+                                        toast.error(`Файл ${file.name} завеликий (макс 10 МБ).`);
+                                        return false;
+                                    }
+                                    return true;
+                                });
 
-                            // Скидаємо value інпута, щоб можна було вибрати той самий файл ще раз, якщо треба
-                            if (postFileInputRef.current) {
-                                postFileInputRef.current.value = '';
-                            }
-                        }}
-                    />
-                    <textarea
-                        className={styles.input}
-                        placeholder="Створити нову публікацію"
-                        value={newPostText}
-                        maxLength={4096} // 🔥 Жорсткий ліміт HTML
-                        onChange={(e) => {
-                            const val = e.target.value;
-                            // 🔥 Валідація на кількість переносів (не більше 100)
-                            const lineBreaks = (val.match(/\n/g) || []).length;
-                            
-                            if (lineBreaks <= 100) {
-                                setNewPostText(val);
-                            } else {
-                                toast.error("Досягнуто ліміт переносів рядка (100).");
-                            }
-                        }}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter' && !e.shiftKey) {
-                                e.preventDefault(); 
-                                handleCreatePost();
-                            }
-                        }}
-                        rows={1}
-                        style={{
-                            resize: 'none', 
-                            maxHeight: "200px",
-                            overflow: 'auto', 
-                        }}
-                        onInput={(e) => {
-                            const target = e.target as HTMLTextAreaElement;
-                            target.style.height = 'auto';
-                            target.style.height = `${target.scrollHeight}px`;
-                        }}
-                    />
-                    <div className={styles.inputIcon} onClick={handleCreatePost}>{SVG_SEND}</div>
+                                // Беремо тільки перші 5 ВАЛІДНИХ файлів
+                                // (якщо вже є завантажені, додаємо нові до існуючих, але не більше 5 загалом)
+                                setPostFiles(prev => {
+                                    const combined = [...prev, ...validFiles];
+                                    if (combined.length > 5) {
+                                        toast.error("Можна додати максимум 5 фото.");
+                                    }
+                                    return combined.slice(0, 5);
+                                });
+
+                                // Скидаємо value інпута, щоб можна було вибрати той самий файл ще раз, якщо треба
+                                if (postFileInputRef.current) {
+                                    postFileInputRef.current.value = '';
+                                }
+                            }}
+                        />
+                        <textarea
+                            className={styles.input}
+                            placeholder="Створити нову публікацію"
+                            value={newPostText}
+                            maxLength={4096} // 🔥 Жорсткий ліміт HTML
+                            onChange={(e) => {
+                                const val = e.target.value;
+                                // 🔥 Валідація на кількість переносів (не більше 100)
+                                const lineBreaks = (val.match(/\n/g) || []).length;
+
+                                if (lineBreaks <= 100) {
+                                    setNewPostText(val);
+                                } else {
+                                    toast.error("Досягнуто ліміт переносів рядка (100).");
+                                }
+                            }}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' && !e.shiftKey) {
+                                    e.preventDefault();
+                                    handleCreatePost();
+                                }
+                            }}
+                            rows={1}
+                            style={{
+                                resize: 'none',
+                                maxHeight: "200px",
+                                overflow: 'auto',
+                            }}
+                            onInput={(e) => {
+                                const target = e.target as HTMLTextAreaElement;
+                                target.style.height = 'auto';
+                                target.style.height = `${target.scrollHeight}px`;
+                            }}
+                        />
+                        <div className={styles.inputIcon} onClick={handleCreatePost}>{SVG_SEND}</div>
+                    </div>
                 </div>
-            </div>
             </>}
 
             <div className={styles.info}>
@@ -429,17 +471,135 @@ export default function ProfilePage() {
                         activeReactionPopup={activeReactionPopup}
                         setActiveReactionPopup={setActiveReactionPopup}
                         emojis={emojis}
+
+                        onOpenModal={setSelectedPost}
                     />
                 ))}
                 <div className={styles.block}></div>
             </div>
+
+            {/* Модальне вікно */}
+            {selectedPost && (
+                <div className={styles.modalOverlay} onClick={() => setSelectedPost(null)}>
+
+                    {/* ПОВНОЕКРАННИЙ РЕЖИМ (Lightbox) */}
+                    {fullScreenMode && (
+                        <div className={styles.lightBox} onClick={(e) => { e.stopPropagation(); setFullScreenMode(false); }}>
+                            <img src={selectedPost.images[currentImgIndex]} alt="Full view" className={styles.fullImage} />
+                            <div className={styles.closeLightBox}>{SVG_PLUS}</div> {/* Використовуємо плюс як хрестик (rotate 45) */}
+                        </div>
+                    )}
+
+                    <div className={styles.unifiedModal} onClick={(e) => e.stopPropagation()}>
+
+                        {/* ГАЛЕРЕЯ */}
+                        {selectedPost.images && selectedPost.images.length > 0 && (
+                            <div className={styles.modalGallerySection}>
+                                <div className={styles.modalMainView}>
+                                    {selectedPost.images.length > 1 && (
+                                        <>
+                                            <div className={styles.arrowLeft} onClick={() => setCurrentImgIndex(prev => prev > 0 ? prev - 1 : selectedPost.images.length - 1)}>
+                                                <div style={{ transform: 'rotate(90deg)', display: 'flex' }}>{SVG_ARROW_DOWN}</div>
+                                            </div>
+                                            <div className={styles.arrowRight} onClick={() => setCurrentImgIndex(prev => prev < selectedPost.images.length - 1 ? prev + 1 : 0)}>
+                                                <div style={{ transform: 'rotate(-90deg)', display: 'flex' }}>{SVG_ARROW_DOWN}</div>
+                                            </div>
+                                        </>
+                                    )}
+                                    <div
+                                        className={styles.modalLargeImage}
+                                        style={{ backgroundImage: `url(${selectedPost.images[currentImgIndex]})` }}
+                                        onClick={() => setFullScreenMode(true)}
+                                    />
+                                </div>
+
+                                {/* Прев'юшки ТЕПЕР ЗНИЗУ */}
+                                {selectedPost.images.length > 1 && (
+                                    <div className={styles.bottomThumbs}>
+                                        {selectedPost.images.map((img, idx) => (
+                                            <div
+                                                key={idx}
+                                                className={`${styles.bottomThumbItem} ${currentImgIndex === idx ? styles.activeThumb : ''}`}
+                                                style={{ backgroundImage: `url(${img})` }}
+                                                onClick={() => setCurrentImgIndex(idx)}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* ТЕКСТ ТА ІНФО */}
+                        <div className={styles.modalInfoSection}>
+                            <div className={styles.postHeaderModal}>
+                                <div className={styles.postHeader}>
+                                    <div className={styles.postProfileImg} style={{ backgroundImage: `url(${getAvatarUrl(profile?.profile_picture || null)})` }}></div>
+                                    <div className={styles.postName}>{profile?.name} {profile?.surname}</div>
+                                </div>
+                            </div>
+
+                            <div className={styles.modalTextContent}>
+                                <div
+                                    ref={modalPostRef}
+                                    className={`${styles.text} ${isModalPostLong && !modalPostExpanded ? styles.postCollapsed : styles.postExpanded}`}
+                                >
+                                    {isModalPostLong && !modalPostExpanded && (
+                                        <span className={styles.showMore} onClick={() => setModalPostExpanded(true)}>
+                                            ... Показати більше
+                                        </span>
+                                    )}
+                                    {selectedPost.text}
+                                </div>
+                            </div>
+                            {/* ... вище текст поста ... */}
+                            <div className={styles.commentsModal}>Коментарі</div>
+
+                            {/* НОВЕ: Поле вводу коментаря */}
+                            <div className={styles.modalCommentInputWrapper}>
+                                <div className={styles.inputContainer} style={{ marginTop: '10px' }}>
+                                    <textarea
+                                        className={styles.input}
+                                        placeholder="Написати коментар..."
+                                        value={commentText}
+                                        rows={1}
+                                        style={{
+                                            resize: 'none',
+                                            maxHeight: "150px",
+                                            overflow: 'auto',
+                                        }}
+                                        onChange={(e) => setCommentText(e.target.value)}
+                                        onInput={(e) => {
+                                            const target = e.target as HTMLTextAreaElement;
+                                            target.style.height = 'auto';
+                                            target.style.height = `${target.scrollHeight}px`;
+                                        }}
+                                    />
+                                    <div
+                                        className={styles.inputIcon}
+                                        onClick={() => {
+                                            console.log("Відправка коментаря:", commentText);
+                                            setCommentText(""); // Очищуємо після відправки
+                                        }}
+                                    >
+                                        {SVG_SEND}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
 
 // Додай це вище або нижче ProfilePage компонента
 
-function PostItem({ post, profile, getAvatarUrl, handleReaction, activeReactionPopup, setActiveReactionPopup, emojis }: any) {
+function PostItem({
+    post, profile, getAvatarUrl, handleReaction,
+    activeReactionPopup, setActiveReactionPopup, emojis,
+    onOpenModal // <--- Просто допиши його тут
+}: any) {
     const postRef = useRef<HTMLDivElement>(null);
     const [isPostLong, setIsPostLong] = useState(false);
     const [postExpanded, setPostExpanded] = useState(false);
@@ -566,7 +726,13 @@ function PostItem({ post, profile, getAvatarUrl, handleReaction, activeReactionP
                                 </div>
                             )}
                         </div>
-                        <div className={styles.postActionIcon} style={{ marginLeft: ".3em", marginBottom: ".2em" }}>{SVG_COMMENT}</div>
+                        <div
+                            className={styles.postActionIcon}
+                            style={{ marginLeft: ".3em", marginBottom: ".2em", cursor: 'pointer' }}
+                            onClick={() => onOpenModal(post)} // Викликаємо відкриття
+                        >
+                            {SVG_COMMENT}
+                        </div>
                     </div>
                     <div className={styles.postActionIcon}>{SVG_SHARE}</div>
                 </div>

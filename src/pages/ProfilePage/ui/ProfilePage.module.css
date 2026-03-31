@@ -114,6 +114,10 @@
     align-items: center;
 }
 
+.postHeaderModal {
+    margin-bottom: 1em;
+}
+
 .postProfileImg {
     width: 40px;
     height: 40px;
@@ -223,12 +227,7 @@
     bottom: 2%;
     height: 10em;
     width: 60%;
-    background: linear-gradient(
-    0deg, 
-    color-mix(in srgb, var(--color-bg) 80%, transparent) 42.91%, 
-    color-mix(in srgb, var(--color-bg) 47.8%, transparent) 53.75%, 
-    color-mix(in srgb, var(--color-bg) 0%, transparent) 68.53%
-);
+
     pointer-events: none;
 }
 
@@ -237,7 +236,7 @@
     width: 60%;
     position: absolute;
     z-index: 3;
-    right: 6%;
+    right: 7%;
     bottom: 2%;
     border: 1px solid var(--color-gray);
     background-color: var(--color-bg);
@@ -436,3 +435,393 @@
     border: 2px solid var(--color-main); /* Рамка твого фірмового кольору */
 
 }
+
+/* Фон, що перекриває все */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7); /* Темніє фон */
+    backdrop-filter: blur(4px);    /* Можна додати твій улюблений блюр */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;                 /* Максимальний пріоритет */
+    cursor: default;
+}
+
+/* Саме вікно */
+.modalContent {
+    background: var(--color-bg);   /* Твій колір фону з AppContext */
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: var(--blur-main);
+    
+    /* Фіксовані розміри як ти просив */
+    min-width: 200px;
+    min-height: 200px;
+    
+    /* Щоб контент всередині не вилазив */
+    overflow: auto;
+}
+
+.galleryContent {
+    background: var(--color-bg);
+    width: 50vw;
+    height: 60vh;
+    display: flex; /* Розділяємо на ліво і право */
+    overflow: hidden;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sideThumbs {
+    width: 100px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+    border-right: 2px solid #000; /* Чорна лінія як на макеті */
+    background: #ccc; /* Сірий фон для колонки */
+    overflow-y: auto;
+}
+
+.thumbItem {
+    width: 100%;
+    aspect-ratio: 1/1;
+    background-size: cover;
+    background-position: center;
+    cursor: pointer;
+    border: 2px solid transparent;
+    background-color: #999;
+}
+
+.activeThumb {
+    border-color: var(--color-main); /* Підсвітка обраного фото */
+}
+
+.mainView {
+    flex: 1;
+    position: relative;
+    background: #d9d9d9; /* Світло-сірий фон як на макеті */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.largeImage {
+    width: 100%;
+    height: 100%;
+    background-size: contain; /* Щоб фото не обрізалося */
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.arrowLeft, .arrowRight {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+
+}
+
+.arrowLeft:hover, .arrowRight:hover {
+  
+}
+
+.arrowLeft { left: 20px; }
+.arrowRight { right: 20px; }
+
+.noImagesContent {
+    padding: 40px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    color: var(--color-text);
+}
+
+.modalText {
+    font-size: 18px;
+    line-height: 1.5;
+    white-space: pre-wrap; /* зберігаємо переноси рядків */
+}
+
+.arrowLeft, .arrowRight {
+    position: absolute;
+    top: 50%;
+
+    cursor: pointer;
+    
+    /* Робимо іконки круглими, білими та акуратними */
+
+    border-radius: 50%;
+    width: 38px; /* Трохи більший розмір для зручності */
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    z-index: 10;
+}
+
+/* Позиція зліва */
+.arrowLeft { 
+    left: 20px; 
+
+}
+
+/* Позиція справа */
+.arrowRight { 
+    right: 20px; 
+
+}
+
+
+/* Додатково: якщо у SVG є фіксований колір, забираємо його */
+.arrowLeft svg, .arrowRight svg {
+    width: 20px;  /* Розмір іконки всередині кола */
+    height: 20px;
+}
+.arrowLeft:hover svg {
+    color: var(--color-main);
+    
+}
+
+/* Аналогічно для правої стрілки */
+.arrowRight:hover svg {
+     color: var(--color-main);
+
+}
+
+.modalContent {
+    background: var(--color-bg);
+    width: 60vw;
+    max-height: 90vh; /* Щоб не вилазило за екран */
+    display: flex;
+    flex-direction: column; /* Все йде зверху вниз */
+    overflow-y: auto; /* Скрол тільки якщо контенту забагато */
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+/* Режим на весь екран при кліку */
+.fullScreenMode {
+    width: 95vw;
+    height: 95vh;
+}
+
+.fullScreenMode .gallerySection {
+    height: 80vh; /* Збільшуємо зону фото */
+}
+
+.gallerySection {
+    display: flex;
+    height: 50vh; /* Фіксована висота для зони фото в звичайному режимі */
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    background: #000; /* Чорний фон краще для фото */
+}
+
+.modalInfoSection {
+    padding: 20px;
+    background: var(--color-bg);
+}
+
+.modalTextWrapper {
+    margin-top: 15px;
+}
+
+/* Копіюємо логіку обрізання тексту з PostItem */
+.postCollapsed {
+    display: -webkit-box;
+    -webkit-line-clamp: 10;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    position: relative;
+}
+
+.postExpanded {
+    display: block;
+}
+
+/* Стилі для стрілок (виправлені) */
+.arrowLeft, .arrowRight {
+  
+    backdrop-filter: blur(5px);
+}
+
+.arrowLeft:hover, .arrowRight:hover {
+
+}
+
+.largeImage {
+    cursor: zoom-in;
+}
+
+.fullScreenMode .largeImage {
+    cursor: zoom-out;
+}
+
+.unifiedModal {
+    background: var(--color-bg);
+    width: 55vw;
+    max-height: 95vh;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+
+.modalGallerySection {
+    background: var(--color-bg); /* Темний фон для зони фото */
+    display: flex;
+    flex-direction: column;
+}
+
+.modalMainView {
+    height: 50vh;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modalLargeImage {
+    width: 100%;
+    height: 100%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: zoom-in;
+}
+
+/* ПРЕВ'ЮШКИ ЗНИЗУ */
+.bottomThumbs {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    background: var(--color-bg);
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.bottomThumbItem {
+    width: 60px;
+    height: 60px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 4px;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: 0.2s;
+}
+
+.activeThumb {
+    opacity: 1;
+    outline: 2px solid var(--color-main);
+}
+
+/* LIGHTBOX (Повноцінний екран) */
+.lightBox {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.95);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: zoom-out;
+}
+
+.fullImage {
+    max-width: 95%;
+    max-height: 95%;
+    object-fit: contain;
+    animation: zoomIn 0.2s ease-out;
+}
+
+.closeLightBox {
+    position: absolute;
+    top: 30px; right: 30px;
+    transform: rotate(45deg); /* Плюс перетворюється на Х */
+    cursor: pointer;
+    scale: 2;
+}
+
+@keyframes zoomIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* Фікс для тексту */
+.modalTextContent {
+
+    overflow-y: auto;
+}
+
+
+.unifiedModal {
+    background: var(--color-bg);
+    width: 55vw;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+
+    /* ПРАВИЛО №1: Тільки auto! */
+    overflow-y: auto; 
+    overflow-x: hidden;
+
+    /* ПРАВИЛО №2: Прибираємо примусове резервування місця */
+    scrollbar-gutter: stable both-edges; /* Це залишить симетрію, але... */
+    /* Або просто: */
+    scrollbar-gutter: auto; 
+
+    border-radius: 16px;
+}
+
+/* ПРАВИЛО №3: Налаштовуємо вигляд скролбару (Webkit) */
+.unifiedModal::-webkit-scrollbar {
+    width: 6px; /* Робимо його дуже тонким */
+}
+
+.unifiedModal::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2); /* Напівпрозорий, щоб не муляв очі */
+    border-radius: 10px;
+}
+
+.unifiedModal::-webkit-scrollbar-track {
+    background: transparent; /* Фон доріжки прозорий, щоб не було порожньої смуги */
+}
+
+.commentsModal {
+    font-size: 1.2em;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    font-weight: bold;
+}
+
+.modalCommentInputWrapper {
+    padding: 0 15px 5px 15px; /* Відступи по боках і знизу */
+    background: var(--color-bg);
+    box-shadow: var(--shadow-main);
+    border: 1px solid var(--color-gray);
+    background-color: var(--color-bg);
+    border-radius: 0.5em;
+}
+
+/* Використовуємо твої існуючі класи .inputContainer, .input та .inputIcon, 
+   вони автоматично підтягнуть стилі з головної сторінки */
