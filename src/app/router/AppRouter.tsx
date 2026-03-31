@@ -28,7 +28,7 @@ import ArchivePage from "../../pages/ArchivePage/ui/ArchivePage";
 export default function AppRouter() {
     return (
         <BrowserRouter>
-            <Toaster toastOptions={{style: {backgroundColor: "var(--color-bg)", color: "var(--color-text)"}}}/>
+            <Toaster toastOptions={{ style: { backgroundColor: "var(--color-bg)", color: "var(--color-text)" } }} />
             <Tooltip id="my-tooltip" />
             <Routes>
                 <Route path={routes.signin} element={<PublicRoute><SignInPage /></PublicRoute>} />
@@ -42,6 +42,7 @@ export default function AppRouter() {
                     <Route path="/managetasks" element={<ManageTasks />} />
                     <Route path="/managechecktasks" element={<ManageCheckTasks />} />
                     <Route path="/managelesson" element={<ManageLesson />} />
+                    <Route path="/managelesson/:date" element={<ManageLesson />} />
                     <Route path="/manageschedule" element={<ManageSchedule />} />
                     <Route path="/managescheduledelete" element={<ManageScheduleDelete />} />
                     <Route path="/manageaccounts" element={<ManageAccountsPage />} />
@@ -49,10 +50,7 @@ export default function AppRouter() {
                     <Route path="/calendar" element={<CalendarPage />} />
                     <Route path="/settings" element={<SettingsPage />} />
                     <Route path="/archive" element={<ArchivePage />} />
-                <Route
-                    path="*"
-                    element={<Page404/>}
-                />
+                    <Route path="*" element={<Page404 />} />
                 </Route>
             </Routes>
         </BrowserRouter>

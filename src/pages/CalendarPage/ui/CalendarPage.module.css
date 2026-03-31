@@ -174,3 +174,13 @@
     grid-template-columns: repeat(7, 1fr);
     height: calc(13 * 72px); /* 13 годин * (60 * 1.2). Зміни, якщо pxPerMinute інший */
 }
+
+.lessonBottom {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+}
+
+.aud {
+    font-weight: bold;
+}

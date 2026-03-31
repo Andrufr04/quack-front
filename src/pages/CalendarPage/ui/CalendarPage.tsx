@@ -5,6 +5,7 @@ import Page403 from "../../Page403/ui/Page403";
 import styles from "./CalendarPage.module.css";
 import { useRef, useEffect, useState } from "react";
 import { apiRequest } from "../../../shared/api/api";
+import { useNavigate } from "react-router-dom";
 
 const START_DAY = 8 * 60;
 const END_DAY = 20 * 60;
@@ -53,6 +54,7 @@ export const CalendarPage = () => {
     const [currentDate, setCurrentDate] = useState(new Date()); // Стан поточного тижня
     const [weekDays, setWeekDays] = useState<{ name: string, date: number, fullDate: string }[]>([]);
     const [nowMinutes, setNowMinutes] = useState<number | null>(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const updateNow = () => {
@@ -136,6 +138,12 @@ export const CalendarPage = () => {
 
     const pxPerMinute = 1.2;
 
+    const onLessonClick = (lesson: Lesson) => {
+        if (isTeacher()) {
+            navigate(`/managelesson/${lesson.date}`)
+        }
+    }
+
     return (
         <div className={styles.container}>
             {/* Кнопка Назад (повертаємо іконку вгору через стиль) */}
@@ -197,10 +205,14 @@ export const CalendarPage = () => {
                                                 <div 
                                                     key={lesson.id} 
                                                     className={`${styles.lesson} ${isActive ? styles.activeLesson : ""}`}
-                                                    style={{ top, height }}
+                                                    style={{ top, height, cursor: isTeacher() ? "pointer" : "" }}
+                                                    onClick={() => onLessonClick(lesson)}
                                                 >
                                                     <div className={styles.title}>{lesson.title}</div>
-                                                    <div>{lesson.start} - {lesson.end}</div>
+                                                    <div className={styles.lessonBottom}>
+                                                        <div>{lesson.start} - {lesson.end}</div>
+                                                        <div className={styles.aud}>28</div>
+                                                    </div>
                                                 </div>
                                             );
                                         })}

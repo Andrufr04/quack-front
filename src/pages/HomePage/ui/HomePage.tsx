@@ -24,6 +24,7 @@ interface LeaderboardUser {
     full_name: string;
     ducks: number;
     coins: number;
+    total_points: number;
 }
 
 interface StudentStats {
@@ -51,17 +52,34 @@ function StudentPage() {
     const [stats, setStats] = useState<StudentStats | null>(null);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
+    const fetchStats = () => {
         apiRequest('/education/student/dashboard-stats/')
             .then(res => res?.json())
             .then(data => setStats(data))
             .finally(() => setLoading(false));
+    };
+
+    useEffect(() => {
+        // Завантажуємо при старті
+        fetchStats();
+
+        // 🔥 2. Слухаємо вебсокет: якщо прийшло сповіщення МЕНІ, миттєво оновлюємо статуси
+        const handleNewNotification = () => fetchStats();
+        window.addEventListener('new_notification', handleNewNotification);
+
+        // 🔥 3. Тихе фонове оновлення кожні 30 сек (для оновлення балів ІНШИХ студентів)
+        const intervalId = setInterval(fetchStats, 30000);
+
+        // Прибираємо слухачі, коли компонент зникає
+        return () => {
+            window.removeEventListener('new_notification', handleNewNotification);
+            clearInterval(intervalId);
+        };
     }, []);
 
     const radius = 40;
     const circumference = 2 * Math.PI * radius;
     const avgGrade = stats?.my_stats.average_grade || 0;
-    // Офсет (макс оцінка 12)
     const strokeDashoffset = circumference * (1 - avgGrade / 12);
 
     return <div className={styles.widgets}>
@@ -82,7 +100,7 @@ function StudentPage() {
                     <div key={user.id} className={isDark() ? styles.dark : ""}>
                         {index + 1}. <Link to={`/profile/${user.id}`} className={isDark() ? styles.userDark : styles.user}>{user.full_name}</Link>
                         <span className={styles.leaderScore}>
-                            ({user.coins})
+                            ({user.total_points})
                         </span>
                     </div>
                 ))}

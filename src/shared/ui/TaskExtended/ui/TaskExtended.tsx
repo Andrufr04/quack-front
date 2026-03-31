@@ -86,7 +86,7 @@ export default function TaskExtended({ onCloseClick, task }: { onCloseClick: () 
 
                 <div className={styles.description}>
                     <div className={styles.descriptionTitle}>Опис:</div>
-                    <pre className={styles.descriptionInfo}>{task.description}</pre>
+                    <div className={styles.descriptionInfo} style={{maxHeight: docs.length > 0 ? "7.5em" : "25em" }}>{task.description}</div>
                 </div>
             </div>
 

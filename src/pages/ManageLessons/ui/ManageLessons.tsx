@@ -5,10 +5,11 @@ import { apiRequest } from "../../../shared/api/api";
 import { isTeacher } from "../../../entities/session/lib/jwt";
 import Page403 from "../../Page403/ui/Page403";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 export default function ManageLesson() {
     if (!isTeacher()) return <Page403 />
+    const { date } = useParams<{ date?: string }>();
     const navigate = useNavigate();
 
     const [lessons, setLessons] = useState<any[]>([]);
@@ -22,24 +23,42 @@ export default function ManageLesson() {
     // 1. Завантаження пар на сьогодні
     useEffect(() => {
         const fetchLessons = async () => {
-            const res = await apiRequest('/education/teacher/lessons-today/');
+            setLoading(true);
+
+            // 🔥 Якщо в URL є дата - шлемо її на бекенд, якщо ні - використовуємо lessons-today
+            // Примітка: твій бекенд має підтримувати запит з параметром дати
+            const endpoint = date
+                ? `/education/teacher/lessons-today/?date=${date}`
+                : '/education/teacher/lessons-today/';
+
+            const res = await apiRequest(endpoint);
             const data = await res?.json();
-            if (data) {
+
+            if (data && data.length > 0) {
                 setLessons(data);
 
-                // Визначаємо поточну пару за часом
+                // Якщо це сьогодні — шукаємо активну пару. Якщо інший день — вибираємо першу.
                 const now = new Date();
-                const activeIdx = data.findIndex((l: any) => {
-                    const start = new Date(l.start_time);
-                    const end = new Date(l.end_time);
-                    return now >= start && now <= end;
-                });
+                const todayStr = new Date().toISOString().split('T')[0];
+
+                let activeIdx = -1;
+
+                if (!date || date === todayStr) {
+                    activeIdx = data.findIndex((l: any) => {
+                        const start = new Date(l.start_time);
+                        const end = new Date(l.end_time);
+                        return now >= start && now <= end;
+                    });
+                }
+
                 setCurrentTab(activeIdx !== -1 ? activeIdx : 0);
+            } else {
+                setLessons([]);
             }
             setLoading(false);
         };
         fetchLessons();
-    }, []);
+    }, [date]); // 🔥 Перезавантажуємо, якщо дата в URL змінилася
 
     // 2. Завантаження студентів при зміні вкладки (пари)
     useEffect(() => {
@@ -168,8 +187,11 @@ export default function ManageLesson() {
     if (lessons.length === 0) {
         return (
             <div className={styles.emptyContainer}>
-                <div className={styles.emptyMessage}>
-                    🎉 На сьогодні пар немає! Можна відпочивати.
+                <div className={styles.emptyContent}>
+                    <div className={styles.emptyMessage}>
+                        {date ? `На ${date} пар не знайдено.` : "На сьогодні пар немає!"}
+                    </div>
+                    {date && <button onClick={() => navigate("/managelesson")} className={styles.topicButton}>Повернутися на сьогодні</button>}
                 </div>
             </div>
         );
@@ -177,7 +199,6 @@ export default function ManageLesson() {
 
     return (
         <div className={styles.container}>
-            {/* Вкладка */}
             <div className={styles.tabs}>
                 {lessons.map((l, idx) => (
                     <div
@@ -185,6 +206,7 @@ export default function ManageLesson() {
                         className={`${styles.tab} ${currentTab === idx ? styles.tabActive : ""}`}
                         onClick={() => setCurrentTab(idx)}
                     >
+                        {currentTab === idx && <span>{date}&nbsp;&nbsp;&nbsp;</span>}
                         {new Date(l.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         -
                         {new Date(l.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {l.study_group_name}
@@ -229,7 +251,14 @@ export default function ManageLesson() {
                             {students.map((s, idx) => (
                                 <tr key={s.id}>
                                     <td>{idx + 1}</td>
-                                    <td>{s.full_name}</td>
+                                    <td>
+                                        <Link
+                                            to={`/profile/${s.profile_id}`}
+                                            style={{ textDecoration: 'none', color: 'var(--color-text)', fontWeight: '500' }}
+                                        >
+                                            {s.full_name}
+                                        </Link>
+                                    </td>
                                     <td>
                                         <div className={styles.attendanceRow}>
                                             <div className={`${styles.attBox} ${styles.green} ${s.attendance_status === 1 ? styles.active : ""}`} onClick={() => handleAttendance(s.id, 1)}></div>

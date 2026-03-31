@@ -4,7 +4,7 @@
 }
 
 .tabs {
-    display: flex;
+  display: flex;
 }
 
 .tab {
@@ -23,7 +23,8 @@
   height: 100%;
 }
 
-th, td {
+th,
+td {
   padding: 10px;
   text-align: center;
   border-bottom: 1px solid var(--color-gray);
@@ -48,9 +49,17 @@ th, td {
   opacity: 0.9;
 }
 
-.green { background-color: #4caf50; }
-.yellow { background-color: #ffeb3b; }
-.red { background-color: #f44336; }
+.green {
+  background-color: #4caf50;
+}
+
+.yellow {
+  background-color: #ffeb3b;
+}
+
+.red {
+  background-color: #f44336;
+}
 
 .active {
   border: 2px solid var(--color-text);
@@ -96,8 +105,10 @@ select {
 }
 
 .tableContainer {
-  flex: 1; /* таблиця займає весь доступний простір */
-  overflow-y: auto; /* скрол якщо багато студентів */
+  flex: 1;
+  /* таблиця займає весь доступний простір */
+  overflow-y: auto;
+  /* скрол якщо багато студентів */
 }
 
 .table {
@@ -107,11 +118,13 @@ select {
   border-radius: 0 0 20px 20px;
 }
 
-th, td {
+th,
+td {
   padding: 10px;
   text-align: center;
   border-bottom: 1px solid #ddd;
-  height: 50px; /* фіксована висота рядка */
+  height: 50px;
+  /* фіксована висота рядка */
 }
 
 .topicButton {
@@ -123,10 +136,12 @@ th, td {
   cursor: pointer;
 }
 
-th, td {
+th,
+td {
   padding: 10px;
   border-bottom: 1px solid #ddd;
-  height: 50px; /* фіксована висота рядка */
+  height: 50px;
+  /* фіксована висота рядка */
 }
 
 /* Вирівнювання всього по центру */
@@ -138,7 +153,8 @@ td:not(:nth-child(2)) {
 /* Колонка з іменами студентів (2-й стовпець) ліворуч */
 td:nth-child(2) {
   text-align: left;
-  padding-left: 16px; /* можна трохи відступ додати */
+  padding-left: 16px;
+  /* можна трохи відступ додати */
 }
 
 
@@ -156,7 +172,8 @@ td:nth-child(2) {
   padding: 8px 16px;
   border-radius: 14px 14px 0 0;
   cursor: pointer;
-  background-color: var(--color-gray); /* сіра за замовчуванням */
+  background-color: var(--color-gray);
+  /* сіра за замовчуванням */
   color: #000000;
   white-space: nowrap;
   overflow: hidden;
@@ -174,7 +191,8 @@ td:nth-child(2) {
 td:nth-child(2) {
   text-align: left;
   padding-left: 16px;
-  max-width: 300px; /* фіксована ширина для обмеження */
+  max-width: 300px;
+  /* фіксована ширина для обмеження */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -193,7 +211,8 @@ td:nth-child(2) {
   border-radius: 0 0 10px 10px;
 }
 
-th, td {
+th,
+td {
   padding: 10px;
   height: 50px;
   border-bottom: 1px solid var(--color-gray);
@@ -238,19 +257,21 @@ td:not(:nth-child(2)) {
 }
 
 .topicButton {
-    width: 300px;
-    color: var(--color-text);
+  width: 300px;
+  color: var(--color-text);
 }
 
 /* Контейнер вкладок на всю ширину */
 .tabs {
   display: flex;
-  width: 100%; /* ключове: розтягування на всю ширину */
+  width: 100%;
+  /* ключове: розтягування на всю ширину */
 }
 
 /* Кожна вкладка займає рівну частину */
 .tab {
-  flex: 1; /* розтягує вкладку рівномірно */
+  flex: 1;
+  /* розтягує вкладку рівномірно */
   padding: 8px 16px;
   cursor: pointer;
   text-align: center;
@@ -267,7 +288,8 @@ td:not(:nth-child(2)) {
 
 /* Вкладка за замовчуванням */
 .tab {
-  flex: 1 1 0; /* розтягується рівномірно */
+  flex: 1 1 0;
+  /* розтягується рівномірно */
   padding: 8px 16px;
   cursor: pointer;
   text-align: center;
@@ -278,28 +300,35 @@ td:not(:nth-child(2)) {
 
 /* Активна вкладка */
 .tabActive {
-  flex: 0 0 auto; /* фіксована ширина для активної вкладки */
-  min-width: 150px; /* мінімальна ширина активної вкладки */
+  flex: 0 0 auto;
+  /* фіксована ширина для активної вкладки */
+  min-width: 150px;
+  /* мінімальна ширина активної вкладки */
 }
 
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
 }
 
 .container {
-  height: 95vh; /* фикс высоты экрана */
+  height: 95vh;
+  /* фикс высоты экрана */
   display: flex;
   flex-direction: column;
 }
 
 .tableWrapper {
   border-radius: 0 0 14px 14px;
-  overflow: hidden; /* обрезает углы */
+  overflow: hidden;
+  /* обрезает углы */
 }
 
 .tableContainer {
   max-height: 100%;
-  overflow-y: auto; /* скрол внутри */
+  overflow-y: auto;
+  /* скрол внутри */
 }
 
 .tab {
@@ -315,11 +344,36 @@ html, body, #root {
   transition: flex 0.3s ease, background 0.2s;
   color: var(--color-text);
 }
+
 .tab:hover {
-  flex: 2.5 1 0; /* увеличивается */
+  flex: 2.5 1 0;
+  /* увеличивается */
 }
+
 .tabActive {
   flex: 2.5 1 0;
   background-color: var(--color-bg);
   font-weight: bold;
+}
+
+.emptyContainer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.emptyContent {
+  width: 350px;
+  height: 200px;
+  gap: 2em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background-color: var(--color-opaque-secondary);
+  box-shadow: var(--shadow-main);
+  border-radius: var(--radius-main);
+  backdrop-filter: var(--blur-form);
 }

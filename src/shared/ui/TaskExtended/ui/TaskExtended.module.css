@@ -88,7 +88,7 @@
     padding: 10px;
     resize: none;
     background: var(--color-opaque-secondary);
-    background-color: #e3e3e3;
+    background-color: var(--color-gray);
 }
 
 .success {
@@ -103,7 +103,7 @@
     border-radius: 10px;
     background: var(--color-opaque-secondary);
     cursor: pointer;
-    background-color: #e3e3e3;
+    background-color: var(--color-gray);
     color: var(--color-text);
 }
 
@@ -112,7 +112,7 @@
 }
 
 .fileButton {
-    background: #f2f2f2;
+    background: #9a9a9a;
     padding: 4px 10px;
     border-radius: 6px;
     font-size: 14px;
@@ -124,7 +124,6 @@
 }
 
 .descriptionInfo {
-    max-height: calc(5 * 1.5em); 
     line-height: 1.5em;
     overflow-y: auto;
     white-space: pre-wrap;

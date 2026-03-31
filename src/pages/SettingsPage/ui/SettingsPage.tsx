@@ -112,7 +112,7 @@ function InterfaceSettings() {
                                 onChange={(e) => setShowTooltips(e.target.checked)} 
                                 style={{ width: '18px', height: '18px', cursor: 'pointer' }}
                             />
-                            <span style={{ fontSize: '16px' }}>Показувати підказки (tooltip) при наведенні</span>
+                            <span style={{ fontSize: '16px' }}>Показувати підказки при наведенні</span>
                         </label>
                     </div>
                 </div>

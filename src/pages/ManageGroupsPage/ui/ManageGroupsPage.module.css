@@ -48,6 +48,20 @@
     align-items: center;
 }
 
+.createForm input {
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    background-color: var(--color-gray);
+    border: none;
+}
+
+.createForm input:focus {
+    background-color: var(--color-gray);
+    border: none;
+    outline: none;
+}
+
 .topicInput {
     flex: 2;
     padding: 8px 12px;
@@ -143,8 +157,15 @@
 }
 
 .editInput {
-    padding: 6px;
-    border-radius: 4px;
-    border: 1px solid var(--color-gray);
+    padding: 8px 12px;
+    border-radius: 8px;
     width: 90%;
+    background-color: var(--color-gray);
+    border: none;
+}
+
+.editInput:focus {
+    outline: none;
+    background-color: var(--color-gray);
+    border: none;
 }

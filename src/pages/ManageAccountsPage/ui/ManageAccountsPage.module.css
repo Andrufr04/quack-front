@@ -54,15 +54,15 @@
     min-width: 120px;
     padding: 8px 12px;
     border-radius: 8px;
-    border: 1px solid #ddd;
-    background-color: #fafafa;
     font-size: 14px;
+    background-color: var(--color-gray);
+    border: none;
 }
 
 .createForm input:focus {
+    background-color: var(--color-gray);
+    border: none;
     outline: none;
-    border-color: var(--color-main);
-    background-color: #fff;
 }
 
 .addBtn {

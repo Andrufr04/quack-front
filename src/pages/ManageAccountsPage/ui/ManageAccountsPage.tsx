@@ -143,7 +143,7 @@ export default function ManageAccountsPage() {
                                                     onChange={(e) => updateGroup(u.id, e.target.value)}
                                                     className={styles.groupSelect}
                                                 >
-                                                    <option value="">— Оберіть —</option>
+                                                    <option value=""> Оберіть </option>
                                                     {availableGroups.map(g => (
                                                         <option key={g.id} value={g.id}>{g.name}</option>
                                                     ))}
