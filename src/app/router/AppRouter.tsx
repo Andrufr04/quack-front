@@ -23,6 +23,7 @@ import { Toaster } from "react-hot-toast";
 import { Tooltip } from 'react-tooltip'
 import SettingsPage from "../../pages/SettingsPage/ui/SettingsPage";
 import ArchivePage from "../../pages/ArchivePage/ui/ArchivePage";
+import NewsPage from "../../pages/NewsPage/ui/NewsPage";
 
 
 export default function AppRouter() {
@@ -50,6 +51,7 @@ export default function AppRouter() {
                     <Route path="/calendar" element={<CalendarPage />} />
                     <Route path="/settings" element={<SettingsPage />} />
                     <Route path="/archive" element={<ArchivePage />} />
+                    <Route path="/news" element={<NewsPage />} />
                     <Route path="*" element={<Page404 />} />
                 </Route>
             </Routes>

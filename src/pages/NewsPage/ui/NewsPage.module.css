@@ -1,0 +1,262 @@
+.newsContainer {
+    padding: 30px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: none;
+}
+
+.newsContainer::-webkit-scrollbar {
+    display: none;
+}
+
+/* ПЕРЕДЕЛАННАЯ СЕТКА */
+.masonryGrid {
+    display: grid;
+    /* Создаем ровно 3 колонки одинаковой ширины */
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 25px; 
+    width: 100%;
+    align-items: start; /* Чтобы карточки не растягивались по высоте самой высокой */
+}
+
+/* Адаптив для Grid */
+@media (max-width: 1100px) {
+    .masonryGrid {
+        grid-template-columns: repeat(2, 1fr); /* 2 колонки на средних экранах */
+    }
+}
+
+@media (max-width: 700px) {
+    .masonryGrid {
+        grid-template-columns: 1fr; /* 1 колонка на мобилках */
+    }
+}
+
+.newsCard {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    /* Убираем break-inside и inline-block, для Grid они не нужны */
+}
+
+.newsCard:hover {
+    transform: translateY(-5px);
+}
+
+.cardImg {
+    width: 100%;
+    height: 200px; /* Фиксируем высоту превью, чтобы было ровно */
+    object-fit: cover;
+    display: block;
+}
+
+.cardContent {
+    padding: 20px;
+}
+
+.date {
+    font-size: 13px;
+    opacity: 0.5;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #fff;
+    line-height: 1.2;
+}
+
+.text {
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 1rem;
+    line-height: 1.5;
+    opacity: 0.7;
+}
+
+/* Стили модалки оставляем как были */
+.modalOverlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    padding: 20px;
+}
+
+.modalContent {
+    background: #1a1a1a;
+    max-width: 800px;
+    width: 100%;
+    max-height: 90vh;
+    border-radius: 20px;
+    overflow-y: auto;
+    color: white;
+}
+
+.newsContainer {
+    padding: 30px;
+    overflow-y: auto;
+    /* Скрываем скроллбар */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.newsContainer::-webkit-scrollbar {
+    display: none;
+}
+
+/* СЕТКА MASONRY */
+.masonryGrid {
+    column-count: 3;    /* Жестко 3 колонки */
+    column-gap: 20px;   /* Отступ между колонками */
+    width: 100%;
+    display: block;      /* Важно: не flex и не grid! */
+}
+
+.newsCard {
+    /* ГЛАВНЫЕ ФИКСЫ ДЛЯ ПЛОТНОЙ СТЫКОВКИ */
+    display: block;
+    width: 100%;
+    break-inside: avoid;      /* Чтобы карточку не резало пополам */
+    margin-bottom: 20px;      /* Отступ только снизу */
+    
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+
+    box-shadow: var(--shadow-main);
+}
+
+.newsCard:hover {
+    transform: translateY(-5px);
+}
+
+.cardImg {
+    width: 100%;
+    display: block;
+    object-fit: cover;
+    /* Высота картинки подстроится сама под её формат */
+}
+
+.cardContent {
+    padding: 20px;
+}
+
+.date {
+    font-size: 13px;
+    opacity: 0.5;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--color-text);
+}
+
+.text {
+    font-size: 1rem;
+    line-height: 1.5;
+    opacity: 0.7;
+    /* Если хочешь обрезку текста: */
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Адаптив: если экран совсем узкий */
+@media (max-width: 1000px) {
+    .masonryGrid { column-count: 2; }
+}
+
+@media (max-width: 600px) {
+    .masonryGrid { column-count: 1; }
+}
+
+
+/* МОДАЛКА */
+.modalOverlay {
+    position: fixed;
+    top: 0; 
+    left: 0;
+    width: 100%; 
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85); /* Затемнение фона */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    padding: 20px;
+    backdrop-filter: blur(5px); /* Легкий блюр фона за модалкой */
+}
+
+.modalContent {
+    background: #1a1a1a;
+    max-width: 700px; /* Оптимальная ширина для чтения */
+    width: 100%;
+    max-height: 90vh;
+    border-radius: 24px;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    
+    /* Убираем полосу прокрутки внутри модалки для красоты */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.2) transparent;
+}
+
+.modalImg {
+    width: 100%;
+    height: auto;
+    max-height: 450px; /* Чтобы картинка не съедала весь экран */
+    object-fit: cover;
+    display: block; /* Убирает лишние отступы снизу */
+}
+
+.modalBody {
+    padding: 30px;
+}
+
+.modalBody h1 {
+    font-size: 1.6rem;
+    margin: 15px 0;
+    line-height: 1.2;
+    color: #fff;
+}
+
+.modalBody p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+}
+
+.modalBody .date {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 10px;
+}
