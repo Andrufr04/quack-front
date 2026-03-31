@@ -1,0 +1,52 @@
+.folderContainer {
+    position: relative;
+    cursor: pointer; /* щоб було зрозуміло, що на папку можна навести */
+}
+
+/* Додаємо ховер: коли мишка над контейнером, листики (.shieets) змінюють позицію */
+.folderContainer:hover .shieets {
+    /* Спочатку scale, потім рух (або навпаки, порядок має значення) */
+    transform: translateY(-20px) scale(1.06);
+}
+
+.folder {
+    position: relative;
+    display: flex;
+}
+
+.back {
+    width: 150px;
+    position: absolute;
+    z-index: 0;
+}
+
+.front {
+    width: 150px;
+    height: 90px;
+    background-color: color-mix(in srgb, var(--color-main) 37%, transparent);
+    backdrop-filter: blur(4px);
+    position: absolute;
+    z-index: 1; /* підняв z-index, щоб був вище листиків (0.5 < 2) */
+    top: 54px;
+    border-radius: 9px;
+
+    padding: 0.3em;
+    font-weight: bold;
+    color: color-mix(in srgb, var(--color-main), black 25%);
+}
+
+.a {
+    backdrop-filter: var(--blur-main);
+}
+
+.shieets {
+    width: 150px;
+    position: absolute;
+    z-index: 1; /* зробив цілим числом для надійності */
+    top: 12px;
+    /* ПЛАВНІСТЬ ТУТ */
+    transform: scale(1.06);
+    transition: transform 0.3s ease-in-out; 
+    will-change: transform;
+
+}
