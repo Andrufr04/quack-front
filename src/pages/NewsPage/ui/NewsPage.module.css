@@ -215,7 +215,8 @@
 }
 
 .modalContent {
-    background: #1a1a1a;
+    background: var(--color-bg);
+    color: var(--color-text);
     max-width: 700px; /* Оптимальная ширина для чтения */
     width: 100%;
     max-height: 90vh;
@@ -245,18 +246,18 @@
     font-size: 1.6rem;
     margin: 15px 0;
     line-height: 1.2;
-    color: #fff;
+    color: var(--color-text);
 }
 
 .modalBody p {
     font-size: 1.1rem;
     line-height: 1.6;
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--color-text);
     margin: 0;
 }
 
 .modalBody .date {
     font-size: 14px;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--color-dark-grey);
     margin-bottom: 10px;
 }
