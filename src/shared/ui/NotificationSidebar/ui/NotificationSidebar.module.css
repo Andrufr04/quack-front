@@ -4,6 +4,24 @@
     z-index: 1;
 }
 
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.3s;
+    z-index: 9999;
+}
+
+.overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
 .Sidebar {
     background-color: var(--color-bg);
     width: 480px; /* Трохи вужча за TaskExtended, бо це просто сповіщення */
@@ -11,14 +29,18 @@
     right: 0;
     top: 0;
     height: 100vh;
-    z-index: 5;
+    z-index: 10000;
     border-top-left-radius: var(--radius-main);
     border-bottom-left-radius: var(--radius-main);
-    padding: 2em;
+    transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 1.5em;
     box-shadow: var(--shadow-main);
+    width: 400px;
+    height: 100vh;
 }
 
 .header {
@@ -141,4 +163,22 @@
 .expanded .cardMessage {
     display: block; /* Знімаємо обрізку тексту */
     color: var(--color-text);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.closeBtn {
+    cursor: pointer;
+    opacity: 0.7;
+    transition: 0.2s;
+}
+
+.closeBtn:hover {
+    opacity: 1;
+    transform: scale(1.1);
 }

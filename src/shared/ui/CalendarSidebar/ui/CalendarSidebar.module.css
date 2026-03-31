@@ -1,0 +1,174 @@
+.sidebar {
+    position: fixed;
+    top: 0;
+    width: 300px;
+    height: 100vh;
+    background: var(--color-bg);
+    backdrop-filter: blur(20px);
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 10000;
+    transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 20px;
+    box-sizing: border-box;
+    border-top-left-radius: var(--radius-main);
+    border-bottom-left-radius: var(--radius-main);
+}
+
+.sidebar.open {
+    right: 0; /* Виїжджає */
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.3s;
+    z-index: 9999;
+}
+
+.overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.closeBtn {
+    cursor: pointer;
+    opacity: 0.7;
+    transition: 0.2s;
+}
+
+.closeBtn:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* Примітивні стилі для сітки календаря */
+.gridMini {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.day {
+    padding: 10px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    font-size: 14px;
+}
+.sidebar {
+    position: fixed;
+    top: 0;
+    right: -420px;
+    width: 300px;
+    height: 100vh;
+    background: var(--color-bg); /* Темний фон як на фото */
+    z-index: 10000;
+    transition: right 0.4s ease;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.sidebar.open { right: 0; }
+
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.3s;
+    z-index: 9999;
+}
+
+.overlay.active { opacity: 1; visibility: visible; }
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.monthYear {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.calendarGrid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.dayName {
+    font-size: 14px;
+    color: #888;
+    padding-bottom: 15px;
+}
+
+.weekendName { color: var(--color-main); } /* Помаранчевий/Червоний для Пт/Сб */
+
+.dayCell {
+    padding: 10px 0;
+    font-size: 12px;
+    color: var(--color-text);
+    cursor: pointer;
+    border-radius: 50%;
+    transition: 0.2s;
+}
+
+.notCurrent { opacity: 0.3; }
+
+.weekend { color: var(--color-main); } /* Вихідні дні */
+
+.today {
+    background: var(--color-main); /* Помаранчеве коло */
+    color: #fff !important;
+}
+
+/* РОЗКЛАД */
+.scheduleList {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.scheduleCard {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.subjectTitle {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--color-text);
+    margin-bottom: 2px;
+}
+
+.timeAndRoom {
+    font-size: 13px;
+    color: #aaa;
+}
+

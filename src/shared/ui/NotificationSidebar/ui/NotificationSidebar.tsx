@@ -14,10 +14,12 @@ export type NotificationItem = {
 
 // 🔥 Приймаємо нові пропси
 export default function NotificationSidebar({ 
+    isOpen,
     onClose, 
     unreadEdu, 
     unreadSoc 
 }: { 
+    isOpen: boolean,
     onClose: () => void, 
     unreadEdu?: boolean, 
     unreadSoc?: boolean 
@@ -151,11 +153,18 @@ export default function NotificationSidebar({
 
     return (
         <>
+        {/* Затемнення фону */}
+            <div 
+                className={`${styles.overlay} ${isOpen ? styles.active : ''}`} 
+                onClick={onClose} 
+            />
             <div className={styles.overlay} onClick={onClose}></div>
             <div className={styles.Sidebar}>
-                <div className={styles.header}>
-                    <div className={styles.icon} onClick={onClose}>{SVG_PLUS}</div>
-                    <div className={styles.title}>Сповіщення</div>
+               <div className={styles.header}>
+                    <h2>Сповіщення</h2>
+                    <div className={styles.closeBtn} onClick={onClose}>
+                        <div style={{ transform: 'rotate(45deg)' }}>{SVG_PLUS}</div>
+                    </div>
                 </div>
 
                 <div className={styles.tabs}>

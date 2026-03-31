@@ -5,10 +5,12 @@ import RoleSwitch from '../../RoleSwitch/ui/RoleSwitch'
 import styles from './ButtonsMenu.module.css'
 import NotificationSidebar from '../../../shared/ui/NotificationSidebar/ui/NotificationSidebar';
 import { apiRequest } from '../../../shared/api/api';
+import CalendarSidebar from '../../../shared/ui/CalendarSidebar/ui/CalendarSidebar';
 
 export default function ButtonsMenu({ direction = "vertical" }) {
     const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
-    
+    const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+
     // 🔥 Окремі стейти для категорій
     const [unreadEdu, setUnreadEdu] = useState(false);
     const [unreadSoc, setUnreadSoc] = useState(false);
@@ -21,7 +23,7 @@ export default function ButtonsMenu({ direction = "vertical" }) {
                     const data = await resEdu.json();
                     setUnreadEdu(data.results?.some((n: any) => !n.is_read));
                 }
-                
+
                 const resSoc = await apiRequest('/notifications/?category=social&page=1');
                 if (resSoc?.ok) {
                     const data = await resSoc.json();
@@ -61,10 +63,12 @@ export default function ButtonsMenu({ direction = "vertical" }) {
     // Головний кружечок горить, якщо хоча б десь є непрочитані
     const hasAnyUnread = unreadEdu || unreadSoc;
 
+
+
     return <>
         <div className={`${styles.menu} ${styles[direction]}`}>
             <RoleSwitch />
-            <div 
+            <div
                 style={{ position: 'relative', cursor: 'pointer' }}
                 onClick={() => setIsNotificationsOpen(true)} // Кружечок більше не зникає просто так!
             >
@@ -73,16 +77,27 @@ export default function ButtonsMenu({ direction = "vertical" }) {
                 )}
                 <RoundButton button={{ icon: SVG_NOTIFICATION, text: "Сповіщення" }} />
             </div>
-            <RoundButton button={{ icon: SVG_CALENDAR, text: "Розклад" }} />
+            <div onClick={() => setIsCalendarOpen(true)}>
+                <RoundButton button={{ icon: SVG_CALENDAR, text: "Розклад" }} />
+            </div>
         </div>
-        
+
         {isNotificationsOpen && (
-            <NotificationSidebar 
-                onClose={() => setIsNotificationsOpen(false)} 
-                // 🔥 Передаємо стейти всередину сайдбара
-                unreadEdu={unreadEdu} 
-                unreadSoc={unreadSoc} 
+            <NotificationSidebar
+                isOpen={isNotificationsOpen} // 🔥 Тепер передаємо стан як проп
+                onClose={() => setIsNotificationsOpen(false)}
+                unreadEdu={unreadEdu}
+                unreadSoc={unreadSoc}
             />
         )}
+
+        {isCalendarOpen && (
+            <CalendarSidebar
+                isOpen={isCalendarOpen}
+                onClose={() => setIsCalendarOpen(false)}
+            />
+        )}
+
+
     </>
 }
