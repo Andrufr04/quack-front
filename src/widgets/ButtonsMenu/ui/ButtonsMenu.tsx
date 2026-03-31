@@ -6,10 +6,13 @@ import styles from './ButtonsMenu.module.css'
 import NotificationSidebar from '../../../shared/ui/NotificationSidebar/ui/NotificationSidebar';
 import { apiRequest } from '../../../shared/api/api';
 import CalendarSidebar from '../../../shared/ui/CalendarSidebar/ui/CalendarSidebar';
+import { useLocation } from 'react-router-dom';
+import { isStudent } from '../../../entities/session/lib/jwt';
 
 export default function ButtonsMenu({ direction = "vertical" }) {
     const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+    const location = useLocation();
 
     // 🔥 Окремі стейти для категорій
     const [unreadEdu, setUnreadEdu] = useState(false);
@@ -69,7 +72,7 @@ export default function ButtonsMenu({ direction = "vertical" }) {
         <div className={`${styles.menu} ${styles[direction]}`}>
             <RoleSwitch />
             <div
-                style={{ position: 'relative', cursor: 'pointer' }}
+                style={{ position: 'relative', right: location.pathname === "/" && isStudent() ? "300px" : "0", cursor: 'pointer' }}
                 onClick={() => setIsNotificationsOpen(true)} // Кружечок більше не зникає просто так!
             >
                 {hasAnyUnread && (
@@ -77,9 +80,9 @@ export default function ButtonsMenu({ direction = "vertical" }) {
                 )}
                 <RoundButton button={{ icon: SVG_NOTIFICATION, text: "Сповіщення" }} />
             </div>
-            <div onClick={() => setIsCalendarOpen(true)}>
+            {location.pathname !== "/" && <div onClick={() => setIsCalendarOpen(true)}>
                 <RoundButton button={{ icon: SVG_CALENDAR, text: "Розклад" }} />
-            </div>
+            </div>}
         </div>
 
         {isNotificationsOpen && (

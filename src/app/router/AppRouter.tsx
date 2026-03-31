@@ -24,6 +24,7 @@ import { Tooltip } from 'react-tooltip'
 import SettingsPage from "../../pages/SettingsPage/ui/SettingsPage";
 import ArchivePage from "../../pages/ArchivePage/ui/ArchivePage";
 import NewsPage from "../../pages/NewsPage/ui/NewsPage";
+import ManageNewsPage from "../../pages/ManageNewsPage/ui/ManageNewsPage";
 
 
 export default function AppRouter() {
@@ -48,6 +49,7 @@ export default function AppRouter() {
                     <Route path="/managescheduledelete" element={<ManageScheduleDelete />} />
                     <Route path="/manageaccounts" element={<ManageAccountsPage />} />
                     <Route path="/managegroups" element={<ManageGroupsPage />} />
+                    <Route path="/managenews" element={<ManageNewsPage />} />
                     <Route path="/calendar" element={<CalendarPage />} />
                     <Route path="/settings" element={<SettingsPage />} />
                     <Route path="/archive" element={<ArchivePage />} />

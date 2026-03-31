@@ -211,7 +211,7 @@ function ThemeSettings() {
 }
 
 const THEME_COLORS = [
-    '#ac1616', '#FE9E52', '#f6ca46', '#8eea38', '#42e3d5',
+    '#FE9E52', '#ac1616', '#f6ca46', '#8eea38', '#42e3d5',
     '#4a4df4', '#9437e5', '#ef3ee0', '#ef417b', '#64748B'
 ];
 function ColorGrid({ selectedColor, onColorSelect }: { selectedColor: string, onColorSelect: (c: string) => void }) {

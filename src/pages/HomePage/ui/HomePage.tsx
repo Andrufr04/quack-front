@@ -82,79 +82,84 @@ function StudentPage() {
     const avgGrade = stats?.my_stats.average_grade || 0;
     const strokeDashoffset = circumference * (1 - avgGrade / 12);
 
-    return <div className={styles.widgets}>
-        {stats?.group_name && <div className={styles.LeaderBoard}>
-            <div className={styles.title}>Таблиця лідерів</div>
-            <div className={styles.currency}>
-                <div className={styles.balance}>
-                    <div className={styles.iconDuck}>{SVG_DUCK}</div>
-                    <div className={styles.amount}>{stats?.my_stats.ducks || 0}</div>
-                </div>
-                <div className={styles.balance}>
-                    <div className={styles.iconCoin}>{SVG_COIN}</div>
-                    <div className={styles.amount}>{stats?.my_stats.coins || 0}</div>
-                </div>
-            </div>
-            <div className={styles.list}>
-                {stats?.leaderboard.map((user, index) => (
-                    <div key={user.id} className={isDark() ? styles.dark : ""}>
-                        {index + 1}. <Link to={`/profile/${user.id}`} className={isDark() ? styles.userDark : styles.user}>{user.full_name}</Link>
-                        <span className={styles.leaderScore}>
-                            ({user.total_points})
-                        </span>
+    return <div className={styles.container}>
+        <div className={styles.widgets}>
+            {stats?.group_name && <div className={styles.LeaderBoard}>
+                <div className={styles.title}>Таблиця лідерів</div>
+                <div className={styles.currency}>
+                    <div className={styles.balance}>
+                        <div className={styles.iconDuck}>{SVG_DUCK}</div>
+                        <div className={styles.amount}>{stats?.my_stats.ducks || 0}</div>
                     </div>
-                ))}
-            </div>
-        </div>}
+                    <div className={styles.balance}>
+                        <div className={styles.iconCoin}>{SVG_COIN}</div>
+                        <div className={styles.amount}>{stats?.my_stats.coins || 0}</div>
+                    </div>
+                </div>
+                <div className={styles.list}>
+                    {stats?.leaderboard.map((user, index) => (
+                        <div key={user.id} className={isDark() ? styles.dark : ""}>
+                            {index + 1}. <Link to={`/profile/${user.id}`} className={isDark() ? styles.userDark : styles.user}>{user.full_name}</Link>
+                            <span className={styles.leaderScore}>
+                                ({user.total_points})
+                            </span>
+                        </div>
+                    ))}
+                </div>
+            </div>}
 
-        <div className={styles.widget} style={{width: "150px", height: "150px" }}>
-            <div className={styles.title} >Середня оцінка</div>
+            <div className={styles.widget} style={{ width: "150px", height: "150px" }}>
+                <div className={styles.title} >Середня оцінка</div>
 
-            <div style={{ position: "relative", width: "100px", height: "100px", marginTop: "10px" }}>
-                {/* Фон круга */}
-                <svg width="100" height="100">
-                    <circle
-                        cx="50"
-                        cy="50"
-                        r={radius}
-                        stroke="var(--color-ui-widget-bg)"
-                        strokeWidth="8"
-                        fill="transparent"
-                    />
-                    {/* Прогресс */}
-                    <circle
-                        cx="50"
-                        cy="50"
-                        r={radius}
-                        stroke={avgGrade >= 10 ? "#00cc66" : avgGrade >= 7 ? "#ffcc00" : "#ff4d4d"}
-                        strokeWidth="8"
-                        fill="transparent"
-                        strokeLinecap="round"
-                        strokeDasharray={circumference}
-                        strokeDashoffset={strokeDashoffset}
-                        transform="rotate(-90 50 50)"
-                        style={{ transition: "stroke-dashoffset 0.5s ease" }}
-                    />
-                </svg>
+                <div style={{ position: "relative", width: "100px", height: "100px", marginTop: "10px" }}>
+                    {/* Фон круга */}
+                    <svg width="100" height="100">
+                        <circle
+                            cx="50"
+                            cy="50"
+                            r={radius}
+                            stroke="var(--color-ui-widget-bg)"
+                            strokeWidth="8"
+                            fill="transparent"
+                        />
+                        {/* Прогресс */}
+                        <circle
+                            cx="50"
+                            cy="50"
+                            r={radius}
+                            stroke={avgGrade >= 10 ? "#00cc66" : avgGrade >= 7 ? "#ffcc00" : "#ff4d4d"}
+                            strokeWidth="8"
+                            fill="transparent"
+                            strokeLinecap="round"
+                            strokeDasharray={circumference}
+                            strokeDashoffset={strokeDashoffset}
+                            transform="rotate(-90 50 50)"
+                            style={{ transition: "stroke-dashoffset 0.5s ease" }}
+                        />
+                    </svg>
 
-                {/* Оценка внутри круга */}
-                <div
-                    style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        width: "100%",
-                        height: "100%",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontWeight: 600,
-                        fontSize: "18px",
-                    }}
-                >
-                    {avgGrade.toFixed(1)}
+                    {/* Оценка внутри круга */}
+                    <div
+                        style={{
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            width: "100%",
+                            height: "100%",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontWeight: 600,
+                            fontSize: "18px",
+                        }}
+                    >
+                        {avgGrade.toFixed(1)}
+                    </div>
                 </div>
             </div>
+        </div>
+        <div className={styles.calendar}>
+                        
         </div>
     </div>
 }

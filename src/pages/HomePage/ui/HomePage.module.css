@@ -4,6 +4,10 @@
     width: 350px;
 }
 
+.container {
+    display: flex;
+}
+
 .title {
     display: flex;
     justify-content: center;
@@ -284,4 +288,25 @@
 .duckIconLarge {
     height: 50px;
     opacity: 0.3;
+}
+
+.calendar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 300px;
+    height: 100vh;
+    background: var(--color-bg);
+    backdrop-filter: blur(20px);
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 1;
+    transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 20px;
+    box-sizing: border-box;
+    border-top-left-radius: var(--radius-main);
+    border-bottom-left-radius: var(--radius-main);
+}
+
+.cal {
+    right: 300px;
 }

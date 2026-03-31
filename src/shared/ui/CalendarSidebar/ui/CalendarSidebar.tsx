@@ -12,7 +12,8 @@ const SCHEDULE = [
     { id: 1, title: "Вища математика", start: "08:30", end: "10:00", room: "402" },
     { id: 2, title: "Програмування React", start: "10:15", end: "11:45", room: "Лаб 3" },
     { id: 3, title: "Іноземна мова", start: "12:15", end: "13:45", room: "215" },
-    { id: 4, title: "Фізичне виховання", start: "14:00", end: "15:30", room: "Спортзал" },
+    { id: 4, title: "Фізичне виховання дуже гарне млє улюблене", start: "14:00", end: "15:30", room: "Спортзал" },
+    { id: 5, title: "Порно, секс - освіта", start: "18:00", end: "24:00", room: "Моя кімната та малий конф. зал" },
 ];
 
 export default function CalendarSidebar({ isOpen, onClose }: CalendarSidebarProps) {
@@ -89,7 +90,7 @@ export default function CalendarSidebar({ isOpen, onClose }: CalendarSidebarProp
                                 <div className={styles.cardInfo}>
                                     <div className={styles.subjectTitle}>{item.title}</div>
                                     <div className={styles.timeAndRoom}>
-                                        {item.start} — {item.end} | Ауд. {item.room}
+                                        {item.start} - {item.end} | Ауд. {item.room}
                                     </div>
                                 </div>
                             </div>

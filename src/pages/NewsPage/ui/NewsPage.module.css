@@ -84,6 +84,11 @@
     font-size: 1rem;
     line-height: 1.5;
     opacity: 0.7;
+    white-space: pre-line;
+}
+
+.modalText {
+    white-space: pre-line;
 }
 
 /* Стили модалки оставляем как были */

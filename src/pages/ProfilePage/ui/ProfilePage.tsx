@@ -1,11 +1,12 @@
 import { useContext, useEffect, useRef, useState } from "react"
-import { SVG_A, SVG_ADDREACTION, SVG_ARROW_DOWN, SVG_CLIP, SVG_COMMENT, SVG_PLUS, SVG_SEND, SVG_SHARE } from "../../../shared/ui/icons/icons"
+import { SVG_A, SVG_ADDREACTION, SVG_ARROW_DOWN, SVG_CLIP, SVG_COMMENT, SVG_PLUS, SVG_SEND, SVG_SHARE, SVG_TRASH } from "../../../shared/ui/icons/icons"
 import RoundButton from "../../../shared/ui/RoundButton/RoundButton"
 import styles from "./ProfilePage.module.css"
 import { apiRequest } from "../../../shared/api/api";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { AppContext } from "../../../app/providers/AppProvider/model/AppContext";
+import Page404 from "../../Page404/ui/Page404";
 
 interface Post {
     id: string;
@@ -31,6 +32,7 @@ export default function ProfilePage() {
     const { mode } = useContext(AppContext)
     const isOwnProfile = !id; // Якщо ID немає — це мій профіль
     const [profile, setProfile] = useState<ProfileData | null>(null)
+    const navigate = useNavigate();
 
     const [expanded, setExpanded] = useState(false)
     const [isLongText, setIsLongText] = useState(true); // По умолчанию true, чтобы первично повесить классы
@@ -78,13 +80,16 @@ export default function ProfilePage() {
                         }
                     } else {
                         console.error("Бекенд не повернув ID профілю!");
+                        navigate("/")
                     }
                 }
                 else {
                     toast.error("Помилка при завантаженні профілю!")
+                    navigate("/")
                 }
             } catch (err) {
                 console.error("Failed to load profile", err)
+                navigate("/")
             }
         };
         fetchData()
@@ -103,11 +108,14 @@ export default function ProfilePage() {
 
     // Створення поста
     const handleCreatePost = async () => {
-        if (!newPostText && postFiles.length === 0) return;
+        const trimmedText = newPostText.trim();
+        if (!trimmedText && postFiles.length === 0) {
+            toast.error("Пост не може бути порожнім!");
+            return;
+        }
 
         const formData = new FormData();
         formData.append('text', newPostText);
-        // Якщо бекенд підтримує декілька фото, додаємо в циклі
         postFiles.forEach(file => formData.append('image', file));
 
         try {
@@ -120,8 +128,10 @@ export default function ProfilePage() {
                 setPostFiles([]);
                 toast.success("Опубліковано!");
 
-                // 🔥 ТЕПЕР БЕЗ ПЕРЕЗАВАНТАЖЕННЯ 🔥
-                // Просто тихо підтягуємо оновлений список постів
+                if (textareaRef.current) {
+                    textareaRef.current.style.height = 'auto';
+                }
+
                 if (profile?.id) {
                     const postsRes = await apiRequest(`/profiles/posts/user/${profile.id}/`);
                     if (postsRes?.ok) {
@@ -130,7 +140,8 @@ export default function ProfilePage() {
                     }
                 }
             } else {
-                toast.error("Помилка при публікації")
+                const errorData = await res?.json();
+                toast.error(errorData?.error || "Помилка при публікації");
             }
         } catch (e) {
             toast.error("Помилка при публікації");
@@ -324,6 +335,29 @@ export default function ProfilePage() {
 
     const [commentText, setCommentText] = useState("");
 
+    const handleDeletePost = async (postId: string) => {
+        if (!postId || !isOwnProfile) return;
+
+        // Оптимістичне оновлення (ховаємо пост відразу)
+        const prevPosts = posts;
+        setPosts(prev => prev.filter(p => p.id !== postId));
+
+        try {
+            const res = await apiRequest(`/profiles/posts/${postId}/delete/`, {
+                method: 'DELETE'
+            });
+            if (res?.ok) {
+                toast.success("Пост видалено");
+            } else {
+                toast.error("Не вдалося видалити пост");
+                setPosts(prevPosts); // Повертаємо, якщо помилка
+            }
+        } catch (e) {
+            toast.error("Помилка сервера");
+            setPosts(prevPosts);
+        }
+    };
+
     return (
         <div className={styles.profile}>
             <title>Quack | Профіль</title>
@@ -331,8 +365,8 @@ export default function ProfilePage() {
             {isOwnProfile && <><div className={styles.newPostGradient}></div>
                 <div className={styles.newPostContainer}>
                     <div className={styles.attachments}>
-                        {postFiles.map((f, i) => (
-                            <div key={i} className={styles.attachedImg} style={{ backgroundImage: `url(${URL.createObjectURL(f)})`, backgroundSize: 'cover' }}>
+                        {filePreviews.map((f, i) => (
+                            <div key={i} className={styles.attachedImg} style={{ backgroundImage: `url(${f})`, backgroundSize: 'cover' }}>
                                 <div className={styles.deleteImg} onClick={() => setPostFiles(prev => prev.filter((_, idx) => idx !== i))}>
                                     {SVG_PLUS}
                                 </div>
@@ -351,38 +385,75 @@ export default function ProfilePage() {
                             accept="image/*"
                             onChange={(e) => {
                                 const files = Array.from(e.target.files || []);
-                                const limit = 10 * 1024 * 1024; // 10 МБ
+                                const sizeLimit = 10 * 1024 * 1024; // 10 МБ
+                                const resLimit = 4096; // 4096px
 
-                                // Фільтруємо файли
-                                const validFiles = files.filter(file => {
-                                    if (!file.type.startsWith('image/')) {
-                                        toast.error(`Файл ${file.name} не є зображенням.`);
-                                        return false;
-                                    }
-                                    if (file.size > limit) {
-                                        toast.error(`Файл ${file.name} завеликий (макс 10 МБ).`);
-                                        return false;
-                                    }
-                                    return true;
+                                const validFiles: File[] = [];
+                                let errors: string[] = [];
+
+                                // Перетворюємо список файлів у масив промісів
+                                const checks = files.map(file => {
+                                    return new Promise<void>((resolve) => {
+                                        // 1. Швидкі перевірки (тип і вага)
+                                        if (!file.type.startsWith('image/')) {
+                                            errors.push(`Файл ${file.name} не є зображенням.`);
+                                            return resolve();
+                                        }
+                                        if (file.size > sizeLimit) {
+                                            errors.push(`Файл ${file.name} завеликий (макс 10 МБ).`);
+                                            return resolve();
+                                        }
+
+                                        // 🔥 2. Глибока перевірка (розміри) 🔥
+                                        const img = new Image();
+                                        img.src = URL.createObjectURL(file); // Створюємо тимчасове посилання
+
+                                        img.onload = () => {
+                                            URL.revokeObjectURL(img.src); // Одразу звільняємо пам'ять
+                                            if (img.width > resLimit || img.height > resLimit) {
+                                                errors.push(`Зображення ${file.name} завелике (макс ${resLimit}x${resLimit}px).`);
+                                            } else {
+                                                validFiles.push(file); // Тільки тут файл вважається валідним!
+                                            }
+                                            resolve();
+                                        };
+
+                                        img.onerror = () => {
+                                            URL.revokeObjectURL(img.src);
+                                            errors.push(`Помилка при читанні файлу ${file.name}.`);
+                                            resolve();
+                                        };
+                                    });
                                 });
 
-                                // Беремо тільки перші 5 ВАЛІДНИХ файлів
-                                // (якщо вже є завантажені, додаємо нові до існуючих, але не більше 5 загалом)
-                                setPostFiles(prev => {
-                                    const combined = [...prev, ...validFiles];
-                                    if (combined.length > 5) {
-                                        toast.error("Можна додати максимум 5 фото.");
+                                // Чекаємо, поки всі картинки перевіряться
+                                Promise.all(checks).then(() => {
+                                    // Показуємо помилки через Toast, якщо вони є
+                                    if (errors.length > 0) {
+                                        // Можна показати першу помилку, або всі через цикл
+                                        toast.error(errors[0]);
                                     }
-                                    return combined.slice(0, 5);
-                                });
 
-                                // Скидаємо value інпута, щоб можна було вибрати той самий файл ще раз, якщо треба
-                                if (postFileInputRef.current) {
-                                    postFileInputRef.current.value = '';
-                                }
+                                    // Додаємо тільки валідні файли
+                                    if (validFiles.length > 0) {
+                                        setPostFiles(prev => {
+                                            const combined = [...prev, ...validFiles];
+                                            if (combined.length > 5) {
+                                                toast.error("Можна додати максимум 5 фото.");
+                                            }
+                                            return combined.slice(0, 5);
+                                        });
+                                    }
+
+                                    // Скидаємо інпут, щоб можна було вибрати той самий файл знову
+                                    if (postFileInputRef.current) {
+                                        postFileInputRef.current.value = '';
+                                    }
+                                });
                             }}
                         />
                         <textarea
+                            ref={textareaRef}
                             className={styles.input}
                             placeholder="Створити нову публікацію"
                             value={newPostText}
@@ -466,6 +537,8 @@ export default function ProfilePage() {
                         key={post.id}
                         post={post}
                         profile={profile}
+                        isOwnProfile={isOwnProfile}
+                        handleDeletePost={handleDeletePost}
                         getAvatarUrl={getAvatarUrl}
                         handleReaction={handleReaction}
                         activeReactionPopup={activeReactionPopup}
@@ -598,7 +671,7 @@ export default function ProfilePage() {
 function PostItem({
     post, profile, getAvatarUrl, handleReaction,
     activeReactionPopup, setActiveReactionPopup, emojis,
-    onOpenModal // <--- Просто допиши його тут
+    onOpenModal, isOwnProfile, handleDeletePost // <--- Просто допиши його тут
 }: any) {
     const postRef = useRef<HTMLDivElement>(null);
     const [isPostLong, setIsPostLong] = useState(false);
@@ -639,6 +712,15 @@ function PostItem({
     return (
         <div className={styles.postContainer}>
             <div className={styles.post}>
+                {isOwnProfile && (
+                    <div 
+                        className={styles.deletePostBtn} 
+                        onClick={() => handleDeletePost(post.id)}
+                        title="Видалити пост"
+                    >
+                        {SVG_TRASH}
+                    </div>
+                )}
                 <div className={styles.postHeader}>
                     <div className={styles.postProfileImg} style={{ backgroundImage: `url(${getAvatarUrl(profile?.profile_picture || null)})` }}></div>
                     <div className={styles.postName}>{profile?.name} {profile?.surname}</div>

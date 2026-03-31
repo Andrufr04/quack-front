@@ -34,6 +34,16 @@
     width: auto;
 }
 
+.svgLogo {
+    height: 36px;
+    width: auto;
+}
+
+.svgLogoFull {
+    height: 36px;
+    width: auto;
+}
+
 .icons { 
     display: flex;
     height: 100%;
@@ -79,4 +89,22 @@
     display: flex;
     justify-content: space-between;
     width: 100%;
+}
+
+.logoFullWrap {
+  width: 30px;          /* старт як іконка */
+  height: 36px;
+  overflow: hidden;
+  transition: width 0.3s ease;
+}
+
+/* коли сайдбар відкритий */
+.expanded .logoFullWrap {
+  width: 120px; /* або 89px або скільки треба */
+}
+
+.svgLogoFull {
+  height: 36px;
+  width: 89px; /* ФІКС, не auto */
+  flex-shrink: 0; /* щоб flex не стискав */
 }

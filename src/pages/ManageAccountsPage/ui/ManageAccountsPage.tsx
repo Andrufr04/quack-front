@@ -74,6 +74,8 @@ export default function ManageAccountsPage() {
                 <div className={styles.current}><Link to="/manageaccounts">Облікові записи</Link></div>
                 <div className={styles.line}></div>
                 <Link to="/managegroups">Групи</Link>
+                <div className={styles.line}></div>
+                <Link to="/managenews">Новини</Link>
             </div>
 
             <div className={styles.container}>
