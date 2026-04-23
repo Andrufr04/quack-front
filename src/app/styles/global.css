@@ -11,10 +11,21 @@ body {
     font-size: 14px;
     color: var(--color-text);
     line-height: 1.3;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 .bold {
     font-weight: 600;
+}
+
+input, textarea {
+    -webkit-user-select: auto;
+    user-select: auto;
+}
+
+button, a {
+    -webkit-tap-highlight-color: transparent;
 }
 
 .rdv-common-content-wrapper {
@@ -48,7 +59,7 @@ body {
 }
 
 .react-tooltip {
-  z-index: 9999 !important;
+  z-index: 9998 !important;
 }
 
 input {
@@ -62,5 +73,4 @@ body {
 a:-webkit-any-link {
     color: inherit;
     cursor: pointer;
-    text-decoration: none;
 }

@@ -14,7 +14,7 @@ export default function RoundButton({ button }: { button: RoundButtonProps }) {
         }
     }
 
-    return <div className={styles.button} onClick={onClick}>
+    return <div className={styles.button} onClick={onClick} data-tooltip-id="my-tooltip" data-tooltip-content={button.text}>
         <div className={styles.icon}>{button.icon}</div>
     </div>
 }

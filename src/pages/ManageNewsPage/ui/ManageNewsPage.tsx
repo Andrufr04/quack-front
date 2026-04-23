@@ -104,8 +104,6 @@ export default function ManageNewsPage() {
     };
 
     const handleDelete = async (id: string) => {
-        if (!window.confirm("Ви впевнені, що хочете видалити цю новину?")) return;
-
         const res = await apiRequest(`/education/news/admin/${id}/`, {
             method: 'DELETE'
         });
@@ -125,6 +123,12 @@ export default function ManageNewsPage() {
                 <Link to="/manageaccounts">Облікові записи</Link>
                 <div className={styles.line}></div>
                 <Link to="/managegroups">Групи</Link>
+                <div className={styles.line}></div>
+                <Link to="/managesubjects">Предмети</Link>
+                <div className={styles.line}></div>
+                <Link to="/managetasktypes">Типи завдань</Link>
+                <div className={styles.line}></div>
+                <Link to="/managelessontypes">Типи занять</Link>
                 <div className={styles.line}></div>
                 <div className={styles.current}><Link to="/managenews">Новини</Link></div>
             </div>

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { AppContext } from "../../../app/providers/AppProvider/model/AppContext";
 import { apiRequest } from "../../../shared/api/api";
 import { SVG_PLUS } from "../../../shared/ui/icons/icons";
@@ -5,47 +6,224 @@ import styles from "./SettingsPage.module.css"
 import { useState, useEffect, useRef, useContext } from "react";
 import toast from "react-hot-toast";
 
-/*
-Откр при наведении
-Не закрівался при переходе на страничку
-Нужні ли подсказки при наведении
-*/
-
 export default function SettingsPage() {
-    // 1. Создаем стейт для вкладок. По умолчанию открыта 'theme'
     const [activeTab, setActiveTab] = useState('theme');
 
     return (
         <div className={styles.container}>
             <div className={styles.settings}>
                 <div className={styles.tabs}>
-                    <div
-                        className={`${styles.tab} ${activeTab === 'theme' ? styles.activeTab : ''}`}
-                        onClick={() => setActiveTab('theme')}
-                    >
-                        Тема
+                    <div className={styles.tabsUpper}>
+                        <div
+                            className={`${styles.tab} ${activeTab === 'theme' ? styles.activeTab : ''}`}
+                            onClick={() => setActiveTab('theme')}
+                        >
+                            Тема
+                        </div>
+                        <div
+                            className={`${styles.tab} ${activeTab === 'interface' ? styles.activeTab : ''}`}
+                            onClick={() => setActiveTab('interface')}
+                        >
+                            Інтерфейс
+                        </div>
+                        <div
+                            className={`${styles.tab} ${activeTab === 'profile' ? styles.activeTab : ''}`}
+                            onClick={() => setActiveTab('profile')}
+                        >
+                            Профіль
+                        </div>
+                        {/* 🔥 НОВА ВКЛАДКА АКАУНТ 🔥 */}
+                        <div
+                            className={`${styles.tab} ${activeTab === 'account' ? styles.activeTab : ''}`}
+                            onClick={() => setActiveTab('account')}
+                        >
+                            Акаунт
+                        </div>
                     </div>
-                    <div
-                        className={`${styles.tab} ${activeTab === 'interface' ? styles.activeTab : ''}`}
-                        onClick={() => setActiveTab('interface')}
-                    >
-                        Інтерфейс
-                    </div>
-                    <div
-                        className={`${styles.tab} ${activeTab === 'profile' ? styles.activeTab : ''}`}
-                        onClick={() => setActiveTab('profile')}
-                    >
-                        Профіль
-                    </div>
+
+                    <Link to="/privacy" className={styles.tab} style={{ textDecoration: 'none' }}>Політика конфіденційності</Link>
                 </div>
 
                 <div className={styles.line}></div>
 
                 <div className={styles.options}>
-                    {/* 2. Условный рендеринг: показываем компонент в зависимости от activeTab */}
                     {activeTab === 'theme' && <ThemeSettings />}
                     {activeTab === 'interface' && <InterfaceSettings />}
                     {activeTab === 'profile' && <ProfileSettings />}
+                    {/* 🔥 КОМПОНЕНТ АКАУНТУ 🔥 */}
+                    {activeTab === 'account' && <AccountSettings />}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// 🔥 НОВИЙ КОМПОНЕНТ ДЛЯ АКАУНТУ 🔥
+function AccountSettings() {
+    const { mode } = useContext(AppContext); // Дістаємо тему для відправки в запиті
+
+    // Стейти для паролю
+    const [oldPassword, setOldPassword] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [loadingPass, setLoadingPass] = useState(false);
+
+    // Стейти для пошти
+    const [newEmail, setNewEmail] = useState("");
+    const [emailCode, setEmailCode] = useState("");
+    const [emailStep, setEmailStep] = useState<0 | 1>(0); // 0 - введення пошти, 1 - введення коду
+    const [loadingEmail, setLoadingEmail] = useState(false);
+
+    const hasPassChanges = oldPassword.length > 0 && newPassword.length > 0 && confirmPassword.length > 0;
+
+    const handleSavePassword = async () => {
+        if (!hasPassChanges) return;
+        if (newPassword !== confirmPassword) return toast.error("Нові паролі не співпадають!");
+        if (newPassword.length < 8) return toast.error("Новий пароль має містити мінімум 8 символів!");
+        if (oldPassword === newPassword) return toast.error("Новий пароль повинен відрізнятись від старого!");
+
+        setLoadingPass(true);
+        try {
+            const res = await apiRequest('/change-password/', {
+                method: 'POST',
+                body: JSON.stringify({ old_password: oldPassword, new_password: newPassword })
+            });
+
+            if (res?.ok) {
+                toast.success("Пароль успішно змінено!");
+                setOldPassword(""); setNewPassword(""); setConfirmPassword("");
+            } else {
+                const data = await res?.json();
+                toast.error(data?.error || "Не вдалося змінити пароль");
+            }
+        } catch (e) {
+            toast.error("Помилка сервера");
+        } finally {
+            setLoadingPass(false);
+        }
+    };
+
+    const handleRequestEmailCode = async () => {
+        if (!newEmail.trim()) return toast.error("Введіть нову пошту!");
+        setLoadingEmail(true);
+        try {
+            const res = await apiRequest('/email-change-request/', {
+                method: 'POST',
+                body: JSON.stringify({ new_email: newEmail, theme: mode }) // 🔥 Передаємо тему!
+            });
+            if (res?.ok) {
+                toast.success(`Код відправлено на ${newEmail}`);
+                setEmailStep(1);
+            } else {
+                const data = await res?.json();
+                toast.error(data?.error || "Помилка відправки коду");
+            }
+        } catch (e) {
+            toast.error("Помилка сервера");
+        } finally {
+            setLoadingEmail(false);
+        }
+    };
+
+    const handleConfirmEmail = async () => {
+        if (!emailCode.trim()) return toast.error("Введіть код!");
+        setLoadingEmail(true);
+        try {
+            const res = await apiRequest('/email-change-confirm/', {
+                method: 'POST',
+                body: JSON.stringify({ new_email: newEmail, code: emailCode })
+            });
+            if (res?.ok) {
+                toast.success("Пошту успішно змінено!");
+                setEmailStep(0);
+                setNewEmail("");
+                setEmailCode("");
+            } else {
+                const data = await res?.json();
+                toast.error(data?.error || "Невірний код");
+            }
+        } catch (e) {
+            toast.error("Помилка сервера");
+        } finally {
+            setLoadingEmail(false);
+        }
+    };
+
+    // Інлайн стилі для інпутів (підтягують CSS-змінні проєкту)
+    const inputStyle = {
+        width: '100%', background: 'var(--color-opaque-secondary)', border: '1px solid var(--color-gray)',
+        borderRadius: 'var(--radius-secondary)', padding: '0.8rem', color: 'var(--color-text)',
+        fontFamily: 'inherit', fontSize: '14px', outline: 'none', marginBottom: '15px', transition: 'border-color 0.2s'
+    };
+
+    return (
+        <div className={styles.profileSettings} style={{ height: '100%', overflowY: 'auto', paddingRight: '10px' }}>
+            
+            {/* --- БЛОК ЗМІНИ ПОШТИ --- */}
+            <div className={styles.settingItem} style={{ marginBottom: '20px' }}>
+                <div className={styles.title}>Електронна пошта</div>
+                <div style={{ marginTop: '10px', maxWidth: '400px' }}>
+                    {emailStep === 0 ? (
+                        <>
+                            <input 
+                                type="email" placeholder="Введіть нову пошту" 
+                                value={newEmail} onChange={e => setNewEmail(e.target.value)} style={inputStyle}
+                            />
+                            <button 
+                                className={styles.saveBtn} onClick={handleRequestEmailCode} disabled={loadingEmail || !newEmail}
+                                style={{ opacity: (!newEmail || loadingEmail) ? 0.5 : 1, width: '100%' }}
+                            >
+                                {loadingEmail ? "Відправка..." : "Надіслати код підтвердження"}
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            <div style={{ fontSize: '13px', opacity: 0.7, marginBottom: '10px' }}>Код відправлено на {newEmail}</div>
+                            <input 
+                                type="text" placeholder="6-значний код" maxLength={6}
+                                value={emailCode} onChange={e => setEmailCode(e.target.value)} style={inputStyle}
+                            />
+                            <div style={{ display: 'flex', gap: '10px' }}>
+                                <button 
+                                    className={styles.saveBtn} onClick={() => {setEmailStep(0); setEmailCode("");}}
+                                    style={{ background: 'transparent', border: '1px solid var(--color-gray)', color: 'var(--color-text)', flex: 1 }}
+                                >
+                                    Скасувати
+                                </button>
+                                <button 
+                                    className={styles.saveBtn} onClick={handleConfirmEmail} disabled={loadingEmail || !emailCode}
+                                    style={{ opacity: (!emailCode || loadingEmail) ? 0.5 : 1, flex: 1 }}
+                                >
+                                    {loadingEmail ? "Перевірка..." : "Підтвердити"}
+                                </button>
+                            </div>
+                        </>
+                    )}
+                </div>
+            </div>
+
+            {/* --- БЛОК ЗМІНИ ПАРОЛЮ --- */}
+            <div className={styles.settingItem}>
+                <div className={styles.title}>Зміна паролю</div>
+                <div style={{ marginTop: '10px', maxWidth: '400px' }}>
+                    <input 
+                        type="password" placeholder="Поточний пароль" 
+                        value={oldPassword} onChange={e => setOldPassword(e.target.value)} style={inputStyle}
+                    />
+                    <input 
+                        type="password" placeholder="Новий пароль (мінімум 8 символів)" 
+                        value={newPassword} onChange={e => setNewPassword(e.target.value)} style={inputStyle}
+                    />
+                    <input 
+                        type="password" placeholder="Підтвердження нового паролю" 
+                        value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} style={inputStyle}
+                    />
+                    <button 
+                        className={styles.saveBtn} onClick={handleSavePassword} disabled={!hasPassChanges || loadingPass}
+                        style={{ opacity: (!hasPassChanges || loadingPass) ? 0.5 : 1, width: '100%' }}
+                    >
+                        {loadingPass ? "Збереження..." : "Змінити пароль"}
+                    </button>
                 </div>
             </div>
         </div>
@@ -53,12 +231,10 @@ export default function SettingsPage() {
 }
 
 function InterfaceSettings() {
-    // 1. Ініціалізуємо з localStorage (дефолтні значення: false, false, true)
     const [savedHover, setSavedHover] = useState(() => localStorage.getItem('sidebar_hover') === 'true');
     const [savedKeepOpen, setSavedKeepOpen] = useState(() => localStorage.getItem('sidebar_keep_open') === 'true');
-    const [savedTooltips, setSavedTooltips] = useState(() => localStorage.getItem('sidebar_tooltips') !== 'false'); // За замовчуванням true
+    const [savedTooltips, setSavedTooltips] = useState(() => localStorage.getItem('sidebar_tooltips') !== 'false');
 
-    // 2. Локальні стейти для чекбоксів
     const [openOnHover, setOpenOnHover] = useState(savedHover);
     const [keepOpenOnNav, setKeepOpenOnNav] = useState(savedKeepOpen);
     const [showTooltips, setShowTooltips] = useState(savedTooltips);
@@ -66,17 +242,14 @@ function InterfaceSettings() {
     const hasChanges = openOnHover !== savedHover || keepOpenOnNav !== savedKeepOpen || showTooltips !== savedTooltips;
 
     const handleSave = () => {
-        // Зберігаємо в localStorage
         localStorage.setItem('sidebar_hover', openOnHover.toString());
         localStorage.setItem('sidebar_keep_open', keepOpenOnNav.toString());
         localStorage.setItem('sidebar_tooltips', showTooltips.toString());
 
-        // Оновлюємо збережені стейти
         setSavedHover(openOnHover);
         setSavedKeepOpen(keepOpenOnNav);
         setSavedTooltips(showTooltips);
 
-        // 🔥 Відправляємо сигнал для Sidebar, щоб він оновився миттєво
         window.dispatchEvent(new Event('interface_settings_changed'));
         toast.success("Налаштування інтерфейсу збережено!");
     };
@@ -88,28 +261,28 @@ function InterfaceSettings() {
                     <div className={styles.title}>Бокове меню (Sidebar)</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '15px' }}>
                         <label style={{ display: 'flex', gap: '10px', alignItems: 'center', cursor: 'pointer' }}>
-                            <input 
-                                type="checkbox" 
-                                checked={openOnHover} 
-                                onChange={(e) => setOpenOnHover(e.target.checked)} 
+                            <input
+                                type="checkbox"
+                                checked={openOnHover}
+                                onChange={(e) => setOpenOnHover(e.target.checked)}
                                 style={{ width: '18px', height: '18px', cursor: 'pointer' }}
                             />
                             <span style={{ fontSize: '16px' }}>Відкривається при наведенні</span>
                         </label>
                         <label style={{ display: 'flex', gap: '10px', alignItems: 'center', cursor: 'pointer' }}>
-                            <input 
-                                type="checkbox" 
-                                checked={keepOpenOnNav} 
-                                onChange={(e) => setKeepOpenOnNav(e.target.checked)} 
+                            <input
+                                type="checkbox"
+                                checked={keepOpenOnNav}
+                                onChange={(e) => setKeepOpenOnNav(e.target.checked)}
                                 style={{ width: '18px', height: '18px', cursor: 'pointer' }}
                             />
                             <span style={{ fontSize: '16px' }}>Не закривати при переході на іншу сторінку</span>
                         </label>
                         <label style={{ display: 'flex', gap: '10px', alignItems: 'center', cursor: 'pointer' }}>
-                            <input 
-                                type="checkbox" 
-                                checked={showTooltips} 
-                                onChange={(e) => setShowTooltips(e.target.checked)} 
+                            <input
+                                type="checkbox"
+                                checked={showTooltips}
+                                onChange={(e) => setShowTooltips(e.target.checked)}
                                 style={{ width: '18px', height: '18px', cursor: 'pointer' }}
                             />
                             <span style={{ fontSize: '16px' }}>Показувати підказки при наведенні</span>
@@ -127,7 +300,7 @@ function InterfaceSettings() {
                     >
                         {hasChanges ? "Зберегти зміни" : "Зміни збережено"}
                     </button>
-                    
+
                 </div>
             </div>
         </div>
@@ -136,17 +309,12 @@ function InterfaceSettings() {
 
 
 function ThemeSettings() {
-    const {mode, setMode} = useContext(AppContext)
-    // 1. Инициализируем сохраненные данные из localStorage
+    const { mode, setMode } = useContext(AppContext)
     const [savedColor, setSavedColor] = useState(() => localStorage.getItem('color') || THEME_COLORS[0]);
-
-    // 2. Текущие данные (то, что юзер просто "клацает")
     const [currentColor, setCurrentColor] = useState(savedColor);
 
-    // 3. ПРИМЕНЯЕМ ЦВЕТ: Только когда изменился именно СОХРАНЕННЫЙ цвет (при загрузке или после handleSave)
     useEffect(() => {
         document.documentElement.style.setProperty('--color-main', savedColor);
-        // Если у тебя тема меняет классы на body, можно добавить и это:
     }, [savedColor]);
 
     const hasChanges = currentColor !== savedColor;
@@ -171,7 +339,7 @@ function ThemeSettings() {
                                 onChange={() => setMode('dark')}
                                 className={styles.radioInput}
                             />
-                            <span>Темная</span>
+                            <span>Темна</span>
                         </label>
                         <label className={styles.radioLabel}>
                             <input
@@ -182,15 +350,13 @@ function ThemeSettings() {
                                 onChange={() => setMode('light')}
                                 className={styles.radioInput}
                             />
-                            <span>Светлая</span>
+                            <span>Світла</span>
                         </label>
                     </div>
                 </div>
 
                 <div className={styles.themeSettingsPart}>
                     <div className={styles.title}>Основний колір</div>
-                    {/* Передаем currentColor, чтобы кружочки подсвечивались при клике, 
-                        но глобально цвет поменяется только после Save */}
                     <ColorGrid selectedColor={currentColor} onColorSelect={setCurrentColor} />
                 </div>
             </div>
@@ -233,18 +399,15 @@ function ProfileSettings() {
     const [description, setDescription] = useState("");
     const maxChars = 500;
 
-    // Стейт для файлів (що ми відправимо на бекенд)
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
     const [bannerFile, setBannerFile] = useState<File | null>(null);
 
-    // Стейт для прев'ю (що ми покажемо на екрані)
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
     const [bannerPreview, setBannerPreview] = useState<string | null>(null);
 
     const [loading, setLoading] = useState(false);
     const [hasChanges, setHasChanges] = useState(false);
 
-    // Рефи для прихованих інпутів
     const avatarInputRef = useRef<HTMLInputElement>(null);
     const bannerInputRef = useRef<HTMLInputElement>(null);
 
@@ -257,7 +420,7 @@ function ProfileSettings() {
                     setDescription(data.description || "");
                     setAvatarPreview(data.profile_picture || null);
                     setBannerPreview(data.banner_picture || null);
-                    setHasChanges(false); // Скидаємо прапорець змін після завантаження
+                    setHasChanges(false);
                 }
             } catch (error) {
                 console.error("Failed to load profile", error);
@@ -266,43 +429,36 @@ function ProfileSettings() {
         fetchProfile();
     }, []);
 
-    // Обробка вибору аватарки
     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
             setAvatarFile(file);
-            setAvatarPreview(URL.createObjectURL(file)); // Локальне прев'ю
+            setAvatarPreview(URL.createObjectURL(file));
             setHasChanges(true);
         }
     };
 
-    // Обробка вибору банера
     const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
             setBannerFile(file);
-            setBannerPreview(URL.createObjectURL(file)); // Локальне прев'ю
+            setBannerPreview(URL.createObjectURL(file));
             setHasChanges(true);
         }
     };
 
-    // Слідкуємо за описом
     const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setDescription(e.target.value);
         setHasChanges(true);
     };
 
-    // 2. Зберігаємо зміни
     const handleSaveProfile = async () => {
         if (!hasChanges || loading) return;
         setLoading(true);
 
         const formData = new FormData();
-
-        // Додаємо опис (якщо він є, навіть порожній рядок)
         formData.append("description", description);
 
-        // Додаємо файли тільки якщо користувач обрав нові
         if (avatarFile) formData.append("profile_picture", avatarFile);
         if (bannerFile) formData.append("banner_picture", bannerFile);
 
@@ -315,7 +471,7 @@ function ProfileSettings() {
             if (res?.ok) {
                 toast.success("Профіль успішно оновлено!");
                 setHasChanges(false);
-                setAvatarFile(null); // Очищаємо, бо воно вже на бекенді
+                setAvatarFile(null);
                 setBannerFile(null);
             } else {
                 toast.error("Не вдалося оновити профіль.");
@@ -330,7 +486,6 @@ function ProfileSettings() {
 
     return (
         <div className={styles.profileSettings}>
-            {/* Смена Аватара */}
             <div className={styles.settingItem}>
                 <div className={styles.title}>Фото профілю</div>
                 <div className={styles.avatarUpload}>
@@ -349,13 +504,13 @@ function ProfileSettings() {
                     <input
                         type="file"
                         ref={avatarInputRef}
-                        style={{ display: 'none' }} // Ховаємо стандартний інпут
+                        style={{ display: 'none' }}
                         accept="image/*"
                         onChange={handleAvatarChange}
                     />
                 </div>
             </div>
-            {/* Смена Баннера */}
+
             <div className={styles.settingItem}>
                 <div className={styles.title}>Банер профілю</div>
                 <div className={styles.bannerUpload}>
@@ -374,19 +529,18 @@ function ProfileSettings() {
                     <input
                         type="file"
                         ref={bannerInputRef}
-                        style={{ display: 'none' }} // Ховаємо стандартний інпут
+                        style={{ display: 'none' }}
                         accept="image/*"
                         onChange={handleBannerChange}
                     />
                 </div>
             </div>
 
-            {/* Смена Описания */}
             <div className={styles.settingItem}>
                 <div className={styles.title}>Про себе</div>
                 <div className={styles.textareaWrapper}>
-                    <textarea 
-                        className={styles.textarea} 
+                    <textarea
+                        className={styles.textarea}
                         placeholder="Розкажіть щось цікаве..."
                         value={description}
                         maxLength={maxChars}
@@ -398,10 +552,9 @@ function ProfileSettings() {
                 </div>
             </div>
 
-            {/* Кнопка сохранить */}
             <div className={styles.containerSave}>
                 <div className={styles.saveContainer}>
-                    <button 
+                    <button
                         className={styles.saveBtn}
                         onClick={handleSaveProfile}
                         disabled={!hasChanges || loading}

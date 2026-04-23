@@ -4,7 +4,6 @@
     align-items: center;    
     width: 100%;
     color: var(--color-ui-secondary);
-    user-select: none;
     max-height: 35%;
 }
 
@@ -37,7 +36,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 101;
     cursor: zoom-out;
 }
 

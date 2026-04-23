@@ -1,0 +1,188 @@
+.container {
+    margin-top: 1em;
+    padding: 1em 4em;
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.menu {
+    display: flex;
+    gap: 1em;
+    align-items: center;
+}
+
+.menu a {
+    color: var(--color-text-dark-grey);
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.menu a:hover {
+    color: var(--color-text);
+}
+
+.current a {
+    color: var(--color-text);
+    text-decoration: underline;
+    text-underline-offset: 5px;
+}
+
+.line {
+    width: 1px;
+    height: 1.5em;
+    background-color: var(--color-text-dark-grey);
+}
+
+.header {
+    background-color: var(--color-bg);
+    padding: 20px;
+    border-radius: 20px 20px 0 0;
+    border-bottom: 1px solid var(--color-gray);
+}
+
+.title {
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    color: var(--color-text);
+}
+
+.createForm {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.topicInput {
+    flex: 1;
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: none;
+    background-color: var(--color-gray);
+    color: var(--color-text);
+    font-size: 14px;
+}
+
+.topicInput:focus {
+    outline: none;
+}
+
+.topicButton {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    background-color: var(--color-main);
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+    transition: opacity 0.2s;
+}
+
+.topicButton:hover {
+    filter: brightness(1.1);
+}
+
+.tableWrapper {
+    background-color: var(--color-bg);
+    border-radius: 0 0 20px 20px;
+    overflow: hidden;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.tableContainer {
+    overflow-y: auto;
+    max-height: 100%;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    padding: 15px;
+    border-bottom: 1px solid var(--color-gray);
+    color: var(--color-text-dark-grey);
+    font-weight: 600;
+}
+
+td {
+    padding: 10px;
+    border-bottom: 1px solid var(--color-gray);
+    text-align: center;
+}
+
+.groupName {
+    font-weight: bold;
+    text-align: left !important;
+    padding-left: 24px;
+    color: var(--color-text);
+}
+
+.editBtn {
+    background: transparent;
+    border: 1px solid var(--color-gray);
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--color-text);
+    transition: 0.2s;
+}
+
+.editBtn:hover {
+    background: var(--color-gray);
+}
+
+.deleteBtn {
+    background: rgba(255, 77, 77, 0.1);
+    border: 1px solid #ff4d4d;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: #ff4d4d;
+    transition: 0.2s;
+}
+
+.deleteBtn:hover {
+    background: #ff4d4d;
+    color: white;
+}
+
+.saveBtn {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.cancelBtn {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.actionBtns {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.editInput {
+    padding: 8px 12px;
+    border-radius: 8px;
+    width: 90%;
+    background-color: var(--color-gray);
+    border: none;
+    color: var(--color-text);
+}
+
+.editInput:focus {
+    outline: none;
+}

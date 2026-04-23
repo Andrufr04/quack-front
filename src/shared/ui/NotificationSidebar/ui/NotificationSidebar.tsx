@@ -1,7 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
 import styles from "./NotificationSidebar.module.css";
-import { apiRequest } from "../../../api/api"; // Перевір шлях
+import { apiRequest } from "../../../api/api"; 
 import { SVG_PLUS } from "../../icons/icons";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 export type NotificationItem = {
     id: string;
@@ -10,9 +12,9 @@ export type NotificationItem = {
     category: 'education' | 'social';
     is_read: boolean;
     created_at: string;
+    related_object_id?: string | null;
 };
 
-// 🔥 Приймаємо нові пропси
 export default function NotificationSidebar({ 
     isOpen,
     onClose, 
@@ -24,6 +26,7 @@ export default function NotificationSidebar({
     unreadEdu?: boolean, 
     unreadSoc?: boolean 
 }) {
+    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<'education' | 'social'>('education');
     const [notifications, setNotifications] = useState<NotificationItem[]>([]);
     
@@ -31,10 +34,10 @@ export default function NotificationSidebar({
     const [hasMore, setHasMore] = useState(true);
     const [loading, setLoading] = useState(false);
     const [expandedId, setExpandedId] = useState<string | null>(null);
+    const [isMarkingAll, setIsMarkingAll] = useState(false); // Стейт для кнопки "Прочитати все"
 
     const sortedNotifications = useMemo(() => {
         return [...notifications].sort((a, b) => {
-            if (a.is_read !== b.is_read) return a.is_read ? 1 : -1; 
             return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
         });
     }, [notifications]);
@@ -55,7 +58,6 @@ export default function NotificationSidebar({
                 }
                 setHasMore(data.next !== null);
 
-                // 🔥 Оновлюємо глобальний статус, якщо підвантажили сторінку з непрочитаними
                 if (data.results.some((n: any) => !n.is_read)) {
                     window.dispatchEvent(new CustomEvent('update_unread_status', {
                         detail: { category, hasUnread: true }
@@ -77,7 +79,6 @@ export default function NotificationSidebar({
         fetchNotifications(1, activeTab);
     }, [activeTab]);
 
-    // 🔥 ДОДАЄМО В РЕАЛЬНОМУ ЧАСІ З СОКЕТА
     useEffect(() => {
         const handleNewSocketNotification = (e: Event) => {
             const customEvent = e as CustomEvent;
@@ -85,12 +86,13 @@ export default function NotificationSidebar({
 
             if (newNotif.category === activeTab || !newNotif.category) {
                 const notificationObj: NotificationItem = {
-                    id: newNotif.id || newNotif.related_id || Date.now().toString(),
+                    id: newNotif.id || newNotif.related_object_id || Date.now().toString(),
                     title: newNotif.title || "Нове сповіщення",
                     message: newNotif.message || "",
                     category: newNotif.category || activeTab,
                     is_read: false, 
                     created_at: newNotif.created_at || new Date().toISOString(),
+                    related_object_id: newNotif.related_object_id
                 };
 
                 setNotifications(prev => {
@@ -124,20 +126,45 @@ export default function NotificationSidebar({
 
         const targetNotif = notifications.find(n => n.id === id);
         if (targetNotif && !targetNotif.is_read) {
-            // Оновлюємо локально
             const updatedNotifs = notifications.map(n => n.id === id ? { ...n, is_read: true } : n);
             setNotifications(updatedNotifs);
             
-            // 🔥 Перевіряємо, чи залишились ще непрочитані
             const stillHasUnread = updatedNotifs.some(n => !n.is_read);
             
-            // Повідомляємо ButtonsMenu
             window.dispatchEvent(new CustomEvent('update_unread_status', {
                 detail: { category: activeTab, hasUnread: stillHasUnread }
             }));
 
-            // Відправляємо на бекенд
             await apiRequest(`/notifications/${id}/read/`, { method: 'POST' });
+        }
+    };
+
+    // 🔥 НОВА ФУНКЦІЯ "ПРОЧИТАТИ ВСЕ" 🔥
+    const handleReadAll = async () => {
+        if (isMarkingAll) return;
+        setIsMarkingAll(true);
+
+        try {
+            const res = await apiRequest('/notifications/read-all/', { method: 'POST' });
+            
+            if (res?.ok) {
+                // 1. Відмічаємо всі локальні сповіщення як прочитані
+                setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+                
+                // 2. Гасимо червоні крапочки глобально для обох категорій
+                window.dispatchEvent(new CustomEvent('update_unread_status', {
+                    detail: { category: 'education', hasUnread: false }
+                }));
+                window.dispatchEvent(new CustomEvent('update_unread_status', {
+                    detail: { category: 'social', hasUnread: false }
+                }));
+                
+                toast.success("Всі сповіщення прочитані!");
+            }
+        } catch (e) {
+            toast.error("Помилка на сервері");
+        } finally {
+            setIsMarkingAll(false);
         }
     };
 
@@ -146,24 +173,110 @@ export default function NotificationSidebar({
         return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' ' + date.toLocaleDateString();
     };
 
-    // Компонент маленького червоного індикатора для вкладок
     const TabDot = () => (
         <div style={{ width: '8px', height: '8px', backgroundColor: 'var(--color-main, #d42b2b)', borderRadius: '50%', marginLeft: '6px', display: 'inline-block' }}></div>
     );
 
+    // 🔥 ФУНКЦІЯ МАРШРУТИЗАЦІЇ (ЛОГІКА ПЕРЕХОДІВ ВІДПОВІДНО ДО ТВОГО APPROUTER) 🔥
+    const getNotificationLink = (n: NotificationItem): string | null => {
+        if (!n.related_object_id) return null;
+        
+        const t = n.title.toLowerCase();
+
+        // ==========================================
+        // 1. АПКА PROFILES (Соціальні сповіщення)
+        // ==========================================
+        
+        // Чат: "Нове повідомлення" -> відкриваємо сторінку чату
+        if (t.includes("повідомлення")) {
+            return `/chats/${n.related_object_id}`;
+        }
+        
+        if(t.includes("відповідь")) {
+            const parts = n.related_object_id.split(':');
+            
+            // Якщо прийшло два ID (новий формат)
+            if (parts.length === 2) {
+                const postId = parts[0];
+                const userId = parts[1];
+                return `/profile/${userId}?post=${postId}`;
+            }
+        }
+        // Пости: "Нова реакція!", "Новий коментар", "Відповідь на коментар"
+        // Ведемо на свій профіль (/profile) і передаємо ?post=id, щоб спрацював плавний скрол
+        if (t.includes("реакція") || t.includes("коментар")) {
+            return `/profile?post=${n.related_object_id}`;
+        }
+
+        // ==========================================
+        // 2. АПКА EDUCATION (Навчальні сповіщення)
+        // ==========================================
+        
+        // Новини: "Нова новина!" -> сторінка всіх новин
+        if (t.includes("новина")) {
+            return `/news`;
+        }
+
+        if (t.includes("оцінено")) {
+            return `/archive`; 
+        }
+        
+        // Завдання (Студенту): "Нове завдання: ..."
+        if (t.includes("завдання")) {
+            return `/tasks`; 
+        }
+
+        // Завдання (Вчителю): "Нова робота на перевірку!"
+        if (t.includes("перевірку")) {
+            return `/managechecktasks`; 
+        }
+        
+        // Розклад: "Оновлення розкладу" (Вчителю), "Зміни в розкладі!" (Студенту)
+        if (t.includes("розклад")) {
+            return `/calendar`;
+        }
+        
+        // Дії на парі: "Відвідуваність", "Нова оцінка!", "Качка за активність!"
+        if (t.includes("відвідуваність") || t.includes("оцінка") || t.includes("качка")) {
+            return `/`; 
+        }
+
+        return null;
+    };
+
     return (
         <>
-        {/* Затемнення фону */}
             <div 
                 className={`${styles.overlay} ${isOpen ? styles.active : ''}`} 
                 onClick={onClose} 
             />
             <div className={styles.overlay} onClick={onClose}></div>
             <div className={styles.Sidebar}>
-               <div className={styles.header}>
+                <div className={styles.header}>
                     <h2>Сповіщення</h2>
-                    <div className={styles.closeBtn} onClick={onClose}>
-                        <div style={{ transform: 'rotate(45deg)' }}>{SVG_PLUS}</div>
+                    
+                    {/* 🔥 КНОПКА "ПРОЧИТАТИ ВСЕ" ТА ЗАКРИТТЯ 🔥 */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <button 
+                            onClick={handleReadAll} 
+                            disabled={isMarkingAll || notifications.length === 0}
+                            style={{
+                                background: 'transparent',
+                                border: '1px solid var(--color-gray)',
+                                color: 'var(--color-text)',
+                                padding: '4px 10px',
+                                borderRadius: '8px',
+                                cursor: (isMarkingAll || notifications.length === 0) ? 'default' : 'pointer',
+                                opacity: (isMarkingAll || notifications.length === 0) ? 0.5 : 1,
+                                fontSize: '12px',
+                                transition: '0.2s'
+                            }}
+                        >
+                            {isMarkingAll ? 'Зачекайте...' : 'Прочитати все'}
+                        </button>
+                        <div className={styles.closeBtn} onClick={onClose}>
+                            <div style={{ transform: 'rotate(45deg)' }}>{SVG_PLUS}</div>
+                        </div>
                     </div>
                 </div>
 
@@ -174,7 +287,6 @@ export default function NotificationSidebar({
                         style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                     >
                         Навчання
-                        {/* 🔥 Показуємо крапочку, якщо є непрочитані */}
                         {unreadEdu && <TabDot />} 
                     </div>
                     <div 
@@ -183,7 +295,6 @@ export default function NotificationSidebar({
                         style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                     >
                         Соціальне
-                        {/* 🔥 Показуємо крапочку, якщо є непрочитані */}
                         {unreadSoc && <TabDot />}
                     </div>
                 </div>
@@ -194,6 +305,7 @@ export default function NotificationSidebar({
                     ) : (
                         sortedNotifications.map(n => { 
                             const isExpanded = expandedId === n.id;
+                            const actionLink = getNotificationLink(n);
                             return (
                                 <div 
                                     key={n.id} 
@@ -206,6 +318,24 @@ export default function NotificationSidebar({
                                     </div>
                                     <div className={styles.cardMessage}>
                                         {n.message}
+                                        {isExpanded && actionLink && (
+                                            <button 
+                                                onClick={(e) => {
+                                                    e.stopPropagation(); // Щоб картка не закрилась
+                                                    onClose(); // Закриваємо сайдбар
+                                                    navigate(actionLink); // Переходимо на сторінку
+                                                }}
+                                                style={{
+                                                    display: 'block', marginTop: '12px', width: '100%',
+                                                    padding: '8px', background: 'var(--color-opaque-secondary)', 
+                                                    color: 'var(--color-main)', border: '1px solid var(--color-main)',
+                                                    borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold',
+                                                    textAlign: 'center', transition: 'all 0.2s'
+                                                }}
+                                            >
+                                                Перейти →
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                             );

@@ -10,13 +10,12 @@
 
 .mark {
     position: absolute;
-    top: 2px;
-    right: 2px;
+    top: 6px;
+    right: 6px;
     color: #fff;
-    font-size: 20px;
-    font-weight: bold;
-    width: 40px;
-    height: 40px;
+    font-size: 16px;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;

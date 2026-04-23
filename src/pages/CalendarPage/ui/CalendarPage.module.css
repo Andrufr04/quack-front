@@ -74,7 +74,6 @@
     font-variant: small-caps;
     font-weight: bold;
     color: var(--color-main);
-    user-select: none;
 }
 
 .year {
@@ -86,18 +85,15 @@
     width: 14.285714%; /* DONT CHANGE THIS FUCKING NUMBER */
     flex-direction: column;
     align-items: center;
-    user-select: none;
 }
 
 .dayOfWeek {
     font-size: 12px;
-    user-select: none;
 }
 
 .date {
     font-size: 1.5em;
     font-weight: bold;
-    user-select: none;
 }
 
 .weekend {

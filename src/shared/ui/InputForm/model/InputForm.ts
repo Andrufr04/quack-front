@@ -3,6 +3,7 @@ type InputFormProps = {
     id: string,
     title: string,
     placeholder: string,
+    maxLength?: number,
     value?: string,
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void,
     error?: boolean,

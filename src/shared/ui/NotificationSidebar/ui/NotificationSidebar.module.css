@@ -14,7 +14,7 @@
     opacity: 0;
     visibility: hidden;
     transition: 0.3s;
-    z-index: 9999;
+    z-index: 100;
 }
 
 .overlay.active {
@@ -29,7 +29,7 @@
     right: 0;
     top: 0;
     height: 100vh;
-    z-index: 10000;
+    z-index: 101;
     border-top-left-radius: var(--radius-main);
     border-bottom-left-radius: var(--radius-main);
     transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);

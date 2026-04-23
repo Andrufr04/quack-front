@@ -13,6 +13,7 @@ export default function InputForm({ input }: { input: InputFormProps }) {
             id={input.id}
             className={styles.field}
             type={isVisible ? "text" : input.type }
+            maxLength={input.maxLength}
             value={input.value}
             onChange={input.onChange}
             placeholder={input.placeholder} 

@@ -68,8 +68,6 @@ export default function TasksDonePage() {
             <Link to="/tasks">До виконання</Link>
             <div className={styles.line}></div>
             <Link to="/tasks/examination">На перевірці</Link>
-            <div className={styles.line}></div>
-            <div className={styles.current}><Link to="/tasks/done">Перевірені</Link></div>
         </div>
 
         <div className={styles.container}>

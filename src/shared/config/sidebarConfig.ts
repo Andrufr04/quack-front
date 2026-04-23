@@ -28,6 +28,11 @@ export const navigationButtonsAdministration: NavigationButtonProps[] = [
     {icon : SVG_PEOPLE, text : "Керування", slug: "/manageaccounts"},
 ]
 
+export const navigationButtonsCurator: NavigationButtonProps[] = [
+    {icon : SVG_HOME, text : "Головна сторінка", slug : "/"},
+    {icon : SVG_CHATS, text : "Чати", slug : "/chats"},
+]
+
 export const settingsButtons: NavigationButtonProps[] = [
     {icon : SVG_SETTINGS, text : "Налаштування", slug : "/settings"},
     {icon : SVG_LOGOUT, text : "Вихід", slug : "/"},

@@ -13,11 +13,13 @@ const END_DAY = 20 * 60;
 export type Lesson = {
     id: string;
     title: string;
-    type: string;  // Додали тип (Лекція, Практика, Заняття)
+    type: string;
     start: string;
     end: string;
-    day: number;   // Залишаємо, може знадобитися для іншої логіки
-    date: string;  // 🔥 ДОДАЛИ ДАТУ (формат "YYYY-MM-DD")
+    day: number;
+    date: string;
+    classroom: string;
+    teacher_id: string;
 };
 
 const timeToMinutes = (time: string) => {
@@ -211,7 +213,7 @@ export const CalendarPage = () => {
                                                     <div className={styles.title}>{lesson.title}</div>
                                                     <div className={styles.lessonBottom}>
                                                         <div>{lesson.start} - {lesson.end}</div>
-                                                        <div className={styles.aud}>28</div>
+                                                        <div className={styles.aud}>{lesson.classroom}</div>
                                                     </div>
                                                 </div>
                                             );

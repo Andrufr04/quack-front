@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react"
-import { navigationButtonsAdministration, navigationButtonsStudent, navigationButtonsTeacher, settingsButtons } from "../../../shared/config/sidebarConfig"
+import { navigationButtonsAdministration, navigationButtonsCurator, navigationButtonsStudent, navigationButtonsTeacher, settingsButtons } from "../../../shared/config/sidebarConfig"
 import NavigationButton from "../../../shared/ui/NavigationButton/ui/NavigationButton"
 import style from "./Sidebar.module.css"
 import { SVG_EXPAND, SVG_LOGO } from "../../../shared/ui/icons/icons"
 import { useLocation, useNavigate } from "react-router-dom"
-import { isAdministration, isStudent, isTeacher } from "../../../entities/session/lib/jwt"
+import { isAdministration, isCurator, isStudent, isTeacher } from "../../../entities/session/lib/jwt"
 import ModeSwitch from "../../ModeSwitch/ui/ModeSwitch"
 
 export default function Sidebar() {
@@ -106,7 +106,8 @@ export default function Sidebar() {
                         isStudent() ? navigationButtonsStudent.map(b => <NavigationButton key={b.text} navigationButton={b} visible={expanded} showTooltip={settings.showTooltips} />)
                             : isTeacher() ? navigationButtonsTeacher.map(b => <NavigationButton key={b.text} navigationButton={b} visible={expanded} showTooltip={settings.showTooltips} />)
                                 : isAdministration() ? navigationButtonsAdministration.map(b => <NavigationButton key={b.text} navigationButton={b} visible={expanded} showTooltip={settings.showTooltips} />)
-                                    : <></>
+                                    : isCurator() ? navigationButtonsCurator.map(b => <NavigationButton key={b.text} navigationButton={b} visible={expanded} showTooltip={settings.showTooltips} />)
+                                        : <></>
                     }
                 </div>
                 <div className={style.iconsSettings} onClick={(e) => e.stopPropagation()}>

@@ -1,12 +1,14 @@
 import { useContext, useEffect, useRef, useState } from "react"
-import { SVG_A, SVG_ADDREACTION, SVG_ARROW_DOWN, SVG_CLIP, SVG_COMMENT, SVG_PLUS, SVG_SEND, SVG_SHARE, SVG_TRASH } from "../../../shared/ui/icons/icons"
+import { SVG_A, SVG_ADDREACTION, SVG_ARROW_DOWN, SVG_CHATS, SVG_CLIP, SVG_COMMENT, SVG_INVISIBLE, SVG_PLUS, SVG_SEND, SVG_SHARE, SVG_TRASH } from "../../../shared/ui/icons/icons"
 import RoundButton from "../../../shared/ui/RoundButton/RoundButton"
 import styles from "./ProfilePage.module.css"
 import { apiRequest } from "../../../shared/api/api";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { AppContext } from "../../../app/providers/AppProvider/model/AppContext";
 import Page404 from "../../Page404/ui/Page404";
+import { getSessionInfo } from "../../../entities/session/lib/jwt";
+import ConfirmModal from "../../../shared/ui/ConfirmModal/ConfirmModal";
 
 interface Post {
     id: string;
@@ -16,6 +18,7 @@ interface Post {
     created_at: string;
     reactions: Record<string, number>;
     my_reaction: string | null;
+    comments_count: number;
 }
 
 interface ProfileData {
@@ -27,10 +30,21 @@ interface ProfileData {
     banner_picture: string | null;
 }
 
+interface PostComment {
+    id: string;
+    parent_id: string | null;
+    text: string;
+    author_id: string;
+    author_name: string;
+    author_avatar: string | null;
+    author_profile_id: string;
+    created_at: string;
+}
+
 export default function ProfilePage() {
     const { id } = useParams<{ id: string }>(); // Дістаємо ID з URL
     const { mode } = useContext(AppContext)
-    const isOwnProfile = !id; // Якщо ID немає — це мій профіль
+    const isOwnProfile = !id || id === getSessionInfo()?.userId; // Якщо ID немає - це мій профіль
     const [profile, setProfile] = useState<ProfileData | null>(null)
     const navigate = useNavigate();
 
@@ -42,23 +56,27 @@ export default function ProfilePage() {
     const [postExpanded, setPostExpanded] = useState(false);
     const [isPostLong, setIsPostLong] = useState(false);
     const postRef = useRef<HTMLDivElement>(null);
+    
 
     const [posts, setPosts] = useState<Post[]>([]); // Стейт для постів
     const [newPostText, setNewPostText] = useState("");
     const [postFiles, setPostFiles] = useState<File[]>([]);
     const postFileInputRef = useRef<HTMLInputElement>(null);
 
-    // 🔥 НОВЕ: Реф для скидання висоти textarea
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-    // 🔥 НОВЕ: Стейт для кешування URL картинок, щоб не блимали
     const [filePreviews, setFilePreviews] = useState<string[]>([]);
 
-    const [showReactions, setShowReactions] = useState(false);
     const [activeReactionPopup, setActiveReactionPopup] = useState<string | null>(null);
 
     const fileInputRef = useRef<HTMLInputElement>(null)
     const token = localStorage.getItem('access_token')
+
+    const myUserId = (() => {
+        if (!token) return null;
+        try { return JSON.parse(atob(token.split('.')[1])).user_id; } catch { return null; }
+    })();
+
+    const [deleteTarget, setDeleteTarget] = useState<{ type: 'post' | 'comment', id: string } | null>(null);
 
     useEffect(() => {
         if (!token) return
@@ -94,6 +112,72 @@ export default function ProfilePage() {
         };
         fetchData()
     }, [token, id, isOwnProfile])
+
+    const executeDelete = async () => {
+        if (!deleteTarget) return;
+
+        try {
+            if (deleteTarget.type === 'post') {
+                const res = await apiRequest(`/profiles/posts/${deleteTarget.id}/delete/`, { method: 'DELETE' });
+                if (res?.ok) {
+                    
+                    setPosts(prevPosts => prevPosts.filter(p => p.id !== deleteTarget.id));
+                    
+                    toast.success("Пост видалено");
+                }
+            } else if (deleteTarget.type === 'comment') {
+                const res = await apiRequest(`/profiles/comments/${deleteTarget.id}/delete/`, { method: 'DELETE' });
+                if (res?.ok) {
+                    setComments(prev => prev.filter(c => c.id !== deleteTarget.id));
+                    
+                    toast.success("Коментар видалено");
+                }
+            }
+        } catch (e) {
+            toast.error("Помилка видалення");
+        } finally {
+            setDeleteTarget(null); // Закриваємо модалку
+        }
+    };
+
+    // 🔥 МАГІЯ СКРОЛУ ТА ПІДСВІТКИ ПОСТА 🔥
+    useEffect(() => {
+        // Чекаємо, поки пости завантажаться
+        if (posts.length > 0) {
+            const params = new URLSearchParams(location.search);
+            const targetPostId = params.get('post');
+
+            if (targetPostId) {
+                // Шукаємо пост у DOM
+                const postElement = document.getElementById(`post-${targetPostId}`);
+                
+                if (postElement) {
+                    // Плавний скрол так, щоб пост був по центру екрану
+                    postElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                    // Робимо красиву тимчасову підсвітку фірмовим кольором
+                    const originalOutline = postElement.style.outline;
+                    const originalTransition = postElement.style.transition;
+                    const originalBoxShadow = postElement.style.boxShadow;
+
+                    postElement.style.transition = 'all 0.5s ease-in-out';
+                    postElement.style.outline = '2px solid var(--color-main)';
+                    postElement.style.boxShadow = '0 0 20px var(--color-main)';
+
+                    // Прибираємо підсвітку через 2.5 секунди
+                    setTimeout(() => {
+                        postElement.style.outline = originalOutline;
+                        postElement.style.boxShadow = originalBoxShadow;
+                        
+                        // Повертаємо оригінальний transition трохи пізніше
+                        setTimeout(() => {
+                            postElement.style.transition = originalTransition;
+                        }, 500);
+                    }, 2500);
+                }
+            }
+        }
+    }, [posts, location.search]); // Запускаємо щоразу, коли змінюються пости або URL
 
     useEffect(() => {
         // Створюємо URL тільки для нових файлів
@@ -249,7 +333,7 @@ export default function ProfilePage() {
     }, [profile?.description]); // Пересчитываем, если текст изменился
 
     useEffect(() => {
-        // Якщо у профілі є банер — беремо його. Якщо ні — ставимо стандартну картинку.
+        // Якщо у профілі є банер - беремо його. Якщо ні - ставимо стандартну картинку.
         // Використовуємо getAvatarUrl, щоб правильно сформувати посилання.
         const bannerUrl = profile?.banner_picture
             ? getAvatarUrl(profile.banner_picture)
@@ -288,15 +372,11 @@ export default function ProfilePage() {
         return () => window.removeEventListener('resize', checkPostLength);
     }, []); // Если текст поста будет приходить с бэкенда, добавь его переменную сюда в массив
 
-    // Попробуй менять количество элементов в массиве от 1 до 5
-    //const photos = [1, 2, 3, 4, 5];
 
     const emojis = ['👍', '🔥', '❤️', '😂', '🤯'];
 
-    // 1. Додай цей стейт до інших useState
     const [selectedPost, setSelectedPost] = useState<Post | null>(null);
 
-    // 2. Ефект для блокування скролу при відкритій модалці
     useEffect(() => {
         if (selectedPost) {
             document.body.style.overflow = 'hidden';
@@ -304,6 +384,33 @@ export default function ProfilePage() {
             document.body.style.overflow = 'unset';
         }
     }, [selectedPost]);
+
+    // 🔥 СТЕЙТИ КОМЕНТАРІВ 🔥
+    const [comments, setComments] = useState<PostComment[]>([]);
+    const [commentText, setCommentText] = useState("");
+    const [replyTo, setReplyTo] = useState<{ id: string, name: string } | null>(null);
+    const [collapsedComments, setCollapsedComments] = useState<string[]>([]); // Зберігає ID прихованих гілок
+
+    const commentInputRef = useRef<HTMLTextAreaElement>(null);
+
+    // 🔥 ЗАВАНТАЖЕННЯ КОМЕНТАРІВ ПРИ ВІДКРИТТІ МОДАЛКИ 🔥
+    useEffect(() => {
+        if (selectedPost) {
+            document.body.style.overflow = 'hidden';
+            loadComments(selectedPost.id);
+        } else {
+            document.body.style.overflow = 'unset';
+            setComments([]);
+            setReplyTo(null);
+            setCommentText("");
+            setCollapsedComments([]);
+        }
+    }, [selectedPost]);
+
+    const loadComments = async (postId: string) => {
+        const res = await apiRequest(`/profiles/posts/${postId}/comments/`);
+        if (res?.ok) setComments(await res.json());
+    };
 
     const [currentImgIndex, setCurrentImgIndex] = useState(0);
 
@@ -333,8 +440,6 @@ export default function ProfilePage() {
         }
     }, [selectedPost]);
 
-    const [commentText, setCommentText] = useState("");
-
     const handleDeletePost = async (postId: string) => {
         if (!postId || !isOwnProfile) return;
 
@@ -356,6 +461,139 @@ export default function ProfilePage() {
             toast.error("Помилка сервера");
             setPosts(prevPosts);
         }
+    };
+
+    // 🔥 ВІДПРАВКА КОМЕНТАРЯ 🔥
+    const handleSendComment = async () => {
+        const text = commentText.trim();
+        if (!text || !selectedPost) return;
+
+        if (text.length > 512) return toast.error("Коментар задовгий (макс 512 символів)");
+        if ((text.match(/\n/g) || []).length > 8) return toast.error("Забагато переносів (макс 8)");
+
+        const res = await apiRequest(`/profiles/posts/${selectedPost.id}/comments/`, {
+            method: 'POST',
+            body: JSON.stringify({ text, parent_id: replyTo?.id || null })
+        });
+
+        if (res?.ok) {
+            setCommentText("");
+            setReplyTo(null);
+            loadComments(selectedPost.id);
+
+            if (commentInputRef.current) {
+                commentInputRef.current.style.height = 'auto';
+            }
+
+            setPosts(prev => prev.map(p => p.id === selectedPost.id ? { ...p, comments_count: (p.comments_count || 0) + 1 } : p));
+            setSelectedPost(prev => prev ? { ...prev, comments_count: (prev.comments_count || 0) + 1 } : null);
+        } else {
+            const data = await res?.json();
+            toast.error(data?.error || "Помилка");
+        }
+    };
+
+    // 🔥 ВИДАЛЕННЯ КОМЕНТАРЯ 🔥
+    const handleDeleteComment = async (commentId: string) => {
+        const res = await apiRequest(`/profiles/comments/${commentId}/delete/`, { method: 'DELETE' });
+        if (res?.ok && selectedPost) {
+            loadComments(selectedPost.id);
+            // 🔥 Миттєво зменшуємо лічильник
+            setPosts(prev => prev.map(p => p.id === selectedPost.id ? { ...p, comments_count: Math.max(0, (p.comments_count || 0) - 1) } : p));
+            setSelectedPost(prev => prev ? { ...prev, comments_count: Math.max(0, (prev.comments_count || 0) - 1) } : null);
+        }
+    };
+
+    // 🔥 РЕКУРСИВНИЙ РЕНДЕР ДЕРЕВА КОМЕНТАРІВ 🔥
+    const renderCommentsTree = (parentId: string | null = null) => {
+        const childComments = comments.filter(c => c.parent_id === parentId);
+        if (childComments.length === 0) return null;
+
+        return childComments.map(c => {
+            const isCollapsed = collapsedComments.includes(c.id);
+            const hasChildren = comments.some(child => child.parent_id === c.id);
+            // Видалити може власник поста (isOwnProfile) АБО власник коментаря
+            const canDelete = isOwnProfile || myUserId === c.author_id;
+
+            return (
+                <div key={c.id} style={{ display: 'flex', marginTop: parentId ? '10px' : '15px' }}>
+
+                    {/* ЛІВА КОЛОНКА: Аватарка і Лінія */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginRight: '12px' }}>
+                        <Link to={`/profile/${c.author_profile_id}`} onClick={() => setSelectedPost(null)}>
+                            <div
+                                style={{
+                                    width: '32px', height: '32px', borderRadius: '50%', flexShrink: 0,
+                                    backgroundImage: `url(${getAvatarUrl(c.author_avatar)})`,
+                                    backgroundSize: 'cover', backgroundPosition: 'center',
+                                    cursor: 'pointer', zIndex: 2
+                                }}>
+                            </div>
+                        </Link>
+                        {/* 🔥 Лінія, яка тягнеться до низу (Flexbox magic) */}
+                        {!isCollapsed && hasChildren && (
+                            <div className={styles.hideLineWrap} onClick={() => setCollapsedComments(prev => isCollapsed ? prev.filter(id => id !== c.id) : [...prev, c.id])}>
+                                <div className={styles.hideLine} />
+                            </div>
+
+                        )}
+                    </div>
+
+                    {/* ПРАВА КОЛОНКА: Контент і Діти */}
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <Link to={`/profile/${c.author_profile_id}`} onClick={() => setSelectedPost(null)} style={{ textDecoration: 'none' }}>
+                                <span style={{ fontWeight: '600', color: 'var(--color-text)' }}>{c.author_name}</span>
+                            </Link>
+
+
+                            {!isCollapsed && (
+                                <>
+                                    <span
+                                        style={{ fontSize: '12px', color: 'var(--color-text-second)', cursor: 'pointer' }}
+                                        onClick={() => {
+                                            setReplyTo({ id: c.id, name: c.author_name });
+                                            // 🔥 Скролимо до поля і ставимо фокус
+                                            setTimeout(() => {
+                                                if (commentInputRef.current) {
+                                                    commentInputRef.current.focus();
+                                                    commentInputRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                                                }
+                                            }, 50);
+                                        }}
+                                    >
+                                        Відповісти
+                                    </span>
+                                </>
+                            )}
+
+                            {canDelete && !isCollapsed && (
+                                <div
+                                    style={{ cursor: 'pointer', opacity: 0.5, marginLeft: 'auto' }}
+                                    onClick={() => setDeleteTarget({ type: 'comment', id: c.id })}
+                                >
+                                    {SVG_TRASH}
+                                </div>
+                            )}
+                        </div>
+
+                        {!isCollapsed ? (
+                            <>
+                                <div style={{ color: 'var(--color-text)', marginTop: '2px', wordBreak: 'break-word', whiteSpace: 'pre-wrap', lineHeight: 1.4, opacity: 0.9 }}>
+                                    {c.text}
+                                </div>
+                                {/* Рекурсивний виклик для дітей */}
+                                {renderCommentsTree(c.id)}
+                            </>
+                        ) : (
+                            <div style={{ fontSize: '10px', color: 'var(--color-grey)', marginTop: '2px', cursor: 'pointer' }} onClick={() => setCollapsedComments(prev => prev.filter(id => id !== c.id))}>
+                                Гілку приховано... натисніть, щоб розгорнути
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        });
     };
 
     return (
@@ -508,11 +746,23 @@ export default function ProfilePage() {
                         />
                     </>}
 
-                    <div className={styles.profileImg} style={{
-                        backgroundImage: `url(${profile ? getAvatarUrl(profile.profile_picture) : "/images/no-image.png"})`,
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center'
-                    }}></div>
+                    <div className={styles.profileImgActions}>
+                        <div className={styles.profileImg} style={{
+                            backgroundImage: `url(${profile ? getAvatarUrl(profile.profile_picture) : "/images/no-image.png"})`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center'
+                        }}></div>
+                        {!isOwnProfile && profile?.id &&
+                            <div className={styles.iconMessage} onClick={async () => {
+                                const res = await apiRequest(`/profiles/chats/start/${profile.id}/`, { method: 'POST' });
+                                if (res?.ok) {
+                                    const data = await res.json();
+                                    navigate(`/chats/${data.chat_id}`); // Перекидаємо в чат
+                                }
+                            }}>
+                                <RoundButton button={{ icon: SVG_CHATS, text: "Написати повідомлення" }} />
+                            </div>}
+                    </div>
                 </div>
 
                 <div className={styles.name}>{profile ? profile.name : "Ім'я"}</div>
@@ -544,7 +794,7 @@ export default function ProfilePage() {
                         activeReactionPopup={activeReactionPopup}
                         setActiveReactionPopup={setActiveReactionPopup}
                         emojis={emojis}
-
+                        setDeleteTarget={setDeleteTarget}
                         onOpenModal={setSelectedPost}
                     />
                 ))}
@@ -629,39 +879,69 @@ export default function ProfilePage() {
 
                             {/* НОВЕ: Поле вводу коментаря */}
                             <div className={styles.modalCommentInputWrapper}>
-                                <div className={styles.inputContainer} style={{ marginTop: '10px' }}>
+                                {replyTo && (
+                                    <div style={{
+                                        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                                        padding: '6px 12px', backgroundColor: 'var(--color-bg-second, rgba(255,255,255,0.05))',
+                                        borderRadius: '8px', margin: '8px 0', fontSize: '13px', color: 'var(--color-text)'
+                                    }}>
+                                        <span>Відповідь для <b>{replyTo.name}</b></span>
+                                        <span style={{ cursor: 'pointer', fontWeight: 'bold', padding: '0 5px' }} onClick={() => setReplyTo(null)}>✕</span>
+                                    </div>
+                                )}
+                                <div className={styles.inputContainer} style={{ marginTop: '6px' }}>
                                     <textarea
+                                        ref={commentInputRef}
                                         className={styles.input}
                                         placeholder="Написати коментар..."
                                         value={commentText}
+                                        maxLength={512}
                                         rows={1}
-                                        style={{
-                                            resize: 'none',
-                                            maxHeight: "150px",
-                                            overflow: 'auto',
+                                        style={{ resize: 'none', maxHeight: "150px", overflow: 'auto' }}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            if ((val.match(/\n/g) || []).length <= 8) setCommentText(val);
+                                            else toast.error("Досягнуто ліміт переносів рядка (8).");
                                         }}
-                                        onChange={(e) => setCommentText(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendComment(); }
+                                        }}
                                         onInput={(e) => {
                                             const target = e.target as HTMLTextAreaElement;
-                                            target.style.height = 'auto';
-                                            target.style.height = `${target.scrollHeight}px`;
+                                            target.style.height = 'auto'; target.style.height = `${target.scrollHeight}px`;
                                         }}
                                     />
-                                    <div
-                                        className={styles.inputIcon}
-                                        onClick={() => {
-                                            console.log("Відправка коментаря:", commentText);
-                                            setCommentText(""); // Очищуємо після відправки
-                                        }}
-                                    >
+                                    <div className={styles.inputIcon} onClick={handleSendComment}>
                                         {SVG_SEND}
                                     </div>
                                 </div>
                             </div>
+
+                            {/* 🔥 СПИСОК КОМЕНТАРІВ 🔥 */}
+                            <div style={{ flex: 1, overflowY: 'auto', paddingRight: '5px', marginBottom: '15px' }}>
+                                {comments.length === 0 ? (
+                                    <div style={{ opacity: 0.5, textAlign: 'center', marginTop: '20px' }}>Ще немає коментарів</div>
+                                ) : (
+                                    // Рендеримо тільки кореневі коментарі (parent_id === null), діти відрендеряться рекурсивно всередині
+                                    renderCommentsTree(null)
+                                )}
+                            </div>
+
+
                         </div>
                     </div>
                 </div>
             )}
+            <ConfirmModal
+                isOpen={deleteTarget !== null}
+                onClose={() => setDeleteTarget(null)}
+                onConfirm={executeDelete}
+                title={deleteTarget?.type === 'post' ? "Видалення поста" : "Видалення коментаря"}
+                text={deleteTarget?.type === 'post' 
+                    ? "Ви дійсно хочете видалити цей пост? Всі коментарі та реакції також будуть видалені. Цю дію неможливо скасувати." 
+                    : "Ви дійсно хочете видалити цей коментар?"
+                }
+            />
         </div>
     )
 }
@@ -671,7 +951,7 @@ export default function ProfilePage() {
 function PostItem({
     post, profile, getAvatarUrl, handleReaction,
     activeReactionPopup, setActiveReactionPopup, emojis,
-    onOpenModal, isOwnProfile, handleDeletePost // <--- Просто допиши його тут
+    onOpenModal, isOwnProfile, setDeleteTarget // <--- Просто допиши його тут
 }: any) {
     const postRef = useRef<HTMLDivElement>(null);
     const [isPostLong, setIsPostLong] = useState(false);
@@ -711,11 +991,11 @@ function PostItem({
 
     return (
         <div className={styles.postContainer}>
-            <div className={styles.post}>
+            <div className={styles.post} id={`post-${post.id}`}>
                 {isOwnProfile && (
-                    <div 
-                        className={styles.deletePostBtn} 
-                        onClick={() => handleDeletePost(post.id)}
+                    <div
+                        className={styles.deletePostBtn}
+                        onClick={() => setDeleteTarget({ type: 'post', id: post.id })}
                         title="Видалити пост"
                     >
                         {SVG_TRASH}
@@ -808,15 +1088,36 @@ function PostItem({
                                 </div>
                             )}
                         </div>
-                        <div
-                            className={styles.postActionIcon}
-                            style={{ marginLeft: ".3em", marginBottom: ".2em", cursor: 'pointer' }}
-                            onClick={() => onOpenModal(post)} // Викликаємо відкриття
-                        >
-                            {SVG_COMMENT}
+                        <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '6px', marginLeft: '.3em' }}>
+                            <div
+                                className={styles.postActionIcon}
+                                style={{ cursor: 'pointer' }}
+                                onClick={() => onOpenModal(post)}
+                            >
+                                {SVG_COMMENT}
+                            </div>
+                            {post.comments_count > 0 && (
+                                <div style={{
+                                    color: 'inherit',
+                                    fontSize: '14px',
+                                    marginBottom: '3px'
+                                }}>
+                                    {post.comments_count}
+                                </div>
+                            )}
                         </div>
                     </div>
-                    <div className={styles.postActionIcon}>{SVG_SHARE}</div>
+                    <div 
+                            className={styles.postActionIcon}
+                            onClick={() => {
+                                // 🔥 Нове посилання: веде на профіль, але передає ID поста
+                                const url = `${window.location.origin}/profile/${profile?.id}?post=${post.id}`;
+                                navigator.clipboard.writeText(url);
+                                toast.success("Посилання на пост скопійовано!");
+                            }}
+                        >
+                            {SVG_SHARE}
+                        </div>
                 </div>
             </div>
         </div>

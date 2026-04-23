@@ -64,10 +64,11 @@
 
 .miniInput,
 .miniSelect {
-    border: 1px solid #ddd;
+    border: none;
     padding: 4px 8px;
     border-radius: 4px;
     font-size: 13px;
+    background-color: var(--color-gray);
 }
 
 .deleteBtn {

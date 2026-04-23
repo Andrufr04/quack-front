@@ -7,7 +7,7 @@ import NotificationSidebar from '../../../shared/ui/NotificationSidebar/ui/Notif
 import { apiRequest } from '../../../shared/api/api';
 import CalendarSidebar from '../../../shared/ui/CalendarSidebar/ui/CalendarSidebar';
 import { useLocation } from 'react-router-dom';
-import { isStudent } from '../../../entities/session/lib/jwt';
+import { isStudent, isTeacher } from '../../../entities/session/lib/jwt';
 
 export default function ButtonsMenu({ direction = "vertical" }) {
     const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
@@ -70,9 +70,13 @@ export default function ButtonsMenu({ direction = "vertical" }) {
 
     return <>
         <div className={`${styles.menu} ${styles[direction]}`}>
-            <RoleSwitch />
+            {(location.pathname !== "/chats" && location.pathname !== "/profile" ) && <div
+                style={{ position: 'relative', right: location.pathname === "/" && (isStudent() || isTeacher()) ? "300px" : "0", cursor: 'pointer' }}
+            >
+                <RoleSwitch/>
+            </div>}
             <div
-                style={{ position: 'relative', right: location.pathname === "/" && isStudent() ? "300px" : "0", cursor: 'pointer' }}
+                style={{ position: 'relative', right: location.pathname === "/" && (isStudent() || isTeacher()) ? "300px" : "0", cursor: 'pointer' }}
                 onClick={() => setIsNotificationsOpen(true)} // Кружечок більше не зникає просто так!
             >
                 {hasAnyUnread && (

@@ -51,7 +51,7 @@ export default function TasksExaminationPage() {
             <div className={styles.line}></div>
             <div className={styles.current}><Link to="/tasks/examination">На перевірці</Link></div>
             <div className={styles.line}></div>
-            <Link to="/tasks/done">Перевірені</Link>
+            <Link to="/archive">Архів</Link>
         </div>
 
         <div className={styles.container}>

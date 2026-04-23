@@ -35,7 +35,7 @@ export default function ManageSchedule() {
             apiRequest('/education/all-groups/').then(res => res?.json()).then(setGroups),
             apiRequest('/education/all-teachers/').then(res => res?.json()).then(setTeachers),
             apiRequest('/education/subjects/').then(res => res?.json()).then(setSubjects),
-            apiRequest('/education/types/').then(res => res?.json()).then(setTypes),
+            apiRequest('/education/admin-lesson-types/').then(res => res?.json()).then(setTypes),
         ])
     }, [])
 
@@ -105,6 +105,16 @@ export default function ManageSchedule() {
                         >
                             <option value="">Обрати предмет</option>
                             {subjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                        </select>
+                    </div>
+                </div>
+
+                <div className={styles.row}>
+                    <div className={styles.field}>
+                        <label className={styles.label}>Тип заняття</label>
+                        <select className={styles.input} value={formData.lesson_type} onChange={e => setFormData({ ...formData, lesson_type: e.target.value })}>
+                            <option value="">Обрати тип заняття</option>
+                            {types.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
                         </select>
                     </div>
                     <div className={styles.field}>

@@ -4,10 +4,11 @@ import InputForm from "../../../shared/ui/InputForm/ui/InputForm";
 import styles from "./SignInPage.module.css";
 import LanguageDropdown from "../../../features/changeLanguage/ui/LanguageDropdown";
 import { login } from "../../../features/auth/api/login";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import ModeSwitch from "../../../widgets/ModeSwitch/ui/ModeSwitch";
 import toast from "react-hot-toast";
+import { apiRequest } from "../../../shared/api/api"; // Імпортуй свій метод запитів
 
 export default function SignInPage() {
     const [email, setEmail] = useState("");
@@ -15,6 +16,13 @@ export default function SignInPage() {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const { t } = useTranslation();
+
+    // 🔥 Стейти для відновлення паролю 🔥
+    const [resetStep, setResetStep] = useState<0 | 1 | 2>(0); // 0 - закрито, 1 - пошта, 2 - код
+    const [resetEmail, setResetEmail] = useState("");
+    const [resetCode, setResetCode] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [resetLoading, setResetLoading] = useState(false);
 
     const handleLogin = async () => {
         if (loading) return;
@@ -31,6 +39,62 @@ export default function SignInPage() {
                 toast.error("В доступі відмовлено!")
             }
             setLoading(false);
+        }
+    };
+
+    // Відправка коду на пошту
+    const handleRequestCode = async () => {
+        if (!resetEmail.trim()) return toast.error("Введіть email!");
+        setResetLoading(true);
+        const currentTheme = localStorage.getItem('mode') === 'dark' ? 'dark' : 'light';
+        try {
+            // Заміни на свій правильний шлях до API
+            const res = await apiRequest('/password-reset/', { 
+                method: 'POST',
+                body: JSON.stringify({ email: resetEmail, theme: currentTheme })
+            });
+            if (res?.ok) {
+                toast.success("Код відправлено на пошту!");
+                setResetStep(2);
+            } else {
+                toast.error("Помилка відправки коду.");
+            }
+        } catch (e) {
+            toast.error("Помилка сервера");
+        } finally {
+            setResetLoading(false);
+        }
+    };
+
+    // Підтвердження коду та зміна паролю
+    const handleConfirmReset = async () => {
+        if (!resetCode.trim() || !newPassword.trim()) return toast.error("Заповніть всі поля!");
+        if (newPassword.length < 8) return toast.error("Пароль має містити мінімум 8 символів!");
+        
+        setResetLoading(true);
+        try {
+            const res = await apiRequest('/password-reset-confirm/', {
+                method: 'POST',
+                body: JSON.stringify({ 
+                    email: resetEmail, 
+                    code: resetCode, 
+                    new_password: newPassword 
+                })
+            });
+            
+            if (res?.ok) {
+                toast.success("Пароль успішно змінено!");
+                setResetStep(0); // Закриваємо модалку
+                setEmail(resetEmail); // Підставляємо пошту в форму логіну
+                setPassword("");
+            } else {
+                const data = await res?.json();
+                toast.error(data?.error || "Невірний код або помилка");
+            }
+        } catch (e) {
+            toast.error("Помилка сервера");
+        } finally {
+            setResetLoading(false);
         }
     };
 
@@ -52,6 +116,7 @@ export default function SignInPage() {
             <div className={styles.signIn}>
                 <div className={styles.form}>
                     <div className={styles.title + " bold"}>{t("signin.title")}</div>
+                    
                     <div className={styles.inputGroup}>
                         <InputForm
                             input={{
@@ -61,7 +126,6 @@ export default function SignInPage() {
                                 placeholder: "cooluser@cat.dog",
                                 value: email,
                                 onChange: e => setEmail(e.target.value),
-                                
                             }}
                         />
                         <div>
@@ -76,25 +140,22 @@ export default function SignInPage() {
                                     onKeyDown: handleKeyDown,
                                 }}
                             />
-                            <div className={`${styles.forgotPassword} ${styles.formHelp}`}>
+                            
+                            {/* 🔥 КЛІК ПО "ЗАБУЛИ ПАРОЛЬ" 🔥 */}
+                            <div 
+                                className={`${styles.forgotPassword} ${styles.formHelp}`}
+                                onClick={() => setResetStep(1)}
+                                style={{ cursor: "pointer", marginTop: "8px" }}
+                            >
                                 {t("signin.forgotPassword")}
                             </div>
                         </div>
                     </div>
+                    
                     <div className={styles.formButtons}>
                         <ActionButton
                             actionButton={{
-                                text: loading ? (
-                                    <div className={styles.loading}>
-                                        <img className={styles.img}
-                                        src="/gifs/loading.svg"
-                                        alt="loading"
-                                        style={{ width: 60, height: 60, marginTop: 5 }}
-                                        />
-                                    </div>
-                                ) : (
-                                    t("signin.login")
-                                ),
+                                text: loading ? "Завантаження..." : t("signin.login"),
                                 enabled: !loading,
                                 onClick: handleLogin,
                                 bgcolor: "#ec8735"
@@ -102,12 +163,87 @@ export default function SignInPage() {
                         />
                         <div className={styles.privacy}>
                             <div className={styles.line}></div>
-                            <div className={styles.formHelp}>{t("signin.privacy")}</div>
+                            <Link to="/privacy" className={styles.formHelp}>{t("signin.privacy")}</Link>
                             <div className={styles.line}></div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            {/* 🔥 МОДАЛКА ВІДНОВЛЕННЯ ПАРОЛЮ 🔥 */}
+            {resetStep > 0 && (
+                <div style={{
+                    position: 'absolute', top: 0, left: 0, width: '100vw', height: '100vh',
+                    backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(5px)',
+                    display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 100
+                }}>
+                    <div className={styles.formModal} style={{ position: 'relative', width: '400px' }}>
+                        <div 
+                            style={{ position: 'absolute', top: '15px', right: '20px', cursor: 'pointer', fontSize: '20px', color: 'var(--color-text)' }}
+                            onClick={() => { setResetStep(0); setResetLoading(false); }}
+                        >✕</div>
+
+                        <div className={styles.title + " bold"}>
+                            {resetStep === 1 ? "Відновлення паролю" : "Підтвердження коду"}
+                        </div>
+
+                        {resetStep === 1 && (
+                            <div className={styles.inputGroup} style={{ marginTop: '20px' }}>
+                                <p style={{ color: 'var(--color-text)', opacity: 0.8, fontSize: '14px', marginBottom: '15px' }}>
+                                    Введіть вашу електронну пошту, і ми надішлемо вам 6-значний код підтвердження.
+                                </p>
+                                <InputForm
+                                    input={{
+                                        type: "email", id: "resetEmail", title: "Ваш Email",
+                                        placeholder: "cooluser@cat.dog", value: resetEmail,
+                                        onChange: e => setResetEmail(e.target.value),
+                                    }}
+                                />
+                                <div style={{ marginTop: '10px' }}>
+                                    <ActionButton
+                                        actionButton={{
+                                            text: resetLoading ? "Відправка..." : "Надіслати код",
+                                            enabled: !resetLoading, onClick: handleRequestCode, bgcolor: "#ec8735"
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        {resetStep === 2 && (
+                            <div className={styles.inputGroup} style={{ marginTop: '20px' }}>
+                                <p style={{ color: 'var(--color-text)', opacity: 0.8, fontSize: '14px', marginBottom: '15px' }}>
+                                    Код надіслано на {resetEmail}
+                                </p>
+                                <InputForm
+                                    input={{
+                                        type: "text", id: "resetCode", title: "6-значний код",
+                                        placeholder: "123456", value: resetCode, maxLength: 6,
+                                        onChange: e => setResetCode(e.target.value),
+                                    }}
+                                />
+                                <div style={{ marginTop: '15px' }}>
+                                    <InputForm
+                                        input={{
+                                            type: "password", id: "newPassword", title: "Новий пароль",
+                                            placeholder: "Мінімум 8 символів", value: newPassword,
+                                            onChange: e => setNewPassword(e.target.value),
+                                        }}
+                                    />
+                                </div>
+                                <div style={{ marginTop: '20px' }}>
+                                    <ActionButton
+                                        actionButton={{
+                                            text: resetLoading ? "Збереження..." : "Змінити пароль",
+                                            enabled: !resetLoading, onClick: handleConfirmReset, bgcolor: "#ec8735"
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

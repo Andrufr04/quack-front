@@ -37,7 +37,6 @@
 
 .title {
     font-size: 24px;
-    user-select: none;
 }
 
 .inputGroup {
@@ -88,4 +87,16 @@
     position: fixed;
     top: 1em;
     right: 1em;
+}
+
+.formModal {
+    max-height: 570px;
+    width: 47%;
+    background: var(--color-bg);
+    box-shadow: var(--shadow-main);
+    border-radius: var(--radius-main);
+    padding: 5em 2.5em;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }

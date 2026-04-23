@@ -1,5 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { routes } from './routes'
+import { HashRouter, Route, Routes } from "react-router-dom";
 import HomePage from "../../pages/HomePage/ui/HomePage";
 import ProfilePage from "../../pages/ProfilePage/ui/ProfilePage";
 import MainLayout from "./MainLayout";
@@ -25,18 +24,24 @@ import SettingsPage from "../../pages/SettingsPage/ui/SettingsPage";
 import ArchivePage from "../../pages/ArchivePage/ui/ArchivePage";
 import NewsPage from "../../pages/NewsPage/ui/NewsPage";
 import ManageNewsPage from "../../pages/ManageNewsPage/ui/ManageNewsPage";
+import PrivacyPage from "../../pages/PrivacyPage/ui/PrivacyPage";
+import ChatsPage from "../../pages/ChatsPage/ui/ChatsPage";
+import ManageSubjectsPage from "../../pages/ManageSubjectsPage/ui/ManageSubjectsPage";
+import ManageTaskTypesPage from "../../pages/ManageTaskTypesPage/ui/ManageTaskTypesPage";
+import ManageLessonTypesPage from "../../pages/ManageLessonTypesPage/ui/ManageLessonTypesPage";
 
 
 export default function AppRouter() {
     return (
-        <BrowserRouter>
+        <HashRouter>
             <Toaster toastOptions={{ style: { backgroundColor: "var(--color-bg)", color: "var(--color-text)" } }} />
             <Tooltip id="my-tooltip" />
             <Routes>
-                <Route path={routes.signin} element={<PublicRoute><SignInPage /></PublicRoute>} />
+                <Route path="/signin" element={<PublicRoute><SignInPage /></PublicRoute>} />
+                <Route path="/privacy" element={<PrivacyPage />} />
                 <Route path="/" element={<PrivateRoute><MainLayout /></PrivateRoute>}>
-                    <Route path={routes.home} element={<HomePage />} />
-                    <Route path={routes.profile} element={<ProfilePage />} />
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/profile/:id?" element={<ProfilePage />} />
                     <Route path="/demo" element={<DemoPage />} />
                     <Route path="/tasks" element={<TasksPage />} />
                     <Route path="/tasks/examination" element={<TasksExaminationPage />} />
@@ -48,15 +53,20 @@ export default function AppRouter() {
                     <Route path="/manageschedule" element={<ManageSchedule />} />
                     <Route path="/managescheduledelete" element={<ManageScheduleDelete />} />
                     <Route path="/manageaccounts" element={<ManageAccountsPage />} />
+                    <Route path="/managetasktypes" element={<ManageTaskTypesPage />} />
+                    <Route path="/managelessontypes" element={<ManageLessonTypesPage />} />
                     <Route path="/managegroups" element={<ManageGroupsPage />} />
                     <Route path="/managenews" element={<ManageNewsPage />} />
+                    <Route path="/managesubjects" element={<ManageSubjectsPage />} />
                     <Route path="/calendar" element={<CalendarPage />} />
                     <Route path="/settings" element={<SettingsPage />} />
                     <Route path="/archive" element={<ArchivePage />} />
                     <Route path="/news" element={<NewsPage />} />
                     <Route path="*" element={<Page404 />} />
+                    <Route path="/chats" element={<ChatsPage />} />
+                    <Route path="/chats/:chatId" element={<ChatsPage />} />
                 </Route>
             </Routes>
-        </BrowserRouter>
+        </HashRouter>
     )
 }

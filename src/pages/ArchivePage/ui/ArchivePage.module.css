@@ -1,4 +1,11 @@
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1em;
+}
+
 .folderContainer {
+    width: 150px;
     position: relative;
     cursor: pointer; /* щоб було зрозуміло, що на папку можна навести */
 }
@@ -33,6 +40,15 @@
     padding: 0.3em;
     font-weight: bold;
     color: color-mix(in srgb, var(--color-main), black 25%);
+    
+}
+
+.subject {
+    display: -webkit-box;
+    line-clamp: 4;
+    -webkit-line-clamp: 4;       
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .a {
@@ -49,4 +65,21 @@
     transition: transform 0.3s ease-in-out; 
     will-change: transform;
 
+}
+
+.doneContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+.doneTop {
+    display: flex;
+    cursor: pointer;
+    gap: .5em;
+}
+
+.doneTop svg {
+    width: 16px;
+    height: 16px;
+    transform: rotate(90deg);
 }

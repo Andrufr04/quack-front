@@ -75,7 +75,14 @@ export default function ManageAccountsPage() {
                 <div className={styles.line}></div>
                 <Link to="/managegroups">Групи</Link>
                 <div className={styles.line}></div>
+                <Link to="/managesubjects">Предмети</Link>
+                <div className={styles.line}></div>
+                <Link to="/managetasktypes">Типи завдань</Link>
+                <div className={styles.line}></div>
+                <Link to="/managelessontypes">Типи занять</Link>
+                <div className={styles.line}></div>
                 <Link to="/managenews">Новини</Link>
+                
             </div>
 
             <div className={styles.container}>
@@ -150,7 +157,7 @@ export default function ManageAccountsPage() {
                                                         <option key={g.id} value={g.id}>{g.name}</option>
                                                     ))}
                                                 </select>
-                                            ) : "—"}
+                                            ) : "-"}
                                         </td>
                                         <td>
                                             <button

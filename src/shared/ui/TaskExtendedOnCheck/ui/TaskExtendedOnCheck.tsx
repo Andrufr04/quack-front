@@ -63,7 +63,7 @@ export default function TaskExtendedOnCheck({ onCloseClick, onSuccess, task }: {
                     
                     <div className={styles.topic}>
                         <div className={styles.topicTitle}>Відповідь студента:</div>
-                        <div className={styles.info}>{task.text || "—"}</div>
+                        <div className={styles.info}>{task.text || "-"}</div>
                     </div>
                 </div>
 

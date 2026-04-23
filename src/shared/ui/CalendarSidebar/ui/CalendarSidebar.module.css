@@ -6,16 +6,12 @@
     background: var(--color-bg);
     backdrop-filter: blur(20px);
     border-left: 1px solid rgba(255, 255, 255, 0.1);
-    z-index: 10000;
+    z-index: 101;
     transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     padding: 20px;
     box-sizing: border-box;
     border-top-left-radius: var(--radius-main);
     border-bottom-left-radius: var(--radius-main);
-}
-
-.sidebar.open {
-    right: 0; /* Виїжджає */
 }
 
 .overlay {
@@ -28,12 +24,7 @@
     opacity: 0;
     visibility: hidden;
     transition: 0.3s;
-    z-index: 9999;
-}
-
-.overlay.active {
-    opacity: 1;
-    visibility: visible;
+    z-index: 100;
 }
 
 .header {
@@ -46,12 +37,6 @@
 .closeBtn {
     cursor: pointer;
     opacity: 0.7;
-    transition: 0.2s;
-}
-
-.closeBtn:hover {
-    opacity: 1;
-    transform: scale(1.1);
 }
 
 /* Примітивні стилі для сітки календаря */
@@ -75,8 +60,7 @@
     right: -420px;
     width: 300px;
     height: 100vh;
-    background: var(--color-bg); /* Темний фон як на фото */
-    z-index: 10000;
+    z-index: 101;
     transition: right 0.4s ease;
     padding: 25px;
     display: flex;
@@ -84,7 +68,9 @@
     overflow-y: auto;
 }
 
-.sidebar.open { right: 0; }
+.sidebar.open { 
+    right: 0; 
+}
 
 .overlay {
     position: fixed;
@@ -93,7 +79,7 @@
     opacity: 0;
     visibility: hidden;
     transition: 0.3s;
-    z-index: 9999;
+    z-index: 100;
 }
 
 .overlay.active { opacity: 1; visibility: visible; }
@@ -150,10 +136,12 @@
     flex-direction: column;
     gap: 5px;
     margin-top: 10px;
+    overflow-y: auto;
+    max-height: 54vh;
 }
 
 .scheduleCard {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--color-ui-widget-bg);
     border-radius: 12px;
     padding: 10px;
     display: flex;
@@ -170,5 +158,18 @@
 .timeAndRoom {
     font-size: 13px;
     color: #aaa;
+    display: flex;
 }
 
+.lessonType {
+    font-size: 11px;
+    color: var(--color-grey);
+    font-weight: bold;
+}
+
+.chatsBtn {
+    width: 16px;
+    height: 16px;
+    margin-left: .5em;
+    cursor: pointer;
+}

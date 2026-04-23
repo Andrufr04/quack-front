@@ -3,7 +3,6 @@
   display: inline-block;
   color: var(--color-text);
   width: 130px;
-  user-select: none;
 }
 
 .dropdown {

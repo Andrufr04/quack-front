@@ -7,10 +7,6 @@ interface JwtPayload {
     group_id?: string | null // Додали це поле
 }
 
-/*
- * const session = getSessionInfo()
- * const isTeacher = session?.roles.includes("teacher")
- */
 export const getSessionInfo = () => {
     const token = localStorage.getItem("access_token")
     if (!token) return null
@@ -32,7 +28,6 @@ export const getSessionInfo = () => {
     }
 };
 
-// Також можна додати зручну функцію для отримання ID групи:
 export const getGroupId = (): string | null => {
     const session = getSessionInfo();
     const token = localStorage.getItem("access_token");
@@ -60,7 +55,6 @@ export const getActiveRole = () => {
     return session.roles[0] || null
 };
 
-//Add to Role Switch Component
 export const setActiveRole = (role: string) => {
     const session = getSessionInfo()
     if (session?.roles.includes(role)) {

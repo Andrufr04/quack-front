@@ -20,10 +20,5 @@
 .info {
     width: 35%;
     text-align: center;
-    user-select: none;
     color: #ffffff;
-}
-
-.img {
-    user-select: none;
 }

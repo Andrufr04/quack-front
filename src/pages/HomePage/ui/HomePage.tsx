@@ -5,6 +5,7 @@ import { isStudent, isTeacher } from "../../../entities/session/lib/jwt";
 import { SVG_COIN, SVG_DUCK } from "../../../shared/ui/icons/icons";
 import { isDark } from "../../../shared/lib/localStorage";
 import { Link } from "react-router-dom";
+import CalendarSidebar from "../../../shared/ui/CalendarSidebar/ui/CalendarSidebar";
 
 interface LessonInfo {
     is_current: boolean;
@@ -37,6 +38,13 @@ interface StudentStats {
     group_name: string | null
 }
 
+interface AttendanceRecord {
+    id: string;
+    subject_name: string;
+    date: string;
+    status: number; // 0 - нб, 1 - є, 2 - запізнення
+}
+
 export default function HomePage() {
     return <div>
         <title>Quack | Головна</title>
@@ -51,20 +59,38 @@ export default function HomePage() {
 function StudentPage() {
     const [stats, setStats] = useState<StudentStats | null>(null);
     const [loading, setLoading] = useState(true);
+    const [attendance, setAttendance] = useState<AttendanceRecord[]>([]);
 
     const fetchStats = () => {
         apiRequest('/education/student/dashboard-stats/')
             .then(res => res?.json())
-            .then(data => setStats(data))
+            .then(data => setStats(data));
+
+        apiRequest('/education/student/attendance-history/?limit=80')
+            .then(res => res?.json())
+            .then(data => setAttendance(data))
             .finally(() => setLoading(false));
+    };
+
+    const fetchAttendance = () => {
+        apiRequest('/education/student/attendance-history/?limit=40')
+            .then(res => res?.json())
+            .then(data => setAttendance(data));
+    };
+
+    // 🔥 Об'єднуємо обидві функції
+    const fetchAllData = () => {
+        fetchStats();
+        fetchAttendance();
+        setLoading(false); // Вимикаємо лоадер після запитів
     };
 
     useEffect(() => {
         // Завантажуємо при старті
-        fetchStats();
+        fetchAllData();
 
         // 🔥 2. Слухаємо вебсокет: якщо прийшло сповіщення МЕНІ, миттєво оновлюємо статуси
-        const handleNewNotification = () => fetchStats();
+        const handleNewNotification = () => fetchAllData();
         window.addEventListener('new_notification', handleNewNotification);
 
         // 🔥 3. Тихе фонове оновлення кожні 30 сек (для оновлення балів ІНШИХ студентів)
@@ -76,6 +102,22 @@ function StudentPage() {
             clearInterval(intervalId);
         };
     }, []);
+
+    const getStatusColor = (status: number) => {
+        switch (status) {
+            case 1: return "#00cc66"; // Зелений (Присутній)
+            case 0: return "#ff4d4d"; // Червоний (Відсутній)
+            case 2: return "#ffcc00"; // Жовтий (Запізнився)
+            default: return "var(--color-ui-widget-bg)";
+        }
+    };
+
+    // Функція для тексту статусу в тултіп
+    const getStatusText = (status: number) => {
+        if (status === 1) return "Присутній";
+        if (status === 0) return "Відсутній";
+        return "Запізнення";
+    };
 
     const radius = 40;
     const circumference = 2 * Math.PI * radius;
@@ -98,7 +140,7 @@ function StudentPage() {
                 </div>
                 <div className={styles.list}>
                     {stats?.leaderboard.map((user, index) => (
-                        <div key={user.id} className={isDark() ? styles.dark : ""}>
+                        <div key={user.id} className={`${isDark() ? styles.dark : ""} ${styles.personLeaderboard}`}>
                             {index + 1}. <Link to={`/profile/${user.id}`} className={isDark() ? styles.userDark : styles.user}>{user.full_name}</Link>
                             <span className={styles.leaderScore}>
                                 ({user.total_points})
@@ -157,9 +199,32 @@ function StudentPage() {
                     </div>
                 </div>
             </div>
+
+            <div className={styles.attendanceWidget}>
+                <div className={styles.title}>Присутність на парах (останні 80)</div>
+                <div className={styles.activityGrid}>
+                    {attendance.map((record) => (
+                        <div
+                            key={record.id}
+                            className={styles.activitySquare}
+                            style={{ backgroundColor: getStatusColor(record.status) }}
+                            // Використовуємо react-tooltip, який у тебе вже підключений в AppRouter
+                            data-tooltip-id="my-tooltip"
+                            data-tooltip-content={`${record.subject_name} | ${new Date(record.date).toLocaleDateString()} | ${getStatusText(record.status)}`}
+                        ></div>
+                    ))}
+                    {/* Заповнюємо порожніми квадратами, якщо пар менше 80 */}
+                    {Array.from({ length: Math.max(0, 80 - attendance.length) }).map((_, i) => (
+                        <div key={`empty-${i}`} className={styles.activitySquare} style={{ opacity: 0.2 }}></div>
+                    ))}
+                </div>
+            </div>
         </div>
         <div className={styles.calendar}>
-                        
+            <CalendarSidebar
+                isOpen={true}
+                onClose={() => { }}
+            />
         </div>
     </div>
 }
@@ -179,7 +244,7 @@ function TeacherPage() {
 
     if (loading) return <div className={styles.loader}>Завантаження...</div>;
 
-    return (
+    return (<div className={styles.container}>
         <div className={styles.widgets}>
             {!data ? (
                 <div className={styles.emptyWidget}>
@@ -234,5 +299,11 @@ function TeacherPage() {
                 </div>
             )}
         </div>
-    );
+        <div className={styles.calendar}>
+            <CalendarSidebar
+                isOpen={true}
+                onClose={() => { }}
+            />
+        </div>
+    </div>);
 }

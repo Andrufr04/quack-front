@@ -37,7 +37,7 @@ export default function ManageLesson() {
             if (data && data.length > 0) {
                 setLessons(data);
 
-                // Якщо це сьогодні — шукаємо активну пару. Якщо інший день — вибираємо першу.
+                // Якщо це сьогодні - шукаємо активну пару. Якщо інший день - вибираємо першу.
                 const now = new Date();
                 const todayStr = new Date().toISOString().split('T')[0];
 

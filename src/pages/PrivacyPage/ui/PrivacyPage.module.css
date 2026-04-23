@@ -1,0 +1,164 @@
+/* Базова структура (ідентична до SettingsPage) */
+.container {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text);
+    background-color: var(--color-bg);
+}
+
+.settings {
+    width: 70%;
+    height: 92vh;
+    background-color: var(--color-opaque-secondary);
+    box-shadow: var(--shadow-main);
+    border-radius: var(--radius-main);
+    backdrop-filter: var(--blur-form);
+    display: flex;
+    padding: 2em;
+    gap: 2em;
+}
+
+.tabs {
+    width: 28%;
+    display: flex;
+    flex-direction: column;
+}
+
+.tab {
+    padding: 0.5em 1em;
+    cursor: pointer;
+    opacity: 0.6;
+    margin-bottom: 0.5em;
+    transition: all 0.2s ease;
+}
+
+.tab:hover {
+    background-color: var(--color-opaque-secondary);
+    border-radius: var(--radius-secondary);
+    opacity: 1;
+}
+
+.activeTab {
+    opacity: 1;
+    background-color: var(--color-opaque-secondary);
+    border-radius: var(--radius-secondary);
+    color: var(--color-main);
+}
+
+.line {
+    width: 1px;
+    background-color: var(--color-opaque-secondary);
+}
+
+.options {
+    width: 100%;
+    
+    /* Робимо контент скролабельним, щоб меню зліва не уїжджало */
+    overflow-y: auto;
+    padding-right: 15px; 
+    scrollbar-gutter: auto;
+}
+
+/* Кастомний скролбар для тексту документації */
+.options::-webkit-scrollbar {
+    width: 6px;
+}
+
+.options::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+}
+
+.options::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* --- ДОДАТКОВІ СТИЛІ ДЛЯ МЕНЮ ТА ДОКУМЕНТІВ --- */
+
+.sidebarTitle {
+    font-size: 12px;
+    font-weight: bold;
+    color: var(--color-grey, gray);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1.5em;
+    padding-left: 1em;
+    display: flex;
+    align-items: center;
+    gap: .5em;
+}
+
+.contactInfo {
+    margin-top: auto; /* Притискає текст до низу меню */
+    padding: 1em;
+    font-size: 12px;
+    color: var(--color-text);
+    opacity: 0.5;
+    line-height: 1.5;
+}
+
+.documentContainer {
+    display: flex;
+    flex-direction: column;
+    animation: fadeIn 0.3s ease;
+}
+
+.header {
+    border-bottom: 1px solid var(--color-opaque-secondary);
+    padding-bottom: 1.5em;
+}
+
+.documentContainer h1 {
+    font-size: 28px;
+    font-weight: bold;
+    margin: 0 0 10px 0;
+}
+
+.date {
+    font-size: 13px;
+    opacity: 0.5;
+}
+
+.documentContainer h2 {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 2em;
+    margin-bottom: 1em;
+    color: var(--color-main, inherit);
+}
+
+.documentContainer p {
+    line-height: 1.6em;
+    font-size: 15px;
+    margin-bottom: 1em;
+    opacity: 0.9;
+}
+
+.documentContainer ul {
+    margin-bottom: 1.5em;
+    padding-left: 20px;
+    opacity: 0.9;
+    line-height: 1.6em;
+}
+
+.documentContainer li {
+    margin-bottom: 0.5em;
+}
+
+.bottomSpace {
+    height: 3em; /* Порожній блок знизу для зручного скролу */
+}
+
+.doneTop {
+    display: flex;
+}
+
+.doneTop svg {
+    width: 10px;
+    height: 10px;
+    transform: rotate(90deg);
+    cursor: pointer;
+}

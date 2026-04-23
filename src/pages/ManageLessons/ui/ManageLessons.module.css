@@ -104,13 +104,6 @@ select {
 
 }
 
-.tableContainer {
-  flex: 1;
-  /* таблиця займає весь доступний простір */
-  overflow-y: auto;
-  /* скрол якщо багато студентів */
-}
-
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -181,7 +174,7 @@ td:nth-child(2) {
   font-size: 11px;
 }
 
-/* Активна вкладка — поточна пара */
+/* Активна вкладка - поточна пара */
 .tabActive {
   background-color: #ffffff;
   color: var(--color-text);
@@ -196,12 +189,6 @@ td:nth-child(2) {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-/* --- Таблиця --- */
-.tableContainer {
-  flex: 1;
-  overflow-y: auto;
 }
 
 .table {
@@ -322,13 +309,12 @@ body,
 .tableWrapper {
   border-radius: 0 0 14px 14px;
   overflow: hidden;
-  /* обрезает углы */
+  background-color: var(--color-bg);
 }
 
 .tableContainer {
   max-height: 100%;
   overflow-y: auto;
-  /* скрол внутри */
 }
 
 .tab {

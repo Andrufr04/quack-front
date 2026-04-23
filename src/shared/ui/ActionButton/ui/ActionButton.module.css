@@ -7,7 +7,6 @@
     align-items: center;
     cursor: pointer;
     height: 38px;
-    user-select: none;
     color: var(--color-text-opposite);
 }
 

@@ -64,7 +64,7 @@ function App() {
     // 1. Пытаемся достать сохраненный цвет
     const savedColor = localStorage.getItem('color');
 
-    // Если цвет есть — применяем его сразу к переменной
+    // Если цвет есть - применяем его сразу к переменной
     if (savedColor) {
       document.documentElement.style.setProperty('--color-main', savedColor);
     }

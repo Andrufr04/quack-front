@@ -69,7 +69,7 @@ export default function TasksPage() {
             <div className={styles.line}></div>
             <Link to="/tasks/examination">На перевірці</Link>
             <div className={styles.line}></div>
-            <Link to="/tasks/done">Перевірені</Link>
+            <Link to="/archive">Архів</Link>
         </div>
 
         <div className={styles.container}>

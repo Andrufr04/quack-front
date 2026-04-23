@@ -133,6 +133,7 @@
 
 .roleInactive {
     opacity: 0.5;
+    color: var(--color-text);
 }
 
 .activateBtn {
