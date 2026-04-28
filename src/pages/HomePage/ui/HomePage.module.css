@@ -1,19 +1,100 @@
-.demoContainer {
-    margin-top: 200px;
-    margin-left: 200px;
-    width: 350px;
-}
-
 .container {
     display: flex;
+    width: calc(100% - 18.75em);
+    /* 300px */
+    margin-top: 3em;
 }
 
-.title {
-    display: flex;
-    justify-content: center;
+/* =========================================
+   СТУДЕНТСЬКИЙ GRID-ЛАЙАУТ
+   ========================================= */
+.studentGrid {
+    display: grid;
+    /* 1 колонка під лідерборд, 3 колонки під інше */
+    grid-template-columns: minmax(17.5em, 21.875em) repeat(3, minmax(0, 1fr));
+    /* 3 гнучкі рядки для віджетів */
+    grid-template-rows: repeat(3, minmax(10em, auto));
+    gap: clamp(1em, 1.5vw, 1.25em);
     width: 100%;
-    font-size: 12px;
-    font-weight: bold;
+}
+
+/* Призначаємо місця в сітці */
+.LeaderBoard {
+    grid-column: 1;
+    grid-row: 1 / span 3;
+    background: var(--color-bg);
+    border-radius: var(--radius-main);
+    padding: 1em;
+    display: flex;
+    flex-direction: column;
+    gap: 0.875em;
+    overflow: hidden;
+    height: 40em;
+}
+
+.attendanceWidget {
+    grid-column: 2 / span 2;
+    grid-row: 1;
+    background-color: var(--color-bg);
+    padding: 1.25em;
+    border-radius: 1.25em;
+    display: flex;
+    flex-direction: column;
+}
+
+.avgGradeWidget {
+    grid-column: 4;
+    grid-row: 1;
+}
+
+.newsWidget {
+    grid-column: 2;
+    grid-row: 2;
+    background: var(--color-bg);
+    border-radius: var(--radius-main);
+    padding: 1.25em;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-decoration: none;
+    color: var(--color-text);
+    transition: transform 0.2s, border-color 0.2s;
+    border: 1px solid transparent;
+}
+
+.tasksWidget {
+    grid-column: 3 / span 2;
+    grid-row: 2;
+    background: var(--color-bg);
+    border-radius: var(--radius-main);
+    padding: 1.25em;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: var(--color-text);
+    transition: transform 0.2s;
+}
+
+.gradesWidget {
+    grid-column: 2 / span 3;
+    grid-row: 3;
+    background: var(--color-bg);
+    border-radius: var(--radius-main);
+    padding: 1.25em;
+    display: flex;
+    flex-direction: column;
+    min-height: 10em;
+}
+
+/* =========================================
+   ЗАГАЛЬНІ ЕЛЕМЕНТИ ТА ВНУТРІШНОСТІ
+   ========================================= */
+
+.title {
+    text-align: center;
+    font-weight: 500;
+    font-size: 0.875em;
+    /* 14px */
 }
 
 .currency {
@@ -22,19 +103,23 @@
 }
 
 .iconDuck {
-    height: 30px;
+    height: 1.875em;
+    /* 30px */
     color: rgb(255, 208, 0);
     stroke: #000;
     stroke-width: 4px;
     position: relative;
-    left: 20px;
+    left: 1.25em;
+    /* 20px */
 }
 
 .iconCoin {
-    height: 25px;
+    height: 1.5625em;
+    /* 25px */
     color: rgb(255, 208, 0);
     position: relative;
-    left: 15px;
+    left: 0.9375em;
+    /* 15px */
 }
 
 .balance {
@@ -48,73 +133,32 @@
 
 .amount {
     background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, var(--color-leaderboard) 20%);
-    padding: 3px 10px 3px 30px;
-    border-radius: 0 10px 10px 0;
-}
-
-.LeaderBoard {
-    background: var(--color-bg);
-    width: 350px;
-    border-radius: var(--radius-main);
-    padding: 16px;
-    height: 520px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    overflow: hidden;
+    padding: 0.1875em 0.625em 0.1875em 1.875em;
+    border-radius: 0 0.625em 0.625em 0;
 }
 
 .personLeaderboard a {
     text-decoration: none;
 }
 
-.widget {
-    background: var(--color-bg);
-    border-radius: var(--radius-main);
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-/* 🔥 Заголовок */
-.title {
-    text-align: center;
-    font-weight: 500;
-    font-size: 14px;
-}
-
-/* 📜 список */
 .list {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-
+    gap: 0.5em;
     overflow-y: auto;
     flex: 1;
-    padding-right: 4px;
+    padding-right: 0.25em;
 }
 
-/* 👤 элемент списка */
 .list div {
     background: var(--color-ui-widget-bg);
-    padding: 8px 10px;
-    border-radius: 10px;
-
-    font-size: 14px;
-
+    padding: 0.5em 0.625em;
+    border-radius: 0.625em;
+    font-size: 0.875em;
     display: flex;
     justify-content: space-between;
-
-    transition: 0.2s;
 }
 
-/* ✨ hover эффект */
-.list div:hover {
-    transform: translateX(4px);
-}
-
-/* 🥇 топ 3 */
 .list div:nth-child(1) {
     background: #fff7cc;
     font-weight: 600;
@@ -141,7 +185,6 @@
     background: #5c3a21;
 }
 
-/* 🔥 красивый скролл */
 .list::-webkit-scrollbar {
     width: 6px;
 }
@@ -151,19 +194,243 @@
     border-radius: 10px;
 }
 
+.widget {
+    background: var(--color-bg);
+    border-radius: var(--radius-main);
+    padding: 1em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Середня оцінка: SVG фікси */
+.svgContainer {
+    position: relative;
+    width: 6.25em;
+    height: 6.25em;
+    margin-top: 1em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.svgChart {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.gradeValue {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1.5em;
+}
+
+/* Відвідуваність */
+.activityGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375em;
+    /* 6px */
+    margin-top: 1em;
+    overflow-x: auto;
+}
+
+.activitySquare {
+    width: 1.5em;
+    height: 1.5em;
+    border-radius: 0.1875em;
+    cursor: pointer;
+    transition: transform 0.1s ease, filter 0.2s ease;
+    background-color: var(--color-ui-widget-bg);
+}
+
+.activitySquare:hover {
+    filter: brightness(1.2);
+}
+
+.newsTag {
+    font-size: 0.875em;
+    text-align: center;
+}
+
+.newsTitle {
+    font-size: 1em;
+    /* 16px */
+    font-weight: 600;
+    margin-top: 0.5em;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.4;
+}
+
+.newsDate {
+    font-size: 0.55em;
+    /* 12px */
+    color: #888;
+    margin-top: 1em;
+}
+
+.tasksStats {
+    display: flex;
+    gap: 0.5em;
+    margin-top: 1em;
+    justify-content: space-between;
+}
+
+.statBox {
+    flex: 1;
+    background: var(--color-ui-widget-bg);
+    border-radius: 1em;
+    padding: 1em 0.5em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2em;
+}
+
+.statNum {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.statLabel {
+    font-size: 0.6875em;
+    color: #888;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+.statUrgent .statNum {
+    color: #ec8735;
+}
+
+.statOverdue .statNum {
+    color: #ff4d4d;
+}
+
+/* Останні оцінки */
+.gradesList {
+    display: flex;
+    gap: 1em;
+    overflow-x: auto;
+    padding-bottom: 0.8em;
+    scrollbar-width: thin;
+    flex: 1;
+}
+
+.gradesList::-webkit-scrollbar {
+    height: 6px;
+}
+
+.gradesList::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+.gradeCard {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    background: var(--color-ui-widget-bg);
+    padding: 1em;
+    border-radius: 1.25em;
+    min-width: 16em;
+    max-width: 20em;
+    flex-shrink: 0;
+}
+
+.gradeMark {
+    width: 2.5em;
+    height: 2.5em;
+    border-radius: 0.5em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.125em;
+    font-weight: bold;
+    color: white;
+    flex-shrink: 0;
+}
+
+.markHigh {
+    background-color: #00cc66;
+}
+
+.markMid {
+    background-color: #ffcc00;
+    color: #000;
+}
+
+.markLow {
+    background-color: #ff4d4d;
+}
+
+.gradeInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2em;
+    overflow: hidden;
+}
+
+.gradeSubject {
+    font-size: 0.875em;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.gradeTheme {
+    font-size: 0.75em;
+    color: var(--color-text-grey);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.gradeDate {
+    font-size: 0.6875em;
+    color: #aaa;
+    margin-top: 0.2em;
+}
+
+.emptyMsg {
+    width: 100%;
+    text-align: center;
+    padding: 2em;
+    opacity: 0.5;
+    font-size: 0.875em;
+}
+
+/* =========================================
+   ВІДЖЕТИ ВИКЛАДАЧА
+   ========================================= */
+
 .widgets {
     display: flex;
     gap: 1em;
+    flex-wrap: wrap;
+    width: 100%;
 }
 
 .teacherLessonCard {
     background: var(--color-bg);
-    width: 300px;
-    border-radius: 20px;
-    padding: 20px;
+    width: clamp(280px, 100%, 18.75em);
+    /* 300px */
+    border-radius: 1.25em;
+    padding: 1.25em;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 1em;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
 }
 
@@ -175,27 +442,27 @@
 
 .statusNow {
     color: #00cc66;
-    font-size: 12px;
+    font-size: 0.75em;
     font-weight: 700;
     text-transform: uppercase;
 }
 
 .statusNext {
     color: #ec8735;
-    font-size: 12px;
+    font-size: 0.75em;
     font-weight: 600;
 }
 
 .classroomBadge {
     background: var(--color-ui-widget-bg);
-    padding: 4px 10px;
-    border-radius: 8px;
-    font-size: 12px;
+    padding: 0.25em 0.625em;
+    border-radius: 0.5em;
+    font-size: 0.75em;
     font-weight: 600;
 }
 
 .subjectTitle {
-    font-size: 18px;
+    font-size: 1.125em;
     font-weight: 700;
     margin: 0;
     color: var(--color-text);
@@ -203,17 +470,17 @@
 }
 
 .typeTag {
-    font-size: 12px;
+    font-size: 0.75em;
     color: #888;
-    margin-top: 4px;
+    margin-top: 0.25em;
 }
 
 .detailsRow {
     display: flex;
-    gap: 20px;
+    gap: 1.25em;
     background: var(--color-ui-widget-bg);
-    padding: 12px;
-    border-radius: 12px;
+    padding: 0.75em;
+    border-radius: 0.75em;
 }
 
 .detailItem {
@@ -222,75 +489,74 @@
 }
 
 .label {
-    font-size: 10px;
+    font-size: 0.625em;
     text-transform: uppercase;
     color: var(--color-text);
     letter-spacing: 0.5px;
 }
 
 .value {
-    font-size: 14px;
+    font-size: 0.875em;
     font-weight: 600;
     color: var(--color-text);
 }
 
-/* Секція студентів всередині віджета */
 .studentsWidget {
     border-top: 1px solid var(--color-ui-widget-bg);
-    padding-top: 12px;
+    padding-top: 0.75em;
 }
 
 .studentsHeader {
     display: flex;
     justify-content: space-between;
-    font-size: 12px;
+    font-size: 0.75em;
     font-weight: 600;
-    margin-bottom: 8px;
+    margin-bottom: 0.5em;
 }
 
 .studentsAmount {
     color: #00cc66;
-    padding: 0 6px;
-    border-radius: 4px;
+    padding: 0 0.375em;
+    border-radius: 0.25em;
 }
 
 .miniStudentList {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 0.375em;
 }
 
 .miniStudentItem {
     background: var(--color-ui-widget-bg);
-    font-size: 11px;
-    padding: 3px 8px;
-    border-radius: 6px;
+    font-size: 0.6875em;
+    padding: 0.1875em 0.5em;
+    border-radius: 0.375em;
     color: var(--color-text);
 }
 
 .moreStudents {
-    font-size: 11px;
-    padding: 3px 8px;
+    font-size: 0.6875em;
+    padding: 0.1875em 0.5em;
     color: #999;
     font-weight: bold;
 }
 
 .emptyWidget {
     background: var(--color-bg);
-    width: 300px;
-    height: 200px;
-    border-radius: 20px;
+    width: 18.75em;
+    height: 12.5em;
+    border-radius: 1.25em;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 0.625em;
     color: #888;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
 }
 
 .duckIconLarge {
-    height: 50px;
+    height: 3.125em;
     opacity: 0.3;
 }
 
@@ -298,52 +564,348 @@
     position: fixed;
     top: 0;
     right: 0;
-    width: 300px;
+    width: 18.75em;
+    /* 300px */
     height: 100vh;
     background: var(--color-bg);
     backdrop-filter: blur(20px);
     border-left: 1px solid rgba(255, 255, 255, 0.1);
     z-index: 1;
     transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    padding: 20px;
+    padding: 1.25em;
     box-sizing: border-box;
     border-top-left-radius: var(--radius-main);
     border-bottom-left-radius: var(--radius-main);
 }
 
-.cal {
-    right: 300px;
-}
-
-.attendanceWidget {
-    background-color: var(--color-bg);
-    padding: 20px;
-    border-radius: 20px;
-    grid-column: 1 / -1; /* Займає всю ширину контейнера віджетів */
-    margin-bottom: 20px;
-    border: 1px solid var(--color-gray);
-    width: 480px;
-    height: 150px;
-}
-
-.activityGrid {
+.curatorWidget {
+    background: var(--color-bg);
+    border-radius: var(--radius-main);
+    padding: 1.5em;
     display: flex;
-    flex-wrap: wrap; /* Дозволяємо перенос, якщо треба, або gap для горизонталі */
-    gap: 6px;
-    margin-top: 15px;
-    overflow-x: auto;
-    padding-bottom: 10px;
+    flex-direction: column;
+    width: 100%;
+    /* Щоб календар збоку залишався видимим на ПК, робимо відступ */
+    max-width: 100%;
 }
 
-.activitySquare {
-    width: 16px;
-    height: 16px;
-    border-radius: 3px;
+.curatorHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 1.5em;
+    flex-wrap: wrap;
+    gap: 1em;
+}
+
+.curatorTitle {
+    font-size: 1.25em;
+    font-weight: bold;
+    margin: 0;
+    color: var(--color-text);
+}
+
+.curatorSubtitle {
+    font-size: 0.875em;
+    color: var(--color-grey);
+    margin-top: 0.25em;
+}
+
+.curatorTabs {
+    display: flex;
+    gap: 0.5em;
+    background: var(--color-ui-widget-bg);
+    padding: 0.3em;
+    border-radius: 0.75em;
+}
+
+.cTab {
+    padding: 0.5em 1em;
+    border-radius: 0.5em;
+    border: none;
+    background: transparent;
+    color: var(--color-text-grey);
+    font-family: inherit;
+    font-size: 0.875em;
+    font-weight: 600;
     cursor: pointer;
-    transition: transform 0.1s ease, filter 0.2s ease;
-    background-color: var(--color-ui-widget-bg);
+    transition: 0.2s;
 }
 
-.activitySquare:hover {
-    filter: brightness(1.2);
+.cTab:hover {
+    color: var(--color-text);
+}
+
+.cTabActive {
+    background: var(--color-bg);
+    color: var(--color-main);
+    box-shadow: var(--shadow-secondary);
+}
+
+/* Таблиця */
+.curatorTableWrapper {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 0.75em;
+    background: var(--color-ui-widget-bg);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    max-height: 75vh;
+}
+
+.curatorTableWrapper::-webkit-scrollbar {
+    height: 8px;
+}
+
+.curatorTableWrapper::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+.cTable {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: max-content;
+}
+
+.cTable th,
+.cTable td {
+    padding: 0.875em 1em;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.cTable th {
+    background: color-mix(in srgb, var(--color-bg) 50%, transparent);
+    font-weight: 600;
+    font-size: 0.75em;
+    text-transform: uppercase;
+    color: var(--color-text-grey);
+    white-space: nowrap;
+}
+
+/* Липкі перші дві колонки (Ім'я та Сер.бал) */
+.cStickyCol {
+    position: sticky;
+    left: 0;
+    background: var(--color-ui-widget-bg);
+    z-index: 1;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    max-width: 15em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cStickyCol2 {
+    background: var(--color-ui-widget-bg);
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    text-align: center !important;
+}
+
+.cZTop {
+    z-index: 1 !important;
+    /* Куток таблиці */
+    background: var(--color-bg) !important;
+}
+
+.cRowEven .cStickyCol,
+.cRowEven .cStickyCol2 {
+    background: color-mix(in srgb, var(--color-ui-widget-bg) 95%, var(--color-bg));
+}
+
+.cStudentLink {
+    color: var(--color-text);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.875em;
+}
+
+.cStudentLink:hover {
+    color: var(--color-main);
+    text-decoration: underline;
+}
+
+.cAvgGrade {
+    background: color-mix(in srgb, var(--color-main) 15%, transparent);
+    color: var(--color-main);
+    padding: 0.2em 0.6em;
+    border-radius: 0.5em;
+    font-weight: bold;
+    font-size: 0.875em;
+}
+
+.thDate {
+    color: var(--color-text);
+    margin-bottom: 0.2em;
+}
+
+.thSubj {
+    font-size: 0.8em;
+    opacity: 0.7;
+    max-width: 10em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cCellContent {
+    display: flex;
+    align-items: center;
+    gap: 0.6em;
+}
+
+.attDot {
+    width: 0.75em;
+    height: 0.75em;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.cGrade {
+    font-weight: bold;
+    font-size: 0.875em;
+}
+
+.tStatus {
+    font-size: 0.75em;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.3em 0.6em;
+    border-radius: 0.5em;
+}
+
+.tMark {
+    font-weight: bold;
+    font-size: 0.875em;
+    color: #00cc66;
+}
+
+.adminGroupSelect {
+    margin-top: 0.5em;
+    padding: 0.5em 1em;
+    border-radius: 0.5em;
+    border: 1px solid var(--color-gray);
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: inherit;
+    font-size: 0.875em;
+    outline: none;
+    cursor: pointer;
+    min-width: 200px;
+    transition: 0.2s;
+}
+
+.adminGroupSelect:focus {
+    border-color: var(--color-main);
+}
+
+/* =========================================
+   АДАПТИВНІСТЬ (МЕДІА-ЗАПИТИ)
+   ========================================= */
+
+@media screen and (max-width: 1200px) {
+    .activitySquare {
+        width: .85em;
+        height: .85em;
+    }
+
+    .tasksStats {
+        flex-direction: column;
+    }
+}
+
+@media screen and (max-width: 1100px) {
+    .activitySquare {
+        width: .675em;
+        height: .675em;
+    }
+}
+
+@media screen and (max-width: 1024px) {
+
+    .activitySquare {
+        width: 1em;
+        height: 1em;
+    }
+
+    .studentGrid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-rows: auto;
+    }
+
+    .LeaderBoard {
+        grid-column: 1 / -1;
+        grid-row: auto;
+        height: 25em;
+    }
+
+    .attendanceWidget {
+        grid-column: 1 / -1;
+        grid-row: auto;
+    }
+
+    .avgGradeWidget {
+        grid-column: 1;
+        grid-row: auto;
+        height: auto;
+        aspect-ratio: auto;
+    }
+
+    .newsWidget {
+        grid-column: 2;
+        grid-row: auto;
+    }
+
+    .tasksWidget {
+        grid-column: 1 / -1;
+        grid-row: auto;
+    }
+
+    .gradesWidget {
+        grid-column: 1 / -1;
+        grid-row: auto;
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .container {
+        width: 100%;
+        margin-top: 0;
+    }
+
+    .studentGrid {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .LeaderBoard {
+        height: 30em;
+        /* Забезпечуємо висоту для скролу на мобілці */
+    }
+
+    .curatorTableWrapper {
+        max-height: 67vh;
+    }
+
+    .curatorHeader {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .curatorTabs {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .cTab {
+        text-align: center;
+    }
+
+    .cStickyCol {
+        max-width: 10em;
+    }
+
+    .cStickyCol2 {
+        left: 10.5em;
+    }
 }

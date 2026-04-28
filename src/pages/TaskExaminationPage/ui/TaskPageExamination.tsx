@@ -55,7 +55,7 @@ export default function TasksExaminationPage() {
         </div>
 
         <div className={styles.container}>
-            {tasks.map(t => <TaskCard key={t.id} task={t.task} onClick={() => selectTask(t)} mark={0}/>)}
+            {tasks.map(t => <TaskCard key={t.id} task={t.task} onClick={() => selectTask(t)} mark={0} selected={selectedTask?.id === t.id}/>)}
         </div>
 
         {selectedTask && <TaskExtendedExamination onCloseClick={() => setSelectedTask(null)} task={selectedTask} />}

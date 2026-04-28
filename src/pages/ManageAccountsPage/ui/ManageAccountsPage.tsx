@@ -70,6 +70,7 @@ export default function ManageAccountsPage() {
 
     return (
         <>
+        <title>Quack | Керування акаунтами</title>
             <div className={styles.menu}>
                 <div className={styles.current}><Link to="/manageaccounts">Облікові записи</Link></div>
                 <div className={styles.line}></div>

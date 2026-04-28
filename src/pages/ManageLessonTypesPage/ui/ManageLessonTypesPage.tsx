@@ -80,6 +80,7 @@ export default function ManageLessonTypesPage() {
 
     return (
         <>
+        <title>Quack | Керування типами занять</title>
             <div className={styles.menu}>
                 <Link to="/manageaccounts">Облікові записи</Link>
                 <div className={styles.line}></div>

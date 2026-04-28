@@ -3,6 +3,7 @@ import Sidebar from "../../widgets/Sidebar/ui/Sidebar";
 import ButtonsMenu from "../../widgets/ButtonsMenu/ui/ButtonsMenu";
 import styles from './MainLayout.module.css'
 import { useNotifications } from "../../features/notifications/lib/useNotifications";
+import MobileNavBar from "../../widgets/MobileNavBar/ui/MobileNavBar";
 
 export default function MainLayout() {
     const token = localStorage.getItem("access_token");
@@ -24,11 +25,18 @@ export default function MainLayout() {
 
     return (
         <>
-            <Sidebar />
+            <div className={styles.desktopSidebar}>
+                <Sidebar />
+            </div>
             <main className={styles.container}>
                 <Outlet />
             </main>
+            
             <ButtonsMenu direction={direction} />
+
+            <div className={styles.mobileNavBar}>
+                <MobileNavBar />
+            </div>
         </>
     );
 }

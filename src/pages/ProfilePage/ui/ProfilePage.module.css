@@ -1,49 +1,61 @@
 .profile {
     display: flex;
-    gap: 2%;
+    flex-direction: row;
+    gap: clamp(1em, 2vw, 2em);
     height: 100%;
+    user-select: text;
 }
 
 .info {
-    width: 30%;
+    width: clamp(15em, 30%, 25em);
     background: var(--color-opaque-secondary);
     backdrop-filter: var(--blur-main);
     height: 94vh;
-    border-top-left-radius: var(--radius-main);
-    border-top-right-radius: var(--radius-main);
-    border-bottom-left-radius: var(--radius-main);
-    border-bottom-right-radius: var(--radius-main);
+    border-radius: var(--radius-main);
     padding: 1em;
     display: flex;
     flex-direction: column;
     gap: 1em;
+    flex-shrink: 0;
+}
+
+.infoAvatarSection {
+    position: relative;
+    display: flex;
+}
+
+.infoTextSection {
+    display: flex;
+    flex-direction: column;
 }
 
 .profileImg {
-    width: 130px;
+    width: 130px; /* 130px */
     height: 130px;
     border-radius: 50%;
     background-color: rgb(99, 99, 99);
     background-image: url("/images/no-image.png");
     box-shadow: var(--shadow-main);
-    
+    background-size: cover;
+    background-position: center center;
 }
 
 .iconPlus {
     position: absolute;
     color: var(--color-text-dark-grey);
-    top: 9em;
-    left: 60px;
+    top: 110px; /* 90px */
+    left: 48px; /* 60px */
+    z-index: 2;
 }
 
 .name {
-    font-size: 18px;
+    font-size: 1.125em; /* 18px */
     font-weight: bold;
     margin-top: 1em;
 }
 
 .description {
-    font-size: 12px;
+    font-size: 0.75em; /* 12px */
     font-weight: 100;
     line-height: 1.5;
 }
@@ -52,56 +64,49 @@
     width: 100%;
 }
 
-/* --- СОСТОЯНИЕ: СВЕРНУТО --- */
 .collapsed {
     overflow: hidden;
-    /* 1.5em (высота строки) * 2 строки = 3em */
     max-height: 3em; 
 }
 
-/* Этот псевдоэлемент "толкает" кнопку вниз до нужной строки */
 .collapsed::before {
     content: '';
     float: right;
-    /* ИСПРАВЛЕНИЕ: жестко задаем высоту двух строк */
     height: 3em; 
     margin-bottom: -1.5em;
 }
 
-/* Сама кнопка, которая "плавает" справа */
 .showMore {
     float: right;
     clear: right;
     cursor: pointer;
-    font-size: 11px;
+    font-size: 0.6875em; /* 11px */
 }
 
 .showMore:hover {
     color: var(--color-main);
 }
 
-/* --- СОСТОЯНИЕ: РАЗВЕРНУТО --- */
 .expanded {
     max-height: none;
 }
 
 .text {
     line-height: 1.5em; 
-    /* Заставляет браузер обрезать текст на любом символе */
     word-break: break-all; 
     white-space: pre-wrap;
 }
 
 .posts {
-    padding: 0 2%;
-    width: 64%;
+    flex: 1;
     height: 90vh;
     overflow-y: auto;
+    padding: 0.5em 2% 0 2%;
 }
 
 .post {
     background-color: var(--color-bg);
-    min-height: 100px;
+    min-height: 6.25em; /* 100px */
     backdrop-filter: var(--blur-main);
     border-radius: var(--radius-main);
     background: var(--color-opaque-secondary);
@@ -115,20 +120,20 @@
 
 .deletePostBtn {
     position: absolute;
-    top: 10px; /* Регулюй під свій падінг */
-    right: 20px; /* Регулюй під свій падінг */
+    top: 0.625em; 
+    right: 1.25em; 
     cursor: pointer;
-    opacity: 0; /* Прихована за замовчуванням */
-    z-index: 1; /* Щоб була поверх усього */
-    padding: 5px; /* Область для кліку */
-    width: 16px;
-    height: 16px;
+    opacity: 0; 
+    z-index: 1; 
+    padding: 0.3125em; 
+    width: 1em;
+    height: 1em;
     color: var(--color-grey);
 }
 
 .deletePostBtn svg {
-    width: 16px;
-    height: 16px;
+    width: 1em;
+    height: 1em;
 }
 
 .post:hover .deletePostBtn {
@@ -146,8 +151,8 @@
 }
 
 .postProfileImg {
-    width: 40px;
-    height: 40px;
+    width: 2.5em; /* 40px */
+    height: 2.5em;
     border-radius: 50%;
     background-color: rgb(99, 99, 99);
     background-image: url("/images/no-image.png");
@@ -157,12 +162,12 @@
 }
 
 .postName {
-    font-size: 13px;
+    font-size: 0.8125em; /* 13px */
     font-weight: bold;
 }
 
 .title {
-    font-size: 15px;
+    font-size: 0.9375em; /* 15px */
     font-weight: bold;
 }
 
@@ -172,15 +177,12 @@
 
 .postCollapsed {
     overflow: hidden;
-    /* 1.5em (высота строки) * 2 строки = 3em */
     max-height: 15em; 
 }
 
-/* Этот псевдоэлемент "толкает" кнопку вниз до нужной строки */
 .postCollapsed::before {
     content: '';
     float: right;
-    /* ИСПРАВЛЕНИЕ: жестко задаем высоту двух строк */
     height: 15em; 
     margin-bottom: -1.5em;
 }
@@ -191,57 +193,27 @@
 
 .postImgs {
     display: grid;
-    gap: 4px; /* Расстояние между фотками (черные полосы на твоем скрине) */
+    gap: 4px; 
     width: 100%;
-    aspect-ratio: 16 / 5; /* Задаем пропорцию всей галереи, чтобы она не была слишком вытянутой */
-    border-radius: 8px; /* Скруглим углы всей галерее, если нужно */
+    aspect-ratio: 16 / 5; 
+    border-radius: 0.5em; 
     overflow: hidden;
-    margin-top: 10px;
+    margin-top: 0.625em;
 }
 
-/* Наш серый див-заглушка */
 .imgPlaceholder {
     width: 100%;
     height: 100%;
     background-position: center center;
 }
 
-/* --- ПАТТЕРНЫ СЕТОК --- */
-
-/* 1 фото: одна колонка */
-.layout1 {
-    grid-template-columns: 1fr;
-}
-
-/* 2 фото: две одинаковые колонки */
-.layout2 {
-    grid-template-columns: 1fr 1fr;
-}
-
-/* 3 фото: левое большое, два правых поменьше */
-.layout3 {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-}
-.layout3 .imgPlaceholder:first-child {
-    grid-row: span 2; /* Первая фотка растягивается на 2 строки вниз */
-}
-
-/* 4 фото: классический квадрат 2x2 */
-.layout4 {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-}
-
-/* 5 фото (и более): твой оранжевый блок */
-.layout5 {
-    /* Левая колонка шире (2fr), две правые поменьше (по 1fr) */
-    grid-template-columns: 2fr 1fr 1fr; 
-    grid-template-rows: 1fr 1fr;
-}
-.layout5 .imgPlaceholder:first-child {
-    grid-row: span 2; /* Первая фотка слева на всю высоту */
-}
+.layout1 { grid-template-columns: 1fr; }
+.layout2 { grid-template-columns: 1fr 1fr; }
+.layout3 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+.layout3 .imgPlaceholder:first-child { grid-row: span 2; }
+.layout4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+.layout5 { grid-template-columns: 2fr 1fr 1fr; grid-template-rows: 1fr 1fr; }
+.layout5 .imgPlaceholder:first-child { grid-row: span 2; }
 
 .block {
     height: 7em;
@@ -254,13 +226,12 @@
     bottom: 2%;
     height: 10em;
     width: 60%;
-
     pointer-events: none;
 }
 
 .newPostContainer {
-    min-height: 40px;
-    width: 60%;
+    min-height: 2.5em; /* 40px */
+    width: clamp(300px, 60%, 800px);
     position: absolute;
     z-index: 3;
     right: 7%;
@@ -277,8 +248,8 @@
 
 .attachedImg {
     background-color: var(--color-ui-widget-bg);
-    width: 100px;
-    height: 100px;
+    width: 6.25em; /* 100px */
+    height: 6.25em;
     position: relative;
     border-radius: 0.5em;
     margin-bottom: 1em;
@@ -288,7 +259,7 @@
     transform: rotate(45deg);
     right: 4px;
     top: 2px;
-    width: 20px;
+    width: 1.25em; /* 20px */
     position: absolute;
     color: var(--color-bg);
     display: none;
@@ -311,19 +282,18 @@
     border: none;
     outline: none;
     color: var(--color-text);
-    font-size: 14px;
+    font-size: 0.875em; /* 14px */
     font-family: inherit;
     padding: 4px 0;
     width: 100%;
 }
 
-/* Цвет плейсхолдера */
 .input::placeholder {
     color: #888888;
 }
 
 .inputIcon {
-    width: 18px;
+    width: 1.125em; /* 18px */
     cursor: pointer;
     margin-bottom: -1px;
 }
@@ -331,7 +301,7 @@
 .postFooter {
     display: flex;
     justify-content: end;
-    height: 30px;
+    height: 1.875em; /* 30px */
     color: var(--color-grey);
     gap: 0.5em;
 }
@@ -339,8 +309,8 @@
 .postActions {
     background: var(--color-opaque-secondary);
     backdrop-filter: var(--blur-main);
-    width: 200px;
-    height: 30px;
+    width: clamp(150px, 20vw, 200px);
+    height: 1.875em; /* 30px */
     box-shadow: 0px 5px 5px rgba(82, 82, 82, 0.1);
     border-radius: 50px;
     display: flex;
@@ -357,7 +327,7 @@
 }
 
 .postActionIcon {
-    width: 16px;
+    width: 1em; /* 16px */
     cursor: pointer;
 }
 
@@ -381,70 +351,57 @@
     display: flex;
     gap: 0.5em;
     align-items: center;
-    font-size: 12px;
+    font-size: 0.75em; /* 12px */
 }
 
-/* --- Всплывающее окно реакций --- */
 .reactionPopup {
     position: absolute;
-    /* Поднимаем окно ровно над иконкой (плюс небольшой отступ в 10px) */
     bottom: calc(100% + 10px);
-    /* 1. СДВИГАЕМ ОКНО ВЛЕВО (подбери значение, если нужно больше/меньше) */
-    left: -70px;
+    left: -4.375em; /* -70px */
     background-color: var(--color-bg);
-    border-radius: 30px; /* Сильное закругление, как пилюля */
-    padding: 10px 14px;
+    border-radius: 30px; 
+    padding: 0.625em 0.875em; /* 10px 14px */
     display: flex;
-    gap: 12px;
+    gap: 0.75em; /* 12px */
     box-shadow: var(--shadow-main);
     z-index: 10;
-    
-    
-    /* Анимация плавного появления */
     animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
-/* Треугольный "хвостик", указывающий на иконку */
 .reactionPopup::after {
     content: '';
     position: absolute;
-    bottom: -8px; /* Выступает вниз */
-    left: 12px; /* Сдвигаем левее, чтобы указывал ровно на иконку смайлика */
-    
-    /* Рисуем треугольник с помощью рамок */
+    bottom: -8px; 
+    left: 5em; /* 80px */
     border-width: 8px 8px 0;
     border-style: solid;
     border-color: var(--color-bg) transparent transparent transparent;
-    /* 2. ВОЗВРАЩАЕМ ХВОСТИК НА МЕСТО */
-    /* Было 12px. Мы сдвинули окно на -40px. Значит тут делаем 12 + 40 = 52px */
-    left: 80px;
 }
 
-/* Серые кружки (заглушки для эмодзи) */
 .reactionCircle {
-    width: 20px;
-    height: 20px;
-    /* background-color: #d9d9d9; */
+    width: 1.25em; /* 20px */
+    height: 1.25em;
     cursor: pointer;
     transition: transform 0.2s ease;
 }
 
-/* Эффект увеличения при наведении на эмодзи */
 .reactionCircle:hover {
     transform: scale(1.15);
 }
 
 .reactionsContainer {
-    height: 30px;
+    height: 1.875em; /* 30px */
     display: flex;
     gap: 0.3em;
+    overflow-x: auto;
+    scrollbar-color: transparent transparent;
 }
 
 .reaction {
     background: var(--color-opaque-secondary);
     backdrop-filter: var(--blur-main);
-    height: 30px;
-    min-width: 60px;
+    height: 1.875em; /* 30px */
+    min-width: 3.75em; /* 60px */
     display: flex;
     gap: 0.5em;
     align-items: center;
@@ -455,63 +412,61 @@
     cursor: pointer;
 }
 
-/* 🔥 ОСЬ ВІН - КЛАС ДЛЯ ТВОЄЇ РЕАКЦІЇ 🔥 */
 .activeReaction {
-    background-color: var(--color-opaque-secondary); /* Легкий фон */
-    border: 2px solid var(--color-main); /* Рамка твого фірмового кольору */
-
+    background-color: var(--color-opaque-secondary); 
+    border: 2px solid var(--color-main); 
 }
 
-/* Фон, що перекриває все */
 .modalOverlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.7); /* Темніє фон */
-    backdrop-filter: blur(4px);    /* Можна додати твій улюблений блюр */
+    background: rgba(0, 0, 0, 0.7); 
+    backdrop-filter: blur(4px);    
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 20;                 /* Максимальний пріоритет */
+    z-index: 20;                 
     cursor: default;
 }
 
-/* Саме вікно */
 .modalContent {
-    background: var(--color-bg);   /* Твій колір фону з AppContext */
+    background: var(--color-bg);   
     border-radius: 12px;
     padding: 20px;
     box-shadow: var(--blur-main);
-    
-    /* Фіксовані розміри як ти просив */
     min-width: 200px;
     min-height: 200px;
-    
-    /* Щоб контент всередині не вилазив */
     overflow: auto;
+    width: 60vw;
+    max-height: 90vh; 
+    display: flex;
+    flex-direction: column; 
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .galleryContent {
     background: var(--color-bg);
     width: 50vw;
     height: 60vh;
-    display: flex; /* Розділяємо на ліво і право */
+    display: flex; 
     overflow: hidden;
     border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .sideThumbs {
-    width: 100px;
+    width: 6.25em; /* 100px */
     height: 100%;
     display: flex;
     flex-direction: column;
     gap: 10px;
     padding: 10px;
-    border-right: 2px solid #000; /* Чорна лінія як на макеті */
-    background: #ccc; /* Сірий фон для колонки */
+    border-right: 2px solid #000; 
+    background: #ccc; 
     overflow-y: auto;
 }
 
@@ -526,13 +481,13 @@
 }
 
 .activeThumb {
-    border-color: var(--color-main); /* Підсвітка обраного фото */
+    border-color: var(--color-main); 
 }
 
 .mainView {
     flex: 1;
     position: relative;
-    background: #d9d9d9; /* Світло-сірий фон як на макеті */
+    background: #d9d9d9; 
     display: flex;
     align-items: center;
     justify-content: center;
@@ -541,33 +496,11 @@
 .largeImage {
     width: 100%;
     height: 100%;
-    background-size: contain; /* Щоб фото не обрізалося */
+    background-size: contain; 
     background-repeat: no-repeat;
     background-position: center;
+    cursor: zoom-in;
 }
-
-.arrowLeft, .arrowRight {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10;
-
-}
-
-.arrowLeft:hover, .arrowRight:hover {
-  
-}
-
-.arrowLeft { left: 20px; }
-.arrowRight { right: 20px; }
 
 .noImagesContent {
     padding: 40px;
@@ -579,89 +512,60 @@
 }
 
 .modalText {
-    font-size: 18px;
+    font-size: 1.125em; /* 18px */
     line-height: 1.5;
-    white-space: pre-wrap; /* зберігаємо переноси рядків */
+    white-space: pre-wrap; 
 }
 
 .arrowLeft, .arrowRight {
     position: absolute;
     top: 50%;
-
+    transform: translateY(-50%);
     cursor: pointer;
-    
-    /* Робимо іконки круглими, білими та акуратними */
-
     border-radius: 50%;
-    width: 38px; /* Трохи більший розмір для зручності */
-    height: 38px;
+    width: 2.375em; /* 38px */
+    height: 2.375em;
     display: flex;
     align-items: center;
     justify-content: center;
-    
     z-index: 10;
+    backdrop-filter: blur(5px);
 }
 
-/* Позиція зліва */
-.arrowLeft { 
-    left: 20px; 
+.arrowLeft { left: 20px; }
+.arrowRight { right: 20px; }
 
-}
-
-/* Позиція справа */
-.arrowRight { 
-    right: 20px; 
-
-}
-
-
-/* Додатково: якщо у SVG є фіксований колір, забираємо його */
 .arrowLeft svg, .arrowRight svg {
-    width: 20px;  /* Розмір іконки всередині кола */
-    height: 20px;
+    width: 1.25em;  /* 20px */
+    height: 1.25em;
 }
-.arrowLeft:hover svg {
+
+.arrowLeft:hover svg, .arrowRight:hover svg {
     color: var(--color-main);
-    
 }
 
-/* Аналогічно для правої стрілки */
-.arrowRight:hover svg {
-     color: var(--color-main);
-
-}
-
-.modalContent {
-    background: var(--color-bg);
-    width: 60vw;
-    max-height: 90vh; /* Щоб не вилазило за екран */
-    display: flex;
-    flex-direction: column; /* Все йде зверху вниз */
-    overflow-y: auto; /* Скрол тільки якщо контенту забагато */
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.3s ease;
-}
-
-/* Режим на весь екран при кліку */
 .fullScreenMode {
     width: 95vw;
     height: 95vh;
 }
 
 .fullScreenMode .gallerySection {
-    height: 80vh; /* Збільшуємо зону фото */
+    height: 80vh; 
+}
+
+.fullScreenMode .largeImage {
+    cursor: zoom-out;
 }
 
 .gallerySection {
     display: flex;
-    height: 50vh; /* Фіксована висота для зони фото в звичайному режимі */
+    height: 50vh; 
     border-bottom: 1px solid rgba(0, 0, 0, 0.2);
-    background: #000; /* Чорний фон краще для фото */
+    background: #000; 
 }
 
 .modalInfoSection {
-    padding: 20px;
+    padding: 1.25em; /* 20px */
     background: var(--color-bg);
 }
 
@@ -669,50 +573,38 @@
     margin-top: 15px;
 }
 
-/* Копіюємо логіку обрізання тексту з PostItem */
-.postCollapsed {
-    display: -webkit-box;
-    -webkit-line-clamp: 10;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    position: relative;
-}
-
-.postExpanded {
-    display: block;
-}
-
-/* Стилі для стрілок (виправлені) */
-.arrowLeft, .arrowRight {
-  
-    backdrop-filter: blur(5px);
-}
-
-.arrowLeft:hover, .arrowRight:hover {
-
-}
-
-.largeImage {
-    cursor: zoom-in;
-}
-
-.fullScreenMode .largeImage {
-    cursor: zoom-out;
+.modalTextContent {
+    overflow-y: auto;
 }
 
 .unifiedModal {
     background: var(--color-bg);
-    width: 55vw;
-    max-height: 95vh;
-    border-radius: 16px;
+    width: clamp(300px, 55vw, 1200px);
+    max-height: 90vh;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow-y: auto; 
+    overflow-x: hidden;
+    scrollbar-gutter: auto; 
+    border-radius: 16px;
     box-shadow: 0 20px 50px rgba(0,0,0,0.5);
 }
 
+.unifiedModal::-webkit-scrollbar {
+    width: 6px; 
+}
+
+.unifiedModal::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2); 
+    border-radius: 10px;
+}
+
+.unifiedModal::-webkit-scrollbar-track {
+    background: transparent; 
+}
+
 .modalGallerySection {
-    background: var(--color-bg); /* Темний фон для зони фото */
+    background: var(--color-bg); 
     display: flex;
     flex-direction: column;
 }
@@ -734,7 +626,6 @@
     cursor: zoom-in;
 }
 
-/* ПРЕВ'ЮШКИ ЗНИЗУ */
 .bottomThumbs {
     display: flex;
     justify-content: center;
@@ -745,8 +636,8 @@
 }
 
 .bottomThumbItem {
-    width: 60px;
-    height: 60px;
+    width: 3.75em; /* 60px */
+    height: 3.75em;
     background-size: cover;
     background-position: center;
     border-radius: 4px;
@@ -760,7 +651,6 @@
     outline: 2px solid var(--color-main);
 }
 
-/* LIGHTBOX (Повноцінний екран) */
 .lightBox {
     position: fixed;
     top: 0; left: 0;
@@ -783,7 +673,7 @@
 .closeLightBox {
     position: absolute;
     top: 30px; right: 30px;
-    transform: rotate(45deg); /* Плюс перетворюється на Х */
+    transform: rotate(45deg); 
     cursor: pointer;
     scale: 2;
 }
@@ -791,46 +681,6 @@
 @keyframes zoomIn {
     from { transform: scale(0.9); opacity: 0; }
     to { transform: scale(1); opacity: 1; }
-}
-
-/* Фікс для тексту */
-.modalTextContent {
-
-    overflow-y: auto;
-}
-
-
-.unifiedModal {
-    background: var(--color-bg);
-    width: 55vw;
-    max-height: 90vh;
-    display: flex;
-    flex-direction: column;
-
-    /* ПРАВИЛО №1: Тільки auto! */
-    overflow-y: auto; 
-    overflow-x: hidden;
-
-    /* ПРАВИЛО №2: Прибираємо примусове резервування місця */
-    scrollbar-gutter: stable both-edges; /* Це залишить симетрію, але... */
-    /* Або просто: */
-    scrollbar-gutter: auto; 
-
-    border-radius: 16px;
-}
-
-/* ПРАВИЛО №3: Налаштовуємо вигляд скролбару (Webkit) */
-.unifiedModal::-webkit-scrollbar {
-    width: 6px; /* Робимо його дуже тонким */
-}
-
-.unifiedModal::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2); /* Напівпрозорий, щоб не муляв очі */
-    border-radius: 10px;
-}
-
-.unifiedModal::-webkit-scrollbar-track {
-    background: transparent; /* Фон доріжки прозорий, щоб не було порожньої смуги */
 }
 
 .commentsModal {
@@ -841,19 +691,13 @@
 }
 
 .modalCommentInputWrapper {
-    padding: 0 15px 5px 15px; /* Відступи по боках і знизу */
+    padding: 0 15px 5px 15px; 
     background: var(--color-bg);
     box-shadow: var(--shadow-main);
     border: 1px solid var(--color-gray);
     background-color: var(--color-bg);
     border-radius: 0.5em;
     flex-shrink: 0;
-}
-
-.hideComment {
-    width: 14px;
-    height: 14px;
-    cursor: pointer;
 }
 
 .hideLineWrap {
@@ -886,4 +730,179 @@
     display: flex;
     height: fit-content;
     border-radius: 50%;
+}
+
+.deleteCommentBtn {
+    cursor: pointer;
+    opacity: 0.5;
+    margin-left: auto;
+    width: 1em;
+    height: 1em;
+}
+
+.commentRow {
+    display: flex;
+    margin-top: 15px;
+}
+
+.commentAvatarSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 12px;
+}
+
+/* =========================================
+   АДАПТИВНІСТЬ (МЕДІА-ЗАПИТИ)
+   ========================================= */
+
+@media screen and (max-width: 1024px) and (min-width: 768px) {
+    .profile {
+        flex-direction: column;
+    }
+    .info {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        align-items: center;
+        border-radius: var(--radius-main);
+    }
+    .infoAvatarSection {
+        flex-shrink: 0;
+        height: 100%;
+        justify-content: center;
+    }
+    .profileImg {
+        width: 6em;
+        height: 6em;
+    }
+    .iconPlus {
+        top: 64px;
+        left: 26px;
+        transform: scale(0.85);
+    }
+    .infoTextSection {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
+    .posts {
+        width: 100%;
+        height: auto;
+        padding: 1em 0;
+    }
+    .newPostContainer {
+        width: 84%;
+        left: 65px;
+        bottom: 10px;
+        position: fixed; /* Для мобілки закріплюємо знизу екрана */
+    }
+    .unifiedModal {
+        width: 80vw;
+    }
+    .galleryContent {
+        width: 80vw;
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .profile {
+        flex-direction: column;
+        gap: 0;
+        overflow: visible;
+    }
+    
+    .info {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        padding: 0.5em 1em;
+        gap: 1em;
+    }
+
+    .infoAvatarSection {
+        flex-shrink: 0;
+        height: 100%;
+        justify-content: center;
+    }
+
+    .profileImg {
+        width: 4em;
+        height: 4em;
+    }
+
+    .iconPlus {
+        top: 2.2em;
+        left: 1.8em;
+        transform: scale(0.75);
+    }
+
+    .infoTextSection {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        overflow: hidden;
+    }
+
+    .name {
+        margin-top: 0;
+        font-size: 1.125em;
+    }
+
+    .descriptionWrapper {
+        font-size: 0.85em;
+    }
+
+    .posts {
+        width: 100%;
+        height: auto;
+        padding: 0.5em 0;
+        overflow: visible;
+    }
+
+    .newPostContainer {
+        width: 90%;
+        left: 20px;
+        bottom: calc(var(--safe-area-bottom) + 60px);
+        position: fixed; /* Для мобілки закріплюємо знизу екрана */
+    }
+
+    /* Приховуємо звичайні кнопки видалення на мобілці, щоб використовувати long press */
+    .deletePostBtn {
+        display: none;
+    }
+    
+    .deleteCommentBtn {
+        display: none;
+    }
+
+    .unifiedModal {
+        width: 95vw;
+        max-height: 90vh;
+    }
+
+    .galleryContent {
+        width: 95vw;
+        flex-direction: column;
+    }
+
+    .sideThumbs {
+        width: 100%;
+        height: 4em;
+        flex-direction: row;
+        border-right: none;
+        border-bottom: 2px solid #000;
+    }
+    
+    .reactionPopup {
+        left: -1em; /* Центруємо на мобілці краще */
+    }
+    
+    .reactionPopup::after {
+        left: 1.5em;
+    }
 }

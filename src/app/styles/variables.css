@@ -21,6 +21,10 @@
     --color-ui-widget-bg: #eee;
     --color-leaderboard: #dcf5ff;
 
+    --blend-percentage: 40%;
+
+    --filter-main: none;
+
     --blur-main: blur(9px);
     --blur-form: blur(15px);
 
@@ -31,6 +35,11 @@
     --radius-secondary: 10px;
 
     --bg-img: url("/images/bg-light-mode.PNG");
+
+    --safe-area-top: env(safe-area-inset-top, 0px);
+    --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-area-left: env(safe-area-inset-left, 0px);
+    --safe-area-right: env(safe-area-inset-right, 0px);
 }
 
 .dark {
@@ -39,7 +48,6 @@
     --color-gray: #454545;
 
     --color-hover-icon-bg: color-mix(in srgb, var(--color-main) 30%, transparent);
-;
     --color-hover-icon: var(--color-main);
     --color-icon-text: #ffffff;
     --color-hover-icon-text: #ffffff;
@@ -55,6 +63,9 @@
     --color-grey: #b1b1b1;
     --color-ui-widget-bg: #353535;
     --color-leaderboard: #3088ab;
+
+    --blend-percentage: 70%;
+    --filter-main: invert();
     
     --bg-img: url("/images/bg-dark-mode.PNG");
 }

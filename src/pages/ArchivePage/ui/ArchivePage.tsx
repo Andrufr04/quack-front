@@ -74,7 +74,6 @@ export default function ArchivePage() {
 
             <div className={styles.container}>
                 {!selectedSubject ? (
-                    // --- РЕЖИМ ПАПОК ---
                     <>
                         {Object.keys(groupedTasks).map(subject => (
                             <div key={subject} className={styles.folderContainer} onClick={() => setSelectedSubject(subject)}>
@@ -109,6 +108,7 @@ export default function ArchivePage() {
                                     task={t.task}
                                     onClick={() => selectTask(t)}
                                     mark={(t.mark ?? 0)}
+                                    selected={selectedTask?.task.id === t.task.id} 
                                 />
                             ))}
                         </div>

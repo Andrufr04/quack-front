@@ -186,3 +186,53 @@ td {
 .editInput:focus {
     outline: none;
 }
+
+/* 🔥 Стилі для картинок 🔥 */
+.imagePicker {
+    width: 60px;
+    height: 40px;
+    border-radius: 8px;
+    background-color: var(--color-gray);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background-size: cover;
+    background-position: center;
+    border: 1px dashed var(--color-text-dark-grey);
+    flex-shrink: 0;
+}
+
+.imagePicker span {
+    font-size: 12px;
+    color: var(--color-text-dark-grey);
+}
+
+.imagePickerSmall {
+    width: 40px;
+    height: 30px;
+    margin: 0 auto;
+    border-radius: 4px;
+    background-color: var(--color-gray);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background-size: cover;
+    background-position: center;
+    border: 1px dashed var(--color-text-dark-grey);
+}
+
+.subjectImageDisplay {
+    width: 40px;
+    height: 30px;
+    margin: 0 auto;
+    border-radius: 4px;
+    background-color: var(--color-gray);
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+}

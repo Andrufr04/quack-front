@@ -25,7 +25,7 @@ export const navigationButtonsAdministration: NavigationButtonProps[] = [
     {icon : SVG_PROFILE, text : "Профіль", slug : "/profile"},
     {icon : SVG_CHATS, text : "Чати", slug : "/chats"},
     {icon : SVG_CALENDAR, text : "Розклад", slug : "/manageschedule"},
-    {icon : SVG_PEOPLE, text : "Керування", slug: "/manageaccounts"},
+    {icon : SVG_PEOPLE, text : "Панель керування", slug: "/manageaccounts"},
 ]
 
 export const navigationButtonsCurator: NavigationButtonProps[] = [

@@ -64,6 +64,7 @@ export default function ManageSchedule() {
     }
 
     return (<>
+    <title>Quack | Керування розкладом</title>
         <div className={styles.menu}>
             <div className={styles.current}><Link to="">Створити пару</Link></div>
             <div className={styles.line}></div>

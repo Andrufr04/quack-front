@@ -9,17 +9,17 @@ export default function PrivacyPage() {
 
     return (
         <div className={styles.container}>
-            <title>Quack | Документація</title>
+            <title>Quack | Політика конфіденційності</title>
 
             <div className={styles.settings}>
                 {/* ЛІВЕ МЕНЮ (як у налаштуваннях) */}
                 <div className={styles.tabs}>
                      
-                    <div className={styles.sidebarTitle}>
-                        <div className={styles.doneTop} onClick={() => navigate("/")}>
+                    <div className={styles.sidebarTitle} onClick={() => navigate(-1)}>
+                        <div className={styles.doneTop}>
                             {SVG_ARROW_DOWN}
                         </div>
-                        <div>Документація</div>
+                        <div>Повернутись</div>
                     </div>
 
                     <div

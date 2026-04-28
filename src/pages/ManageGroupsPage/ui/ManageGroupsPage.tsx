@@ -50,6 +50,7 @@ export default function ManageGroupsPage() {
 
     return (
         <>
+        <title>Quack | Керування групами</title>
             <div className={styles.menu}>
                 <Link to="/manageaccounts">Облікові записи</Link>
                 <div className={styles.line}></div>

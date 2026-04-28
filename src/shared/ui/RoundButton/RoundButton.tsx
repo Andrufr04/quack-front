@@ -14,7 +14,9 @@ export default function RoundButton({ button }: { button: RoundButtonProps }) {
         }
     }
 
-    return <div className={styles.button} onClick={onClick} data-tooltip-id="my-tooltip" data-tooltip-content={button.text}>
+    const isMobile = window.innerWidth < 768
+
+    return <div className={styles.button} onClick={onClick} data-tooltip-id="my-tooltip" data-tooltip-content={button.text} data-tooltip-hidden={isMobile}>
         <div className={styles.icon}>{button.icon}</div>
     </div>
 }

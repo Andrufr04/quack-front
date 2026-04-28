@@ -147,6 +147,8 @@ export const CalendarPage = () => {
     }
 
     return (
+        <>
+        <title>Quack | Розклад</title>
         <div className={styles.container}>
             {/* Кнопка Назад (повертаємо іконку вгору через стиль) */}
             <div className={styles.iconPrevious} onClick={() => changeWeek(-1)}>
@@ -209,6 +211,7 @@ export const CalendarPage = () => {
                                                     className={`${styles.lesson} ${isActive ? styles.activeLesson : ""}`}
                                                     style={{ top, height, cursor: isTeacher() ? "pointer" : "" }}
                                                     onClick={() => onLessonClick(lesson)}
+                                                    data-tooltip-id="my-tooltip" data-tooltip-content={lesson.title}
                                                 >
                                                     <div className={styles.title}>{lesson.title}</div>
                                                     <div className={styles.lessonBottom}>
@@ -230,5 +233,6 @@ export const CalendarPage = () => {
                 <RoundButton button={{ icon: SVG_ARROW_DOWN, text: "Наступний тиждень" }} />
             </div>
         </div>
+        </>
     );
 };

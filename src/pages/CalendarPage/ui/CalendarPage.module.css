@@ -1,71 +1,63 @@
-.wrapper {
-  position: relative;
-  height: 80vh;
-  padding-left: 16px; /* Забираємо загальний padding, бо сітка має розтягуватись */
-  padding-right: 16px;
-  backdrop-filter: var(--blur-main);
-  background-color: var(--color-opaque-secondary);
-  border-radius: 0 0 14px 14px;
-  overflow-y: auto;
+.container {
+    width: 100%;
+    height: 100vh;
+    display: grid;
+    /* На десктопі: Кнопка | Календар | Кнопка */
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(0.5em, 2vw, 1em);
+    padding: clamp(1em, 2vw, 2em);
+    box-sizing: border-box;
 }
 
-/* ФІКС: Прибрано висоту 1360px та space-between */
-.timeColumn {
-  width: 60px;
-  flex-shrink: 0; /* Щоб сітка не стискала цю колонку */
-  display: flex;
-  flex-direction: column;
-  color: #666;
-  text-align: center; /* Щоб час стояв по центру колонки */
-  font-size: 14px;
+.iconPrevious {
+    transform: rotate(90deg);
+    cursor: pointer;
+    transition: transform 0.2s ease;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  flex: 1;
-  position: relative;
+.iconNext {
+    transform: rotate(-90deg);
+    cursor: pointer;
+    transition: transform 0.2s ease;
 }
 
-.dayColumn {
-    position: relative;
-    border-left: 1px dashed rgba(255, 255, 255, 0.03); /* Вертикальні лінії для днів */
-}
+/* Анімація кліку для кнопок */
+.iconPrevious:active { transform: scale(0.9) rotate(90deg); }
+.iconNext:active { transform: scale(0.9) rotate(-90deg); }
 
-.lesson {
-    position: absolute;
-    left: 4px;
-    right: 4px;
-    background: var(--color-bg);
-    border-radius: 12px;
-    padding: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    font-size: 12px;
+.calendar {
+    width: 100%;
+    max-width: 1400px;
+    max-height: 90vh;
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    overflow: hidden;
-    z-index: 2;
+    /* Дозволяємо горизонтальний скрол на малих екранах */
+    overflow-x: auto;
+    scrollbar-width: none; /* Ховаємо скролбар у Firefox */
 }
 
-.activeLesson {
-    background-color: var(--color-main);
+/* Ховаємо скролбар у Chrome/Safari, щоб виглядав як нативний свайп */
+.calendar::-webkit-scrollbar {
+    display: none;
 }
 
-/* ФІКС: Зрівняв бокові падінги з .wrapper (16px), щоб дні співпадали з сіткою */
 .days {
     display: flex;
-    padding: 20px 16px; 
+    padding: 1.25em 1em; /* 20px 16px */
     background-color: var(--color-bg);
     color: var(--color-grey);
-    border-radius: 14px 14px 0 0;
+    border-radius: 0.875em 0.875em 0 0; /* 14px */
+    /* Жорстко тримаємо мінімальну ширину, щоб дні не стискалися в кашу */
+    min-width: 45em; 
 }
 
-/* ФІКС: Має бути рівно такої ж ширини, як .timeColumn (60px) */
 .headerInfo {
-    width: 60px; 
+    width: 5.75em; /* 60px */
     flex-shrink: 0;
-    font-size: 11px;
+    font-size: clamp(0.625em, 1vw, 0.6875em); /* 11px */
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -77,22 +69,24 @@
 }
 
 .year {
-    font-size: 12px;
+    font-size: 0.75em; /* 12px */
 }
 
 .day {
     display: flex;
-    width: 14.285714%; /* DONT CHANGE THIS FUCKING NUMBER */
+    /*width: 13.285714%;  DONT CHANGE THIS FUCKING NUMBER!!! UPD: sadly, we had to change this fucking number*/
+    flex: 1;
     flex-direction: column;
     align-items: center;
+    flex-shrink: 0;
 }
 
 .dayOfWeek {
-    font-size: 12px;
+    font-size: 0.75em; /* 12px */
 }
 
 .date {
-    font-size: 1.5em;
+    font-size: clamp(1.2em, 2vw, 1.5em);
     font-weight: bold;
 }
 
@@ -100,83 +94,161 @@
     color: var(--color-main);
 }
 
-.calendar {
-    width: 90%;
-    /* Щоб календар не "стрибав", можна додати max-width: 1200px; */
+.wrapper {
+    position: relative;
+    height: clamp(60vh, 80vh, 1000px);
+    padding-left: 1em; /* 16px */
+    padding-right: 1em;
+    backdrop-filter: var(--blur-main);
+    background-color: var(--color-opaque-secondary);
+    border-radius: 0 0 0.875em 0.875em; /* 14px */
+    overflow-y: auto;
+    /* Жорстко тримаємо мінімальну ширину, синхронно з .days */
+    min-width: 45em; 
 }
 
-.container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5em;
-}
-
-.iconPrevious {
-    transform: rotate(90deg);
-    cursor: pointer;
-}
-
-.iconNext {
-    transform: rotate(-90deg);
-    cursor: pointer;
-}
-
-.title {
-    font-weight: bold;
-    white-space: nowrap;      /* не переносить строку */
-    overflow: hidden;         /* скрыть лишнее */
-    text-overflow: ellipsis;  /* добавить ... */
-}
+/* Кастомний вертикальний скролбар для wrapper */
+.wrapper::-webkit-scrollbar { width: 6px; }
+.wrapper::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.2); border-radius: 10px; }
+.wrapper::-webkit-scrollbar-track { background: transparent; }
 
 /* ФОНОВА СІТКА */
 .backgroundGrid {
     position: absolute;
-    top: 16px; /* Відступ зверху, якщо є padding у wrapper */
-    left: 16px;
-    right: 16px;
+    top: 1em; /* 16px */
+    left: 1em;
+    right: 1em;
     display: flex;
     flex-direction: column;
 }
 
 .gridRow {
     display: flex;
-    align-items: flex-start; /* Щоб лінія була зверху рядка */
+    align-items: flex-start;
     position: relative;
 }
 
 .timeLabel {
-    width: 60px; /* Ширина колонки часу */
+    width: 3.75em; /* 60px */
     flex-shrink: 0;
     color: #666;
-    font-size: 14px;
+    font-size: 0.875em; /* 14px */
     text-align: center;
     position: relative;
-    top: -10px; /* Піднімаємо текст, щоб він стояв навпроти лінії */
+    top: -0.625em; /* -10px */
 }
 
 .gridLine {
     flex-grow: 1;
-    border-top: 1px solid rgba(255, 255, 255, 0.05); /* Ледь помітна лінія */
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
     width: 100%;
 }
 
 /* СІТКА КАРТОК */
 .eventsGrid {
     position: relative;
-    top: 16px; /* Має співпадати з top фонової сітки */
-    margin-left: 60px; /* Відступ на ширину timeLabel */
+    top: 1em; /* 16px */
+    margin-left: 3.75em; /* 60px */
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    height: calc(13 * 72px); /* 13 годин * (60 * 1.2). Зміни, якщо pxPerMinute інший */
+    /* pxPerMinute у TSX дорівнює 1.2, отже 60 * 1.2 = 72px. */
+    height: calc(13 * 72px); 
+}
+
+.dayColumn {
+    position: relative;
+    border-left: 1px dashed rgba(255, 255, 255, 0.03);
+}
+
+.lesson {
+    position: absolute;
+    left: 0.25em; /* 4px */
+    right: 0.25em;
+    background: var(--color-bg);
+    border-radius: 0.75em; /* 12px */
+    padding: 0.5em; /* 8px */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    font-size: 0.75em; /* 12px */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    z-index: 2;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.activeLesson {
+    background-color: var(--color-main);
+}
+
+.title {
+    font-weight: bold;
+    font-size: 1em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .lessonBottom {
     display: flex;
     justify-content: space-between;
-    font-size: 10px;
+    /* 10px відносно батьківського шрифту 12px (10/12 = ~0.833) */
+    font-size: 0.833em; 
 }
 
 .aud {
     font-weight: bold;
+}
+
+
+/* =========================================
+   АДАПТИВНІСТЬ (МЕДІА-ЗАПИТИ)
+   ========================================= */
+
+@media screen and (max-width: 1024px) {
+    .container {
+        padding: 1em;
+    }
+
+    .lessonBottom {
+        flex-direction: column;
+    }
+}
+
+/* Mobile (< 768px) */
+@media screen and (max-width: 767px) {
+    .container {
+        /* На мобілці перемикаємо кнопки наверх */
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto minmax(0, 1fr);
+        gap: 1em;
+        align-items: start;
+        /* Відступи враховують мобільну нижню панель (5.5em) і безпечні зони */
+        padding: calc(var(--safe-area-top) + 1em) 1em calc(var(--safe-area-bottom) + 5.5em) 1em;
+    }
+
+    .iconPrevious {
+        grid-column: 1;
+        grid-row: 1;
+        justify-self: end; /* Кнопки притискаються до центру */
+    }
+
+    .iconNext {
+        grid-column: 2;
+        grid-row: 1;
+        justify-self: start;
+    }
+
+    .calendar {
+        grid-column: 1 / -1;
+        grid-row: 2;
+        height: 100%;
+        max-height: 75vh;
+    }
+
+    .wrapper {
+        height: 100%; /* Розтягуємо на всю доступну висоту */
+    }
+
+    
 }

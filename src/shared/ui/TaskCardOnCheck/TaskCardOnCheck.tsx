@@ -2,10 +2,10 @@ import type { TeacherTaskToCheck } from "../../../entities/task/model/types"
 import { SVG_A } from "../icons/icons"
 import styles from "./TaskCardOnCheck.module.css"
 
-export default function TaskCardOnCheck({ onClick, task }: { onClick: () => void, task: TeacherTaskToCheck }) {
+export default function TaskCardOnCheck({ onClick, task, selected }: { onClick: () => void, task: TeacherTaskToCheck, selected: boolean }) {
 
-    return <div className={styles.taskCard}>
-        <div className={styles.taskImg}></div>
+    return <div className={`${styles.taskCard} ${selected ? styles.cardSelected : ""}`}>
+        <div className={styles.taskImg} style={task.task.subject_image ? { backgroundImage: `url(${task.task.subject_image})` } : {}}></div>
         <div className={styles.taskInfo}>
             <div className={styles.top}>
                 <div className={styles.title}>{task.task.subject_name}</div>

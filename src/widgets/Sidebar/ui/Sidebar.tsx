@@ -5,7 +5,6 @@ import style from "./Sidebar.module.css"
 import { SVG_EXPAND, SVG_LOGO } from "../../../shared/ui/icons/icons"
 import { useLocation, useNavigate } from "react-router-dom"
 import { isAdministration, isCurator, isStudent, isTeacher } from "../../../entities/session/lib/jwt"
-import ModeSwitch from "../../ModeSwitch/ui/ModeSwitch"
 
 export default function Sidebar() {
     const [expanded, setExpanded] = useState(false)

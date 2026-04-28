@@ -55,6 +55,7 @@ export default function ManageScheduleDelete() {
 
     return (
         <>
+        <title>Quack | Змінити розклад</title>
             <div className={styles.menu}>
                 <Link to="/manageschedule">Створити пару</Link>
                 <div className={styles.line}></div>

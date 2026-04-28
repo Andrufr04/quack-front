@@ -3,7 +3,7 @@ import { formatDate, getDaysRemaining } from "../../../lib/formatDate"
 import { SVG_A } from "../../icons/icons"
 import styles from "./TaskCard.module.css"
 
-export default function TaskCard({ onClick, task, mark }: { onClick: () => void, task: Task, mark?: number }) {
+export default function TaskCard({ onClick, task, mark, selected }: { onClick: () => void, task: Task, mark?: number, selected: boolean }) {
 
     const getMarkClass = () => {
         if (mark && mark > 0) {
@@ -17,11 +17,11 @@ export default function TaskCard({ onClick, task, mark }: { onClick: () => void,
     const deadlineStatus = getDaysRemaining(task.end);
     const isOverdue = deadlineStatus === "Прострочено";
 
-    return <div className={styles.taskCard}>
+    return <div className={`${styles.taskCard} ${selected ? styles.cardSelected : ""}`}>
         {(mark || (mark ?? 0) > 0) && <div className={`${styles.mark} ${getMarkClass()}`}>
             {mark}
         </div>}
-        <div className={styles.taskImg}></div>
+        <div className={styles.taskImg} style={task.subject_image ? { backgroundImage: `url(${task.subject_image})` } : {}}></div>
         <div className={styles.taskInfo}>
             <div className={styles.top}>
                 <div className={styles.title}>{task.subject_name}</div>

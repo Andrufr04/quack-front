@@ -1,13 +1,53 @@
 .container {
     padding: 2% 6%;
     height: 100vh;
-    background: var(--bg-img);
+    background: var(--bg-img) center/cover no-repeat;
     width: 100%;
-    background-size: cover;
     overflow-y: auto;
     scrollbar-color: transparent transparent;
+
+    /* 🔥 Додаємо відступ зліва для ПК (ширина твого закритого сайдбару ~60px = 3.75em) */
+    padding-left: calc(3.75em + 2%);
 }
 
 * {
     scrollbar-color: var(--color-ui-secondary) transparent;
+}
+
+/* За замовчуванням показуємо десктоп, ховаємо мобільний */
+.desktopSidebar {
+    display: block;
+}
+
+.mobileNavBar {
+    display: none;
+}
+
+/* =========================================
+   АДАПТИВНІСТЬ (МЕДІА-ЗАПИТИ)
+   ========================================= */
+
+@media screen and (max-width: 1024px) {
+    .container {
+        padding-left: calc(3.75em + 1em); /* Трохи зменшуємо відступ на планшетах */
+        padding-right: 7%;
+    }
+}
+
+/* Mobile (< 768px) */
+@media screen and (max-width: 767px) {
+    /* Міняємо їх місцями! */
+    .desktopSidebar {
+        display: none;
+    }
+
+    .mobileNavBar {
+        display: block;
+    }
+
+    .container {
+        /* Прибираємо відступ зліва (бо сайдбару там немає) */
+        /* Додаємо відступ знизу, щоб контент не ховався за навігацією */
+        padding: 4em 1em calc(5.5em + var(--safe-area-bottom)) 1em;
+    }
 }

@@ -1,10 +1,9 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { formatDate } from "../../../lib/formatDate"
 import ActionButton from "../../ActionButton/ui/ActionButton"
 import { SVG_PLUS } from "../../icons/icons"
 import styles from "./TaskExtended.module.css"
 import type { Task } from "../../../../entities/task/model/types"
-import { FileViewer } from "../../FileViewer/ui/FileViewer"
 import { taskApi } from "../../../../entities/task/api/taskApi"
 import toast from "react-hot-toast"
 
@@ -12,6 +11,7 @@ export default function TaskExtended({ onCloseClick, task }: { onCloseClick: () 
     const [description, setDescription] = useState("")
     const [files, setFiles] = useState<File[]>([])
     const [loading, setLoading] = useState(false)
+    const [previewImage, setPreviewImage] = useState<string | null>(null);
 
     const isValid = description.trim().length > 0 || files.length > 0
 
@@ -22,20 +22,17 @@ export default function TaskExtended({ onCloseClick, task }: { onCloseClick: () 
 
         try {
             const formData = new FormData();
-
             formData.append("text", description);
-
             formData.append("task_id", task.id);
 
             files.forEach((f) => {
-                formData.append('attachments', f); // Ключ має збігатися з тим, що чекає Django
+                formData.append('attachments', f);
             });
 
-            // 4. Виклик твого API
             const result = await taskApi.submitTaskWork(formData);
 
             if (result) {
-                onCloseClick(); // Закриваємо модалку після успіху
+                onCloseClick();
                 toast.success("Завдання завантажено!")
             }
         } catch (error) {
@@ -46,12 +43,39 @@ export default function TaskExtended({ onCloseClick, task }: { onCloseClick: () 
         }
     };
 
-    const docs = useMemo(() => {
-        return task.attachments?.files.map(f => ({
-            uri: f.file,
-            fileName: f.file.split('/').pop()
-        })) || [];
+    const classifiedFiles = useMemo(() => {
+        const images: { url: string, name: string }[] = [];
+        const videos: { url: string, name: string }[] = [];
+        const others: { url: string, name: string }[] = [];
+
+        if (!task.attachments?.files) return { images, videos, others };
+
+        task.attachments.files.forEach(f => {
+            const url = f.file;
+            let name = 'file';
+            try {
+                name = decodeURIComponent(url.split('/').pop() || 'file');
+            } catch (e) {
+                name = url.split('/').pop() || 'file';
+            }
+            const ext = name.split('.').pop()?.toLowerCase();
+
+            if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext || '')) {
+                images.push({ url, name });
+            } else if (['mp4', 'webm', 'ogg', 'mov'].includes(ext || '')) {
+                videos.push({ url, name });
+            } else {
+                others.push({ url, name });
+            }
+        });
+
+        return { images, videos, others };
     }, [task]);
+
+    useEffect(() => {
+        setDescription("")
+        setFiles([])
+    }, [task])
 
     const handleDrop = (e: React.DragEvent) => {
         e.preventDefault();
@@ -86,11 +110,37 @@ export default function TaskExtended({ onCloseClick, task }: { onCloseClick: () 
 
                 <div className={styles.description}>
                     <div className={styles.descriptionTitle}>Опис:</div>
-                    <div className={styles.descriptionInfo} style={{maxHeight: docs.length > 0 ? "7.5em" : "25em" }}>{task.description}</div>
+                    <div className={styles.descriptionInfo} style={{ maxHeight: (classifiedFiles.images.length > 0 || classifiedFiles.videos.length > 0 || classifiedFiles.others.length > 0) ? "7.5em" : "25em" }}>{task.description}</div>
                 </div>
             </div>
 
-            {docs.length > 0 && <FileViewer docs={docs} />}
+            <div className={styles.attachmentsContainer}>
+                {classifiedFiles.images.length > 0 && (
+                    <div className={styles.mediaGrid}>
+                        {classifiedFiles.images.map((img, i) => (
+                            <img key={`img-${i}`} src={img.url} alt={img.name} className={styles.mediaItem} onClick={() => setPreviewImage(img.url)} />
+                        ))}
+                    </div>
+                )}
+
+                {classifiedFiles.videos.length > 0 && (
+                    <div className={styles.mediaGrid}>
+                        {classifiedFiles.videos.map((vid, i) => (
+                            <video key={`vid-${i}`} src={vid.url} controls className={styles.mediaItem} preload="metadata" />
+                        ))}
+                    </div>
+                )}
+
+                {classifiedFiles.others.length > 0 && (
+                    <div className={styles.downloadList}>
+                        {classifiedFiles.others.map((file, i) => (
+                            <a key={`doc-${i}`} href={file.url} target="_blank" rel="noopener noreferrer" download className={styles.downloadBtn}>
+                                Завантажити: {file.name}
+                            </a>
+                        ))}
+                    </div>
+                )}
+            </div>
 
             <div className={styles.extendedBottom}>
                 <div className={styles.field}>
@@ -149,7 +199,14 @@ export default function TaskExtended({ onCloseClick, task }: { onCloseClick: () 
                 />
             </div>
         </div>
+
+        {previewImage && (
+            <div className={styles.imageModalOverlay} onClick={() => setPreviewImage(null)}>
+                <div className={styles.imageModalContent}>
+                    <img src={previewImage} alt="Full screen" className={styles.fullScreenImage} />
+                </div>
+            </div>
+        )}
     </>
     )
 }
-

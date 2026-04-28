@@ -30,15 +30,19 @@
 }
 
 .menuPlus {
+    margin-top: 2em;
+    width: 100%;
     display: flex;
     justify-content: space-between;
 }
 
 .groupSelect {
-    border-radius: 6px;
     border: none;
     background: none;
     outline: none;
 }
 
+.groupSelect option {
+    background-color: var(--color-bg);
+}
 

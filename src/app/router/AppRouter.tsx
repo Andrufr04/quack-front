@@ -1,14 +1,12 @@
-import { HashRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, HashRouter, Route, Routes } from "react-router-dom";
 import HomePage from "../../pages/HomePage/ui/HomePage";
 import ProfilePage from "../../pages/ProfilePage/ui/ProfilePage";
 import MainLayout from "./MainLayout";
-import DemoPage from "../../pages/DemoPage/DemoPage";
 import SignInPage from "../../pages/SignInPage/ui/SignInPage";
 import Page404 from "../../pages/Page404/ui/Page404";
 import PublicRoute from "./PublicRoute";
 import PrivateRoute from "./PrivateRoute";
 import TasksPage from "../../pages/TasksPage/ui/TaskPage";
-import TasksDonePage from "../../pages/TaskDonePage/ui/TaskPage";
 import ManageTasks from "../../pages/ManageTasksPage/ui/ManageTasks";
 import ManageCheckTasks from "../../pages/ManageCheckTasksPage/ui/ManageCheckTasks";
 import ManageLesson from "../../pages/ManageLessons/ui/ManageLessons";
@@ -29,11 +27,15 @@ import ChatsPage from "../../pages/ChatsPage/ui/ChatsPage";
 import ManageSubjectsPage from "../../pages/ManageSubjectsPage/ui/ManageSubjectsPage";
 import ManageTaskTypesPage from "../../pages/ManageTaskTypesPage/ui/ManageTaskTypesPage";
 import ManageLessonTypesPage from "../../pages/ManageLessonTypesPage/ui/ManageLessonTypesPage";
+import { Capacitor } from "@capacitor/core";
 
+const isElectron = navigator.userAgent.toLowerCase().includes('electron');
+const isNativeMobile = Capacitor.isNativePlatform();
+const Router = (isElectron || isNativeMobile) ? HashRouter : BrowserRouter;
 
 export default function AppRouter() {
     return (
-        <HashRouter>
+        <Router>
             <Toaster toastOptions={{ style: { backgroundColor: "var(--color-bg)", color: "var(--color-text)" } }} />
             <Tooltip id="my-tooltip" />
             <Routes>
@@ -42,10 +44,8 @@ export default function AppRouter() {
                 <Route path="/" element={<PrivateRoute><MainLayout /></PrivateRoute>}>
                     <Route path="/" element={<HomePage />} />
                     <Route path="/profile/:id?" element={<ProfilePage />} />
-                    <Route path="/demo" element={<DemoPage />} />
                     <Route path="/tasks" element={<TasksPage />} />
                     <Route path="/tasks/examination" element={<TasksExaminationPage />} />
-                    <Route path="/tasks/done" element={<TasksDonePage />} />
                     <Route path="/managetasks" element={<ManageTasks />} />
                     <Route path="/managechecktasks" element={<ManageCheckTasks />} />
                     <Route path="/managelesson" element={<ManageLesson />} />
@@ -67,6 +67,6 @@ export default function AppRouter() {
                     <Route path="/chats/:chatId" element={<ChatsPage />} />
                 </Route>
             </Routes>
-        </HashRouter>
+        </Router>
     )
 }

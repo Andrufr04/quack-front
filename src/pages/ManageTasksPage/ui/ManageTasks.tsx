@@ -1,9 +1,10 @@
 import { Link, useLocation } from "react-router-dom"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react" // 🔥 Додав useRef
 import styles from "./ManageTasks.module.css"
 import { taskApi } from "../../../entities/task/api/taskApi"
 import { isTeacher } from "../../../entities/session/lib/jwt"
 import Page403 from "../../Page403/ui/Page403"
+import toast from "react-hot-toast"
 
 export default function ManageTasks() {
     if (!isTeacher()) return <Page403 />
@@ -25,6 +26,9 @@ export default function ManageTasks() {
     const [loading, setLoading] = useState(false)
     const [errors, setErrors] = useState<Record<string, boolean>>({})
     const [descFileError, setDescFileError] = useState<boolean>(false)
+
+    // 🔥 Створюємо реф для файлового інпуту
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     // 1. Завантаження груп при старті сторінки
     useEffect(() => {
@@ -80,13 +84,20 @@ export default function ManageTasks() {
                 // Очищення стейту
                 setGroup("")
                 setSubject("")
+                setType("")
                 setDeadline("")
                 setTheme("")
                 setDescription("")
-                setFiles([]) // Очищуємо масив файлів
+                setFiles([]) 
+                
+                // 🔥 Очищуємо візуальне відображення вибраних файлів у браузері
+                if (fileInputRef.current) {
+                    fileInputRef.current.value = "";
+                }
+                toast.success("Завдання створено!")
             }
         } catch (err) {
-            console.error("Помилка створення:", err)
+            toast.error("Помилка створення завдання!")
         } finally {
             setLoading(false)
         }
@@ -95,7 +106,7 @@ export default function ManageTasks() {
     const isFormValid = group && subject && deadline && theme && (description || files.length > 0) && !loading
 
     return <>
-        <title>Quack | Завдання</title>
+        <title>Quack | Створити завдання</title>
 
         <div className={styles.menu}>
             <div className={styles.current}><Link to="">Створити завдання</Link></div>
@@ -209,6 +220,7 @@ export default function ManageTasks() {
                 <input
                     type="file"
                     multiple
+                    ref={fileInputRef} // 🔥 Прив'язуємо реф до інпуту
                     className={`${styles.file} ${files.length > 0 ? styles.success : ""} ${descFileError ? styles.error : ""}`}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         if (e.target.files) {

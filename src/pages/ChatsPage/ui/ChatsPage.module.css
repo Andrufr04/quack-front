@@ -1,35 +1,38 @@
 .chatPage {
     display: flex;
-    height: 92vh;
-    /* Як у твоїй ProfilePage */
+    height: 100%;
     background: var(--color-opaque-secondary);
     backdrop-filter: var(--blur-main);
     border-radius: var(--radius-main);
     overflow: hidden;
-    /* Щоб краї не вилазили */
     box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
     overscroll-behavior-y: none;
 }
 
 /* --- ЛІВА ПАНЕЛЬ (Список) --- */
 .sidebar {
-    width: 350px;
+    width: clamp(18.75em, 30vw, 25em);
+    /* 300px - 400px гнучкість */
     background: color-mix(in srgb, var(--color-bg) 70%, transparent);
     display: flex;
     flex-direction: column;
 }
 
 .searchWrapper {
-    padding: 15px;
+    padding: 0.9375em;
+    /* 15px */
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 0.625em;
+    /* 10px */
 }
 
 .searchInput {
     width: 100%;
-    padding: 10px 15px;
-    border-radius: 20px;
+    padding: 0.625em 0.9375em;
+    /* 10px 15px */
+    border-radius: 1.25em;
+    /* 20px */
     border: 1px solid rgba(255, 255, 255, 0.1);
     background: var(--color-bg);
     color: var(--color-text);
@@ -43,19 +46,22 @@
 }
 
 .chatList::-webkit-scrollbar {
-    width: 4px;
+    width: 0.25em;
+    /* 4px */
 }
 
 .chatList::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.2);
-    border-radius: 4px;
+    border-radius: 0.25em;
 }
 
 .chatItem {
     display: flex;
     align-items: center;
-    padding: 15px;
-    gap: 15px;
+    padding: 0.9375em;
+    /* 15px */
+    gap: 0.9375em;
+    /* 15px */
     cursor: pointer;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     transition: 0.2s;
@@ -67,8 +73,9 @@
 
 .avatar {
     position: relative;
-    width: 45px;
-    height: 45px;
+    width: 2.8125em;
+    /* 45px */
+    height: 2.8125em;
     border-radius: 50%;
     background-size: cover;
     background-position: center;
@@ -84,13 +91,15 @@
 .chatHeader {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 5px;
+    margin-bottom: 0.3125em;
+    /* 5px */
 }
 
 .chatName {
     font-weight: bold;
     color: var(--color-text);
-    font-size: 14px;
+    font-size: 0.875em;
+    /* 14px */
     display: -webkit-box;
     line-clamp: 2;
     -webkit-line-clamp: 2;
@@ -99,12 +108,14 @@
 }
 
 .chatTime {
-    font-size: 11px;
+    font-size: 0.6875em;
+    /* 11px */
     color: var(--color-grey);
 }
 
 .lastMessage {
-    font-size: 13px;
+    font-size: 0.8125em;
+    /* 13px */
     color: var(--color-grey);
     white-space: nowrap;
     overflow: hidden;
@@ -117,6 +128,7 @@
     display: flex;
     flex-direction: column;
     background: var(--color-opaque-secondary);
+    user-select: text;
 }
 
 .emptyChat {
@@ -130,30 +142,62 @@
 .activeChatHeader {
     display: flex;
     align-items: center;
-    padding: 15px 20px;
+    padding: 0.9375em 1.25em;
+    /* 15px 20px */
     background: color-mix(in srgb, var(--color-bg) 70%, transparent);
-    gap: 15px;
+    gap: 0.9375em;
+    /* 15px */
+}
+
+/* 🔥 КНОПКА "НАЗАД" ДЛЯ МОБІЛКИ 🔥 */
+.backButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin-right: 0.5em;
+    color: var(--color-text);
+    padding: 0.25em;
+    border-radius: 50%;
+    transition: 0.2s;
+}
+
+.backButton:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.backButton svg {
+    width: 1.5em;
+    height: 1.5em;
 }
 
 .activeChatName {
-    font-size: 16px;
+    font-size: 1em;
+    /* 16px */
     font-weight: bold;
     color: var(--color-text);
 }
 
 .messagesContainer {
     flex: 1;
-    padding: 20px;
+    padding: 1.25em;
+    /* 20px */
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 0.625em;
+    /* 10px */
 }
 
 .messageWrapper {
     display: flex;
     width: 100%;
-    margin-bottom: 10px;
+    margin-bottom: 0.625em;
+    /* 10px */
+    position: relative;
+    align-items: flex-end;
+    gap: 0.5em;
+    /* 8px */
 }
 
 .myMessage {
@@ -165,129 +209,60 @@
 }
 
 .messageBubble {
-    padding: 10px 15px;
-    border-radius: 15px;
+    padding: 0.625em 0.9375em;
+    /* 10px 15px */
+    border-radius: 0.9375em;
+    /* 15px */
     position: relative;
     word-break: break-word;
 }
 
 .myMessage .messageBubble {
     background: var(--color-main);
-    /* Твій фірмовий колір */
     color: #fff;
-    border-bottom-right-radius: 4px;
+    border-bottom-right-radius: 0.25em;
+    /* 4px */
 }
 
 .otherMessage .messageBubble {
     background: var(--color-opaque-secondary);
     color: var(--color-text);
-    border-bottom-left-radius: 4px;
+    border-bottom-left-radius: 0.25em;
+    /* 4px */
 }
 
 .messageText {
-    font-size: 14px;
+    font-size: 0.875em;
+    /* 14px */
     line-height: 1.4;
     white-space: pre-wrap;
 }
 
 .messageTime {
-    font-size: 10px;
+    font-size: 0.625em;
+    /* 10px */
     text-align: right;
-    opacity: 0.7;
-    margin-top: 5px;
+    margin-top: 0.3125em;
+    /* 5px */
+    color: #535353;
 }
 
-/* --- РЯДОК ВВОДУ (Вкрадений і прокачаний) --- */
+/* --- РЯДОК ВВОДУ --- */
 .inputArea {
-    padding: 15px 20px;
-}
-
-.inputContainer {
-    display: flex;
-    align-items: flex-end;
-    border-radius: 18px;
+    padding: 0.9375em 1.25em;
+    /* 15px 20px */
 }
 
 .superInputContainer {
     background: var(--color-bg);
     border: 1px solid var(--color-gray);
     border-radius: 0.5em;
-    padding: 8px 15px;
-}
-
-.input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    outline: none;
-    color: var(--color-text);
-    font-size: 14px;
-    font-family: inherit;
-    padding: 4px 0;
-    width: 100%;
-
-}
-
-.input::placeholder {
-    color: #888;
-}
-
-.sendIcon,
-.clipIcon {
-    width: 20px;
-    cursor: pointer;
-    color: var(--color-grey);
-    margin-bottom: 2px;
-    transition: color 0.2s;
-}
-
-.sendIcon:hover,
-.clipIcon:hover {
-    color: var(--color-main);
-}
-
-.newPostContainer {
-    min-height: 40px;
-    width: 60%;
-    position: absolute;
-    z-index: 3;
-    right: 7%;
-    bottom: 2%;
-    border: 1px solid var(--color-gray);
-    background-color: var(--color-bg);
-    border-radius: 0.5em;
-    display: flex;
-    flex-direction: column;
-    padding: 0.5em 1em;
-    box-shadow: var(--shadow-main);
-    justify-content: center;
-}
-
-.attachedImg {
-    background-color: var(--color-ui-widget-bg);
-    width: 100px;
-    height: 100px;
-    position: relative;
-    border-radius: 0.5em;
-    margin-bottom: 1em;
-}
-
-.deleteImg {
-    transform: rotate(45deg);
-    right: 4px;
-    top: 2px;
-    width: 20px;
-    position: absolute;
-    color: var(--color-bg);
-    display: none;
-    cursor: pointer;
-}
-
-.attachedImg:hover .deleteImg {
-    display: block;
+    padding: 0.5em 0.9375em;
+    /* 8px 15px */
 }
 
 .inputContainer {
+    display: flex;
     gap: 1em;
     align-items: end;
 }
@@ -298,21 +273,25 @@
     border: none;
     outline: none;
     color: var(--color-text);
-    font-size: 14px;
+    font-size: 0.875em;
+    /* 14px */
     font-family: inherit;
-    padding: 4px 0;
+    padding: 0.25em 0;
+    /* 4px 0 */
     width: 100%;
 }
 
-/* Цвет плейсхолдера */
 .input::placeholder {
-    color: #888888;
+    color: #888;
 }
 
+.sendIcon,
+.clipIcon,
 .inputIcon {
-    width: 18px;
+    width: 1.125em;
     cursor: pointer;
-    margin-bottom: -1px;
+    color: var(--color-grey);
+    margin-bottom: -2px;
 }
 
 .inputContainerContainer {
@@ -322,31 +301,65 @@
 /* --- ДОДАНО ДЛЯ ЗОБРАЖЕНЬ В ЧАТІ --- */
 .msgImagesGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    gap: 8px;
-    margin-top: 10px;
-    margin-bottom: 5px;
+    grid-template-columns: repeat(auto-fit, minmax(6.25em, 1fr));
+    /* min 100px */
+    gap: 0.5em;
+    /* 8px */
+    margin-top: 0.625em;
+    /* 10px */
+    margin-bottom: 0.3125em;
+    /* 5px */
 }
 
 .msgImage {
     width: 100%;
     aspect-ratio: 1;
     object-fit: cover;
-    border-radius: 8px;
+    border-radius: 0.5em;
+    /* 8px */
     cursor: zoom-in;
 }
 
 .attachments {
     display: flex;
-    gap: 10px;
+    gap: 0.625em;
+    /* 10px */
     flex-wrap: wrap;
-    margin-bottom: 10px;
+    margin-bottom: 0.625em;
+    /* 10px */
+}
+
+.attachedImg {
+    background-color: var(--color-ui-widget-bg);
+    width: 6.25em;
+    /* 100px */
+    height: 6.25em;
+    position: relative;
+    border-radius: 0.5em;
+    margin-bottom: 1em;
+}
+
+.deleteImg {
+    transform: rotate(45deg);
+    right: 0.25em;
+    top: 0.125em;
+    width: 1.25em;
+    /* 20px */
+    position: absolute;
+    color: var(--color-bg);
+    display: none;
+    cursor: pointer;
+}
+
+.attachedImg:hover .deleteImg {
+    display: block;
 }
 
 .unreadBadge {
-    background-color: var(--color-main); /* Твій помаранчевий колір */
+    background-color: var(--color-main);
     color: #ffffff;
-    font-size: 9px;
+    font-size: 0.5625em;
+    /* 9px */
     font-weight: bold;
     height: 20px;
     width: 20px;
@@ -367,12 +380,13 @@
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(8px); /* Розмиваємо чат на фоні */
+    backdrop-filter: blur(8px);
     z-index: 100;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px;
+    padding: 1.25em;
+    /* 20px */
     cursor: zoom-out;
 }
 
@@ -388,9 +402,10 @@
 .fullScreenImage {
     max-width: 100%;
     max-height: 90vh;
-    border-radius: 12px;
+    border-radius: 0.75em;
+    /* 12px */
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-    object-fit: contain; /* Картинка не буде обрізатися */
+    object-fit: contain;
 }
 
 .dayGroup {
@@ -401,71 +416,69 @@
 
 .dateSeparator {
     align-self: center;
-    margin: 15px 0;
-    padding: 6px 14px;
+    margin: 0.9375em 0;
+    /* 15px */
+    padding: 0.375em 0.875em;
+    /* 6px 14px */
     background: var(--color-opaque-secondary);
     backdrop-filter: var(--blur-main);
-    border-radius: 12px;
+    border-radius: 0.75em;
+    /* 12px */
     color: var(--color-text);
-    font-size: 12px;
+    font-size: 0.75em;
+    /* 12px */
     font-weight: 600;
     z-index: 5;
 }
 
 .stickyDate {
     position: sticky;
-    top: 10px;
+    top: 0.625em;
+    /* 10px */
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* --- ФУТЕР ПОВІДОМЛЕННЯ (Реакції + Час в один рядок) --- */
+/* --- ФУТЕР ПОВІДОМЛЕННЯ (Реакції + Час) --- */
 .messageFooter {
     display: flex;
     align-items: flex-end;
     justify-content: flex-end;
-    gap: 10px;
-    margin-top: 4px;
-}
-
-.messageTime {
-    font-size: 10px;
-    opacity: 0.7;
-    white-space: nowrap;
+    gap: 0.625em;
+    /* 10px */
+    margin-top: 0.25em;
+    /* 4px */
 }
 
 .msgReactionsContainer {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px;
-    margin-right: auto; /* Виштовхує час вправо */
+    gap: 0.25em;
+    /* 4px */
+    margin-right: auto;
 }
 
-/* --- КНОПКА РЕАКЦІЇ ЗБОКУ --- */
-.messageWrapper {
-    display: flex;
-    width: 100%;
-    position: relative;
-    align-items: flex-end;
-    gap: 8px;
-}
-
+/* --- КНОПКА РЕАКЦІЇ ЗБОКУ ТА ДЛЯ МОБІЛЬНИХ --- */
 .msgActionBtn {
     opacity: 0;
     cursor: pointer;
     color: var(--color-grey);
     transition: 0.2s;
-    padding: 4px;
+    padding: 0.25em;
+    /* 4px */
     position: relative;
-    width: 24px;
-    height: 24px;
+    width: 1.5em;
+    /* 24px */
+    height: 1.5em;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
 }
 
-.messageWrapper:hover .msgActionBtn {
+.messageWrapper:hover .msgActionBtn,
+.msgActionBtn.activeBtn {
     opacity: 1;
+    /* Робимо видимим при наведенні АБО при активному попапі */
 }
 
 .msgActionBtn:hover {
@@ -480,18 +493,23 @@
     left: 50%;
     transform: translateX(-50%);
     background-color: var(--color-bg);
-    border-radius: 30px;
-    padding: 8px 12px;
+    border-radius: 1.875em;
+    /* 30px */
+    padding: 0.5em 0.75em;
+    /* 8px 12px */
     display: flex;
-    gap: 10px;
+    gap: 0.625em;
+    /* 10px */
     box-shadow: var(--shadow-main);
     z-index: 10;
 }
 
 .msgReactionCircle {
-    width: 24px;
-    height: 24px;
-    font-size: 18px;
+    width: 1.5em;
+    /* 24px */
+    height: 1.5em;
+    font-size: 1.125em;
+    /* 18px */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -505,13 +523,17 @@
 
 .msgReaction {
     background: rgba(0, 0, 0, 0.15);
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 13px;
+    padding: 0.125em 0.5em;
+    /* 2px 8px */
+    border-radius: 0.75em;
+    /* 12px */
+    font-size: 0.8125em;
+    /* 13px */
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 0.25em;
+    /* 4px */
     border: 1px solid transparent;
 }
 
@@ -524,6 +546,7 @@
 .myMessage .msgReaction {
     background: rgba(255, 255, 255, 0.2);
 }
+
 .myMessage .msgReactionActive {
     background: var(--color-bg);
     color: var(--color-text);
@@ -531,22 +554,27 @@
 
 /* --- ГРУПОВІ ЧАТИ: Аватарка та Ім'я --- */
 .msgAvatar {
-    width: 32px;
-    height: 32px;
+    width: 2em;
+    /* 32px */
+    height: 2em;
     border-radius: 50%;
     background-size: cover;
     background-position: center;
     cursor: pointer;
     flex-shrink: 0;
-    margin-right: 8px;
+    margin-right: 0.5em;
+    /* 8px */
     align-self: flex-end;
 }
 
 .msgSenderName {
-    font-size: 12px;
+    font-size: 0.75em;
+    /* 12px */
     color: var(--color-main);
-    margin-bottom: 4px;
-    margin-left: 6px;
+    margin-bottom: 0.25em;
+    /* 4px */
+    margin-left: 0.375em;
+    /* 6px */
     font-weight: 600;
     cursor: pointer;
 }
@@ -555,46 +583,27 @@
     text-decoration: underline;
 }
 
-/* --- ПОШУК ТА СТВОРЕННЯ ГРУПИ --- */
-.searchWrapper {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 15px;
-}
-
-.createGroupBtn {
-    background-color: var(--color-gray);
-    color: var(--color-text);
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.iconPlus {
     cursor: pointer;
-    transition: background 0.2s;
-    flex-shrink: 0;
-}
-
-.createGroupBtn:hover {
-    background-color: #e2e2e2; /* Як в addBtn hover */
 }
 
 /* --- СИСТЕМНІ ПОВІДОМЛЕННЯ В ЧАТІ --- */
 .systemMessage {
     align-self: center;
     text-align: center;
-    font-size: 12px;
-    color: var(--color-text);
-    opacity: 0.6;
-    margin: 8px 0;
-    padding: 6px 14px;
-    background: var(--color-gray);
-    border-radius: 12px;
+    font-size: 0.75em;
+    /* 12px */
+    color: var(--color-grey);
+    margin: 0.5em 0;
+    /* 8px 0 */
+    padding: 0.375em 0.875em;
+    /* 6px 14px */
+    background-color: rgb(from var(--color-gray) r g b / 0.5);
+    border-radius: 0.75em;
+    /* 12px */
 }
 
-/* --- МОДАЛКИ (Стилізовані під ProfilePage та ManageAccounts) --- */
+/* --- МОДАЛКИ (Стилізовані) --- */
 .modalOverlay {
     position: fixed;
     top: 0;
@@ -611,9 +620,11 @@
 .modalContent {
     background: var(--color-bg);
     backdrop-filter: var(--blur-main);
-    padding: 24px;
+    padding: 1.5em;
+    /* 24px */
     border-radius: var(--radius-main);
-    width: 320px;
+    width: clamp(20em, 90vw, 25em);
+    /* 320px гнучкість */
     box-shadow: var(--shadow-main);
     display: flex;
     flex-direction: column;
@@ -623,42 +634,46 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
+    margin-bottom: 0.9375em;
+    /* 15px */
 }
 
 .modalTitle {
     color: var(--color-text);
-    font-size: 1.2rem;
+    font-size: 1.2em;
 }
 
 .closeModal {
     cursor: pointer;
     color: var(--color-text-dark-grey);
     font-weight: bold;
-    font-size: 18px;
+    font-size: 1.125em;
+    /* 18px */
 }
 
 .modalInput {
     width: 100%;
-    padding: 10px 12px;
-    border-radius: 8px;
+    padding: 0.625em 0.75em;
+    /* 10px 12px */
+    border-radius: 0.5em;
+    /* 8px */
     background-color: var(--color-gray);
     border: none;
     color: var(--color-text);
-    font-size: 14px;
+    font-size: 0.875em;
+    /* 14px */
     font-family: inherit;
-    margin-bottom: 15px;
+    margin-bottom: 0.9375em;
+    /* 15px */
     box-sizing: border-box;
     outline: none;
 }
 
-.modalInput:focus {
-    outline: none;
-}
-
 .modalBtnSubmit {
-    padding: 8px 20px;
-    border-radius: 8px;
+    padding: 0.5em 1.25em;
+    /* 8px 20px */
+    border-radius: 0.5em;
+    /* 8px */
     border: none;
     background-color: var(--color-gray);
     color: var(--color-text);
@@ -671,8 +686,8 @@
     background: var(--color-gray);
     color: var(--color-text);
     border: 1px solid var(--color-gray);
-    padding: 8px 20px;
-    border-radius: 8px;
+    padding: 0.5em 1.25em;
+    border-radius: 0.5em;
     cursor: pointer;
     transition: 0.2s;
 }
@@ -682,8 +697,8 @@
 }
 
 .modalBtnAdd {
-    padding: 8px 20px;
-    border-radius: 8px;
+    padding: 0.5em 1.25em;
+    border-radius: 0.5em;
     border: none;
     background-color: var(--color-main);
     color: white;
@@ -694,8 +709,8 @@
 }
 
 .leaveBtn {
-    padding: 8px 20px;
-    border-radius: 8px;
+    padding: 0.5em 1.25em;
+    border-radius: 0.5em;
     border: 1px solid #ff4d4d;
     background: transparent;
     color: #ff4d4d;
@@ -712,30 +727,36 @@
 
 /* Список учасників */
 .participantList {
-    max-height: 250px;
+    max-height: 15.625em;
+    /* 250px */
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    margin-bottom: 10px;
+    gap: 0.5em;
+    /* 8px */
+    margin-bottom: 0.625em;
+    /* 10px */
 }
 
 .participantList::-webkit-scrollbar {
-    width: 4px;
+    width: 0.25em;
 }
 
 .participantList::-webkit-scrollbar-thumb {
     background: var(--color-gray);
-    border-radius: 4px;
+    border-radius: 0.25em;
 }
 
 .participantItem {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 0.75em;
+    /* 12px */
     background: var(--color-bg);
-    padding: 8px 12px;
-    border-radius: 12px;
+    padding: 0.5em 0.75em;
+    /* 8px 12px */
+    border-radius: 0.75em;
+    /* 12px */
     border: 1px solid var(--color-gray);
     transition: 0.2s;
 }
@@ -745,8 +766,9 @@
 }
 
 .avatarSmall {
-    width: 32px;
-    height: 32px;
+    width: 2em;
+    /* 32px */
+    height: 2em;
     border-radius: 50%;
     background-size: cover;
     background-position: center;
@@ -761,20 +783,23 @@
 
 .participantName {
     color: var(--color-text);
-    font-size: 14px;
+    font-size: 0.875em;
+    /* 14px */
     font-weight: 500;
 }
 
 .adminBadge {
     color: var(--color-main);
-    font-size: 10px;
+    font-size: 0.625em;
+    /* 10px */
     font-weight: bold;
 }
 
 .removeUserBtn {
     color: #ff4d4d;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 0.75em;
+    /* 12px */
     transition: 0.2s;
 }
 
@@ -787,14 +812,17 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: 0.625em;
+    /* 10px */
+    margin-bottom: 1.25em;
+    /* 20px */
 }
 
 .groupAvatarWrapper {
     position: relative;
-    width: 80px;
-    height: 80px;
+    width: 5em;
+    /* 80px */
+    height: 5em;
     border-radius: 50%;
     overflow: hidden;
 }
@@ -822,8 +850,8 @@
 }
 
 .groupAvatarOverlay svg {
-    width: 16px;
-    height: 16px;
+    width: 1em;
+    height: 1em;
 }
 
 .groupAvatarWrapper:hover .groupAvatarOverlay {
@@ -839,22 +867,28 @@
 .groupNameDisplay {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 5px 15px;
-    border-radius: 8px;
+    gap: 0.5em;
+    /* 8px */
+    padding: 0.3125em 0.9375em;
+    /* 5px 15px */
+    border-radius: 0.5em;
+    /* 8px */
     transition: 0.2s;
 }
 
 .editIcon {
-    font-size: 16px;
-    margin-top: 4px;
+    font-size: 1em;
+    /* 16px */
+    margin-top: 0.25em;
+    /* 4px */
     color: var(--color-text-dark-grey);
 }
 
 .clickableProfile {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 0.75em;
+    /* 12px */
     flex: 1;
     cursor: pointer;
 }
@@ -872,11 +906,136 @@
 
 .transferAdminBtn {
     color: var(--color-main);
-    font-size: 12px;
+    font-size: 0.75em;
+    /* 12px */
     font-weight: 600;
     cursor: pointer;
 }
 
 .transferAdminBtn:hover {
     text-decoration: underline;
+}
+
+.recordingIndicator {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.625em;
+    /* 10px */
+    color: #ff4d4d;
+    font-weight: 500;
+    font-size: 0.875em;
+    /* 14px */
+    padding: 0.3125em 0;
+    /* 5px 0 */
+    user-select: none;
+}
+
+.redDot {
+    width: 0.625em;
+    /* 10px */
+    height: 0.625em;
+    background: #ff4d4d;
+    border-radius: 50%;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.5);
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.recordingPulse {
+    color: #ff4d4d !important;
+    transform: scale(1.2);
+    animation: pulse 1s infinite;
+}
+
+.voiceMessageWrapper {
+    margin-top: 0.25em;
+    max-width: 100%;
+}
+
+.audioPlayer {
+    width: 25em;
+    max-width: 100%;
+    height: 2.5em;
+    /* 40px */
+    outline: none;
+}
+
+.myMessage .audioPlayer {
+    opacity: 0.9;
+}
+
+audio::-webkit-media-controls-panel {
+    background-color: var(--color-gray);
+}
+
+/* =========================================
+   АДАПТИВНІСТЬ (МЕДІА-ЗАПИТИ)
+   ========================================= */
+
+@media screen and (max-width: 1024px) {
+    .sidebar {
+        width: clamp(15em, 35vw, 20em);
+    }
+}
+
+@media screen and (max-width: 767px) {
+
+    .sidebar,
+    .chatArea {
+        width: 100%;
+        flex: none;
+        /* Відключаємо flex: 1, щоб один блок міг зайняти весь простір */
+        height: 100%;
+    }
+
+    .activeChatHeader {
+        padding: 0.625em 0.9375em;
+    }
+
+    /* Виправлення позиції попапу реакцій, щоб він не вилазив за екран на мобільному */
+    .msgReactionPopup {
+        left: auto;
+        transform: none;
+    }
+
+    .myMessage .msgReactionPopup {
+        right: 0;
+        /* Вирівнюємо по правому краю */
+    }
+
+    .myMessage .msgReactionPopup::after {
+        left: auto;
+        right: 1em;
+        /* Зсуваємо стрілочку */
+    }
+
+    .otherMessage .msgReactionPopup {
+        left: 0;
+        /* Вирівнюємо по лівому краю */
+    }
+
+    .otherMessage .msgReactionPopup::after {
+        left: 1em;
+    }
+
+    .participantActions {
+        opacity: 1;
+        /* На мобільному завжди показуємо дії */
+    }
 }

@@ -5,6 +5,7 @@
     display: flex;
     gap: 0.5em;
     color: var(--color-menu-icon);
+    z-index: 2;
 }
 
 .vertical {

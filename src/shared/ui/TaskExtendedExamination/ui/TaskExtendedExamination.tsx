@@ -1,60 +1,66 @@
 import { useMemo, useState } from "react"
-import { formatDate } from "../../../lib/formatDate"
-import ActionButton from "../../ActionButton/ui/ActionButton"
 import { SVG_PLUS } from "../../icons/icons"
 import styles from "./TaskExtendedExamination.module.css"
 import type { Task, TaskStatus } from "../../../../entities/task/model/types"
-import { FileViewer } from "../../FileViewer/ui/FileViewer"
-import { taskApi } from "../../../../entities/task/api/taskApi"
 
 export default function TaskExtendedExamination({ onCloseClick, task }: { onCloseClick: () => void, task: TaskStatus }) {
-    const [description, setDescription] = useState("")
-    const [files, setFiles] = useState<File[]>([])
-    const [loading, setLoading] = useState(false)
+    const [previewImage, setPreviewImage] = useState<string | null>(null);
 
-    const isValid = description.trim().length > 0 || files.length > 0
+    const classifiedFiles = useMemo(() => {
+        const images: { url: string, name: string }[] = [];
+        const videos: { url: string, name: string }[] = [];
+        const others: { url: string, name: string }[] = [];
 
-    const handleUpload = async () => {
-        if (!isValid || loading) return;
+        if (!task.task.attachments?.files) return { images, videos, others };
 
-        setLoading(true);
-
-        try {
-            const formData = new FormData();
-
-            formData.append("text", description);
-
-            formData.append("task_id", task.id);
-
-            files.forEach((f) => {
-                formData.append('attachments', f);
-            });
-
-            const result = await taskApi.submitTaskWork(formData);
-
-            if (result) {
-                onCloseClick();
+        task.task.attachments.files.forEach(f => {
+            const url = f.file;
+            let name = 'file';
+            try {
+                name = decodeURIComponent(url.split('/').pop() || 'file');
+            } catch (e) {
+                name = url.split('/').pop() || 'file';
             }
-        } catch (error) {
-            console.error("Помилка при завантаженні:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
+            const ext = name.split('.').pop()?.toLowerCase();
 
-    const docs = useMemo(() => {
-        return task.task.attachments?.files.map(f => ({
-            uri: f.file,
-            fileName: f.file.split('/').pop()
-        })) || [];
+            if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext || '')) {
+                images.push({ url, name });
+            } else if (['mp4', 'webm', 'ogg', 'mov'].includes(ext || '')) {
+                videos.push({ url, name });
+            } else {
+                others.push({ url, name });
+            }
+        });
+
+        return { images, videos, others };
+    }, [task]);
+
+    const myClassifiedFiles = useMemo(() => {
+        const images: { url: string, name: string }[] = [];
+        const videos: { url: string, name: string }[] = [];
+        const others: { url: string, name: string }[] = [];
+
+        if (!task.submitted_attachments?.files) return { images, videos, others };
+
+        task.submitted_attachments.files.forEach(f => {
+            const url = f.file;
+            let name = 'file';
+            try { name = decodeURIComponent(url.split('/').pop() || 'file'); }
+            catch (e) { name = url.split('/').pop() || 'file'; }
+            const ext = name.split('.').pop()?.toLowerCase();
+
+            if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext || '')) images.push({ url, name });
+            else if (['mp4', 'webm', 'ogg', 'mov'].includes(ext || '')) videos.push({ url, name });
+            else others.push({ url, name });
+        });
+
+        return { images, videos, others };
     }, [task]);
 
     return (<>
         <div className={styles.TaskExtended}>
             <div className={styles.extendedTop}>
                 <div className={styles.icon} onClick={onCloseClick}>{SVG_PLUS}</div>
-
-                <div>{`${formatDate(task.task.start)}-${formatDate(task.task.end)}`}</div>
 
                 <div className={styles.top}>
                     <div className={styles.subject}>{task.task.subject_name}</div>
@@ -67,69 +73,83 @@ export default function TaskExtendedExamination({ onCloseClick, task }: { onClos
 
                 <div className={styles.description}>
                     <div className={styles.descriptionTitle}>Опис:</div>
-                    <pre className={styles.descriptionInfo}>{task.task.description}</pre>
+                    <div className={styles.descriptionInfo} style={{ maxHeight: (classifiedFiles.images.length > 0 || classifiedFiles.videos.length > 0 || classifiedFiles.others.length > 0) ? "7.5em" : "25em" }}>{task.task.description}</div>
+                </div>
+
+                <div className={styles.attachmentsContainer}>
+                    {classifiedFiles.images.length > 0 && (
+                        <div className={styles.mediaGrid}>
+                            {classifiedFiles.images.map((img, i) => (
+                                <img key={`img-${i}`} src={img.url} alt={img.name} className={styles.mediaItem} onClick={() => setPreviewImage(img.url)} />
+                            ))}
+                        </div>
+                    )}
+
+                    {classifiedFiles.videos.length > 0 && (
+                        <div className={styles.mediaGrid}>
+                            {classifiedFiles.videos.map((vid, i) => (
+                                <video key={`vid-${i}`} src={vid.url} controls className={styles.mediaItem} preload="metadata" />
+                            ))}
+                        </div>
+                    )}
+
+                    {classifiedFiles.others.length > 0 && (
+                        <div className={styles.downloadList}>
+                            {classifiedFiles.others.map((file, i) => (
+                                <a key={`doc-${i}`} href={file.url} target="_blank" rel="noopener noreferrer" download className={styles.downloadBtn}>
+                                    Завантажити: {file.name}
+                                </a>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
-
-            {docs.length > 0 && <FileViewer docs={docs} />}
-
-            <div className={styles.extendedBottom}>
-                {/* <div className={styles.field}>
-
-                    <div className={`${styles.label} ${isValid ? styles.successText : styles.required}`}>
-                        *оберіть опис, файл або обидва
-                    </div>
-
-                    <textarea
-                        placeholder="Опис"
-                        className={`${styles.textarea} ${description ? styles.success : ""}`}
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                    />
-
-                    <label className={`${styles.fileWrapper} ${files.length > 0 ? styles.success : ""}`}>
-                        <input
-                            type="file"
-                            multiple
-                            className={styles.fileInput}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                if (e.target.files) {
-                                    setFiles(Array.from(e.target.files));
-                                }
-                            }}
-                        />
-
-                        <span className={styles.fileButton}>Вибрати файл</span>
-                        <span className={styles.fileName}>
-                            {files.length === 1 ? files[0].name : 
-                            files.length > 1 ? `${files[0].name} + ${files.length-1} файл(и)`  :
-                            "Файл не вибрано"}
-                        </span>
-                    </label>
-
+            <div style={{ padding: '2em 0', borderTop: '1px solid var(--color-gray)' }}>
+                <div className={styles.top}>
+                    <div className={styles.subject} style={{ fontSize: '1.2em', marginBottom: '0.5em' }}>Ваша відповідь:</div>
                 </div>
 
-                <ActionButton
-                    actionButton={{
-                        text: loading ? (
-                            <div className={styles.loading}>
-                                <img
-                                    className={styles.img}
-                                    src="/gifs/loading.svg"
-                                    alt="loading"
-                                    style={{ width: 60, height: 60, marginTop: 5 }}
-                                />
-                            </div>
-                        ) : (
-                            "Завантажити завдання повторно"
-                        ),
-                        enabled: isValid && !loading,
-                        onClick: handleUpload,
-                        bgcolor: (!isValid || loading) ? "#ababab" : ""
-                    }}
-                /> */}
+                <div className={styles.description} style={{ marginBottom: '1em' }}>
+                    {task.submitted_text && <div className={styles.descriptionInfo} style={{ maxHeight: "25em" }}>
+                        {task.submitted_text}
+                    </div>}
+                </div>
+
+                <div className={styles.attachmentsContainer}>
+                    {myClassifiedFiles.images.length > 0 && (
+                        <div className={styles.mediaGrid}>
+                            {myClassifiedFiles.images.map((img, i) => (
+                                <img key={`my-img-${i}`} src={img.url} alt={img.name} className={styles.mediaItem} onClick={() => setPreviewImage(img.url)} />
+                            ))}
+                        </div>
+                    )}
+                    {myClassifiedFiles.videos.length > 0 && (
+                        <div className={styles.mediaGrid}>
+                            {myClassifiedFiles.videos.map((vid, i) => (
+                                <video key={`my-vid-${i}`} src={vid.url} controls className={styles.mediaItem} preload="metadata" />
+                            ))}
+                        </div>
+                    )}
+                    {myClassifiedFiles.others.length > 0 && (
+                        <div className={styles.downloadList}>
+                            {myClassifiedFiles.others.map((file, i) => (
+                                <a key={`my-doc-${i}`} href={file.url} target="_blank" rel="noopener noreferrer" download className={styles.downloadBtn}>
+                                    Завантажити: {file.name}
+                                </a>
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
+
+        {previewImage && (
+            <div className={styles.imageModalOverlay} onClick={() => setPreviewImage(null)}>
+                <div className={styles.imageModalContent}>
+                    <img src={previewImage} alt="Full screen" className={styles.fullScreenImage} />
+                </div>
+            </div>
+        )}
     </>
     )
 }

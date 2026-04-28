@@ -198,6 +198,8 @@ export default function ManageLesson() {
     }
 
     return (
+        <>
+        <title>Quack | Керування уроками</title>
         <div className={styles.container}>
             <div className={styles.tabs}>
                 {lessons.map((l, idx) => (
@@ -286,5 +288,6 @@ export default function ManageLesson() {
                 </div>
             </div>
         </div>
+        </>
     );
 }

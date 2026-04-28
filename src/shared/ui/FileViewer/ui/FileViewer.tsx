@@ -38,29 +38,6 @@ export const FileViewer = memo(({ docs, style }: { docs: { uri: string }[], styl
     return (
         <>
             <div className={styles.viewerContainer} style={mergedStyle}>
-                {/* {docs.length > 1 && (
-                <div className={styles.customNav}>
-                    <button 
-                        className={styles.navBtn} 
-                        onClick={prevDoc} 
-                        disabled={currentDocIndex === 0}
-                    >
-                        ❮
-                    </button>
-                    
-                    <span className={styles.docCounter}>
-                        {currentDocIndex + 1} / {docs.length}
-                    </span>
-
-                    <button 
-                        className={styles.navBtn} 
-                        onClick={nextDoc} 
-                        disabled={currentDocIndex === docs.length - 1}
-                    >
-                        ❯
-                    </button>
-                </div>
-            )} */}
                 {docs.length > 1 &&
                     <div className={styles.arrowLeft} onClick={prevDoc} >
                         {SVG_A}
@@ -68,7 +45,10 @@ export const FileViewer = memo(({ docs, style }: { docs: { uri: string }[], styl
                 }
                 <div className={styles.viewerWrapper}>
                     <div className={styles.zoomArea} onClick={() => setExpanded(true)}>
-                        <DocViewer documents={activeDoc} pluginRenderers={DocViewerRenderers} config={config} />
+                        {/* 🔥 ДОДАНО ОБГОРТКУ З pointerEvents: 'none' 🔥 */}
+                        <div style={{ pointerEvents: 'none', width: '100%', height: '100%' }}>
+                            <DocViewer documents={activeDoc} pluginRenderers={DocViewerRenderers} config={config} />
+                        </div>
                     </div>
                 </div>
                 {docs.length > 1 &&
@@ -88,6 +68,7 @@ export const FileViewer = memo(({ docs, style }: { docs: { uri: string }[], styl
                                 </div>
                             }
                             <div className={styles.fullViewerWrapper}>
+                                {/* Тут плеєр працює як завжди, бо немає заборони на події */}
                                 <DocViewer documents={activeDoc} pluginRenderers={DocViewerRenderers} config={config} />
                             </div>
                             {docs.length > 1 &&

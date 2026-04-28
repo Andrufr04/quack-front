@@ -80,6 +80,7 @@ export default function ManageTaskTypesPage() {
 
     return (
         <>
+        <title>Quack | Керування типами предметів</title>
             <div className={styles.menu}>
                 <Link to="/manageaccounts">Облікові записи</Link>
                 <div className={styles.line}></div>

@@ -12,9 +12,10 @@ export default function TasksPage() {
     if (!isStudent()) return <Page403/>
     const [selectedTask, setSelectedTask] = useState<Task | null>(null)
     const [tasks, setTasks] = useState<TaskStatus[]>([])
+    const [contWidth, setContWidth] = useState<string>("100%")
 
     function selectTask(task: Task) {
-        if (selectedTask === task) {
+        if (selectedTask?.id === task.id) {
             setSelectedTask(null)
             return
         }
@@ -22,7 +23,14 @@ export default function TasksPage() {
     }
 
     useEffect(() => {
-        // 1. Виносимо логіку завантаження в окрему константу, щоб викликати її звідусіль
+        if (selectedTask) {
+            setContWidth("calc(100% - 450px)")
+        } else {
+            setContWidth("100%")
+        }
+    }, [selectedTask])
+
+    useEffect(() => {
         const fetchTasks = async () => {
             try {
                 const data = await taskApi.getStudentTasks(0);
@@ -39,27 +47,22 @@ export default function TasksPage() {
             }
         };
 
-        // Завантажуємо при монтуванні (або зміні selectedTask)
         fetchTasks();
 
-        // 2. 🔥 СТВОРЮЄМО СЛУХАЧА ДЛЯ WEBSOCKET СПОВІЩЕНЬ 🔥
         const handleNewNotification = (e: any) => {
             const notif = e.detail;
             
-            // Якщо прилетіло нове завдання - оновлюємо список миттєво!
             if (notif.category === 'education' && notif.title.includes('Нове завдання')) {
                 fetchTasks();
             }
         };
 
-        // Підписуємось на подію, яку стріляє useNotifications
         window.addEventListener('new_notification', handleNewNotification);
 
-        // 3. Відписуємось, коли сторінка закривається (щоб не було витоку пам'яті)
         return () => {
             window.removeEventListener('new_notification', handleNewNotification);
         };
-    }, [selectedTask]);
+    }, []);
 
     return <>
         <title>Quack | Завдання</title>
@@ -72,8 +75,16 @@ export default function TasksPage() {
             <Link to="/archive">Архів</Link>
         </div>
 
-        <div className={styles.container}>
-            {tasks.map(t => <TaskCard key={t.id} task={t.task} onClick={() => selectTask(t.task)} />)}
+        <div className={styles.container} style={{width: contWidth}}>
+            {tasks.map(t => 
+                <TaskCard 
+                    key={t.id} 
+                    task={t.task} 
+                    // 🔥 ПРАВИЛЬНО: Порівнюємо за ID
+                    selected={selectedTask?.id === t.task.id} 
+                    onClick={() => selectTask(t.task)} 
+                />
+            )}
         </div>
 
         {selectedTask && <TaskExtended onCloseClick={() => setSelectedTask(null)} task={selectedTask} />}

@@ -1,4 +1,4 @@
-/* Базова структура (ідентична до SettingsPage) */
+/* Базова структура */
 .container {
     width: 100%;
     height: 100vh;
@@ -10,29 +10,37 @@
 }
 
 .settings {
-    width: 70%;
-    height: 92vh;
+    /* Використовуємо clamp: мінімум 320px, ідеально 80vw, але не більше 1400px для 2K/4K моніторів */
+    width: clamp(320px, 80vw, 1400px);
+    height: clamp(80vh, 92vh, 95vh);
     background-color: var(--color-opaque-secondary);
     box-shadow: var(--shadow-main);
     border-radius: var(--radius-main);
     backdrop-filter: var(--blur-form);
-    display: flex;
-    padding: 2em;
-    gap: 2em;
+    
+    /* Максимізуємо використання GRID */
+    display: grid;
+    /* 3 колонки: меню (гнучке, мінімум 220px), лінія (1px), контент (решта простору) */
+    grid-template-columns: minmax(220px, 25vw) 1px minmax(0, 1fr);
+    gap: clamp(1em, 3vw, 2em);
+    padding: clamp(1em, 3vw, 2em);
 }
 
+/* ЛІВЕ МЕНЮ */
 .tabs {
-    width: 28%;
     display: flex;
     flex-direction: column;
+    height: 100%;
 }
 
 .tab {
-    padding: 0.5em 1em;
+    padding: clamp(0.5em, 1vw, 0.8em) 1em;
     cursor: pointer;
     opacity: 0.6;
     margin-bottom: 0.5em;
     transition: all 0.2s ease;
+    /* 14px = 0.875em, 16px = 1em */
+    font-size: clamp(0.875em, 1.2vw, 1em);
 }
 
 .tab:hover {
@@ -48,38 +56,31 @@
     color: var(--color-main);
 }
 
+/* ЛІНІЯ РОЗДІЛЕННЯ */
 .line {
-    width: 1px;
+    width: 100%;
+    height: 100%;
     background-color: var(--color-opaque-secondary);
 }
 
+/* КОНТЕНТ */
 .options {
-    width: 100%;
-    
-    /* Робимо контент скролабельним, щоб меню зліва не уїжджало */
+    height: 100%;
     overflow-y: auto;
-    padding-right: 15px; 
+    padding-right: clamp(5px, 1vw, 15px); 
     scrollbar-gutter: auto;
 }
 
-/* Кастомний скролбар для тексту документації */
-.options::-webkit-scrollbar {
-    width: 6px;
-}
+/* Кастомний скролбар */
+.options::-webkit-scrollbar { width: 6px; }
+.options::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
+.options::-webkit-scrollbar-track { background: transparent; }
 
-.options::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
-}
-
-.options::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-/* --- ДОДАТКОВІ СТИЛІ ДЛЯ МЕНЮ ТА ДОКУМЕНТІВ --- */
+/* --- ДОДАТКОВІ СТИЛІ --- */
 
 .sidebarTitle {
-    font-size: 12px;
+    /* 10px = 0.625em, 12px = 0.75em */
+    font-size: clamp(0.625em, 1vw, 0.75em);
     font-weight: bold;
     color: var(--color-grey, gray);
     text-transform: uppercase;
@@ -88,13 +89,14 @@
     padding-left: 1em;
     display: flex;
     align-items: center;
-    gap: .5em;
+    gap: 0.5em;
 }
 
 .contactInfo {
-    margin-top: auto; /* Притискає текст до низу меню */
+    margin-top: auto; 
     padding: 1em;
-    font-size: 12px;
+    /* 11px = 0.6875em, 12px = 0.75em */
+    font-size: clamp(0.6875em, 1vw, 0.75em);
     color: var(--color-text);
     opacity: 0.5;
     line-height: 1.5;
@@ -112,53 +114,104 @@
 }
 
 .documentContainer h1 {
-    font-size: 28px;
+    /* 22px = 1.375em, 32px = 2em */
+    font-size: clamp(1.375em, 2.5vw, 2em);
     font-weight: bold;
     margin: 0 0 10px 0;
 }
 
 .date {
-    font-size: 13px;
+    /* 11px = 0.6875em, 13px = 0.8125em */
+    font-size: clamp(0.6875em, 1vw, 0.8125em);
     opacity: 0.5;
 }
 
 .documentContainer h2 {
-    font-size: 18px;
+    /* 16px = 1em, 20px = 1.25em */
+    font-size: clamp(1em, 1.8vw, 1.25em);
     font-weight: bold;
     margin-top: 2em;
     margin-bottom: 1em;
     color: var(--color-main, inherit);
 }
 
-.documentContainer p {
-    line-height: 1.6em;
-    font-size: 15px;
-    margin-bottom: 1em;
-    opacity: 0.9;
-}
-
+.documentContainer p, 
 .documentContainer ul {
-    margin-bottom: 1.5em;
-    padding-left: 20px;
-    opacity: 0.9;
     line-height: 1.6em;
+    /* 14px = 0.875em, 16px = 1em */
+    font-size: clamp(0.875em, 1.2vw, 1em);
+    opacity: 0.9;
 }
 
-.documentContainer li {
-    margin-bottom: 0.5em;
+.documentContainer p { margin-bottom: 1em; }
+.documentContainer ul { margin-bottom: 1.5em; padding-left: 20px; }
+.documentContainer li { margin-bottom: 0.5em; }
+
+.bottomSpace { height: 3em; }
+
+.doneTop { display: flex; }
+.doneTop svg { width: clamp(10px, 1vw, 14px); height: clamp(10px, 1vw, 14px); transform: rotate(90deg); cursor: pointer; }
+
+
+/* =========================================
+   АДАПТИВНІСТЬ (МЕДІА-ЗАПИТИ)
+   ========================================= */
+
+/* Tablet (768px – 1024px) */
+@media screen and (max-width: 1024px) {
+    .settings {
+        width: 95vw;
+        grid-template-columns: minmax(180px, 25%) 1px minmax(0, 1fr);
+    }
 }
 
-.bottomSpace {
-    height: 3em; /* Порожній блок знизу для зручного скролу */
-}
+/* Mobile (< 768px) */
+@media screen and (max-width: 767px) {
+    .settings {
+        width: 100vw;
+        height: 100vh;
+        border-radius: 0;
+        padding: 1em;
+        
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1px minmax(0, 1fr); 
+        gap: 1em;
+    }
 
-.doneTop {
-    display: flex;
-}
+    .tabs {
+        height: auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 0.5em;
+    }
 
-.doneTop svg {
-    width: 10px;
-    height: 10px;
-    transform: rotate(90deg);
-    cursor: pointer;
+    .sidebarTitle {
+        grid-column: 1 / -1; 
+        margin-bottom: 0.5em;
+        padding-left: 0;
+    }
+
+    .tab {
+        margin-bottom: 0;
+        text-align: center;
+        padding: 0.8em;
+        /* 13px = 0.8125em */
+        font-size: 0.8125em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .contactInfo {
+        display: none;
+    }
+
+    .line {
+        width: 100%;
+        height: 1px; 
+    }
+
+    .options {
+        padding-right: 5px;
+    }
 }

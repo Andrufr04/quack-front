@@ -119,6 +119,7 @@ export default function ManageNewsPage() {
 
     return (
         <>
+        <title>Quack | Керування новинами</title>
             <div className={styles.menu}>
                 <Link to="/manageaccounts">Облікові записи</Link>
                 <div className={styles.line}></div>

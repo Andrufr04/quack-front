@@ -58,29 +58,15 @@ export default function ManageCheckTasks() {
         return () => window.removeEventListener('new_notification', handleNewSubmission);
     }, [fetchWorks]);
 
-    useEffect(() => {
-        if (selectRef.current) {
-            const tempSpan = document.createElement("span");
-            tempSpan.style.visibility = "hidden";
-            tempSpan.style.position = "absolute";
-            tempSpan.style.font = window.getComputedStyle(selectRef.current).font;
-            tempSpan.textContent = selectedGroup;
-            document.body.appendChild(tempSpan);
-
-            const arrowWidth = 25;
-            selectRef.current.style.width = tempSpan.offsetWidth + arrowWidth + "px";
-
-            document.body.removeChild(tempSpan);
-        }
-    }, [selectedGroup]);
-
     // 4. Функція, яка спрацює ПІСЛЯ успішної оцінки в модалці
     const handleGradeSuccess = () => {
         setSelectedTask(null); // Закриваємо модалку
         fetchWorks();          // Тихо оновлюємо список робіт
     };
 
-    return (<>
+    return (
+    <>
+    <title>Quack | Перевірити завдання</title>
         <div className={styles.menuPlus}>
             <div className={styles.menu}>
                 <Link to="/managetasks">Створити завдання</Link>
@@ -94,19 +80,19 @@ export default function ManageCheckTasks() {
                 value={selectedGroup}
                 onChange={(e) => setSelectedGroup(e.target.value)}
             >
-                <option>Всі</option>
-                {groups.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
+                <option value="Всі">Всі</option>
+                {groups.map(g => <option key={g.id} value={g.name}>{g.name}</option>)}
             </select>
         </div>
 
         <div className={styles.container}>
-            {works.map(t => <TaskCardOnCheck key={t.id} task={t} onClick={() => selectTask(t)} />)}
+            {works.map(t => <TaskCardOnCheck key={t.id} task={t} onClick={() => selectTask(t)} selected={selectedTask?.task.id === t.task.id}/>)}
         </div>
 
         {selectedTask && (
             <TaskExtendedOnCheck 
                 onCloseClick={() => setSelectedTask(null)} 
-                onSuccess={handleGradeSuccess} // 🔥 Передаємо новий пропс
+                onSuccess={handleGradeSuccess}
                 task={selectedTask} 
             />
         )}

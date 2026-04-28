@@ -25,12 +25,12 @@ export default function NewsPage() {
             // Якщо у юзера зараз відкрита новина, ми перевіряємо, чи не змінилась вона
             setSelectedNews(prevSelected => {
                 if (!prevSelected) return null;
-                
+
                 // Шукаємо цю ж новину в нових даних
                 const updatedItem = data.find(n => n.id === prevSelected.id);
-                
+
                 // Якщо знайшли - оновлюємо текст/заголовок. Якщо ні (видалили) - закриваємо модалку (return null)
-                return updatedItem || null; 
+                return updatedItem || null;
             });
         }
     };
@@ -63,43 +63,46 @@ export default function NewsPage() {
     };
 
     return (
-        <div className={styles.newsContainer}>
-            <div className={styles.masonryGrid}>
-                {news.map((item) => (
-                    <div 
-                        key={item.id} 
-                        className={styles.newsCard} 
-                        onClick={() => handleOpenNews(item)}
-                        style={{ 
-                            border: item.is_read ? 'none' : '2px solid var(--color-main)' 
-                        }}
-                    >
-                        {item.image && (
-                            <img src={item.image} alt="" className={styles.cardImg} />
-                        )}
-                        <div className={styles.cardContent}>
-                            <span className={styles.date}>
-                                {new Date(item.created_at).toLocaleDateString()}
-                            </span>
-                            <h2 className={styles.title}>{item.title}</h2>
-                            <p className={styles.text}>{item.text}</p>
+        <>
+            <title>Quack | Новини</title>
+            <div className={styles.newsContainer}>
+                <div className={styles.masonryGrid}>
+                    {news.map((item) => (
+                        <div
+                            key={item.id}
+                            className={styles.newsCard}
+                            onClick={() => handleOpenNews(item)}
+                            style={{
+                                border: item.is_read ? 'none' : '2px solid var(--color-main)'
+                            }}
+                        >
+                            {item.image && (
+                                <img src={item.image} alt="" className={styles.cardImg} />
+                            )}
+                            <div className={styles.cardContent}>
+                                <span className={styles.date}>
+                                    {new Date(item.created_at).toLocaleDateString()}
+                                </span>
+                                <h2 className={styles.title}>{item.title}</h2>
+                                <p className={styles.text}>{item.text}</p>
+                            </div>
                         </div>
-                    </div>
-                ))}
-            </div>
-
-            {selectedNews && (
-                <div className={styles.modalOverlay} onClick={() => setSelectedNews(null)}>
-                    <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
-                        {selectedNews.image && <img src={selectedNews.image} className={styles.modalImg} />}
-                        <div className={styles.modalBody}>
-                            <span className={styles.date}>{new Date(selectedNews.created_at).toLocaleString()}</span>
-                            <h1>{selectedNews.title}</h1>
-                            <p className={styles.modalText}>{selectedNews.text}</p>
-                        </div>
-                    </div>
+                    ))}
                 </div>
-            )}
-        </div>
+
+                {selectedNews && (
+                    <div className={styles.modalOverlay} onClick={() => setSelectedNews(null)}>
+                        <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+                            {selectedNews.image && <img src={selectedNews.image} className={styles.modalImg} />}
+                            <div className={styles.modalBody}>
+                                <span className={styles.date}>{new Date(selectedNews.created_at).toLocaleString()}</span>
+                                <h1>{selectedNews.title}</h1>
+                                <p className={styles.modalText}>{selectedNews.text}</p>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </>
     );
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import styles from "./HomePage.module.css";
 import { apiRequest } from "../../../shared/api/api";
-import { isStudent, isTeacher } from "../../../entities/session/lib/jwt";
+import { isAdministration, isCurator, isStudent, isTeacher } from "../../../entities/session/lib/jwt";
 import { SVG_COIN, SVG_DUCK } from "../../../shared/ui/icons/icons";
 import { isDark } from "../../../shared/lib/localStorage";
 import { Link } from "react-router-dom";
@@ -28,6 +28,15 @@ interface LeaderboardUser {
     total_points: number;
 }
 
+interface RecentGrade {
+    id: string;
+    type: string;
+    grade: number;
+    subject: string;
+    theme: string;
+    date: string;
+}
+
 interface StudentStats {
     leaderboard: LeaderboardUser[];
     my_stats: {
@@ -35,6 +44,7 @@ interface StudentStats {
         coins: number;
         average_grade: number;
     };
+    recent_grades?: RecentGrade[];
     group_name: string | null
 }
 
@@ -42,61 +52,118 @@ interface AttendanceRecord {
     id: string;
     subject_name: string;
     date: string;
-    status: number; // 0 - нб, 1 - є, 2 - запізнення
+    status: number;
+}
+
+interface NewsItem {
+    id: string;
+    title: string;
+    created_at: string;
+}
+
+interface CuratorData {
+    group_name: string;
+    students: {
+        id: string;
+        profile_id: string;
+        full_name: string;
+        lesson_avg: number;
+        task_avg: number;
+        lessons: Record<string, { attendance: number | null, grade: number | null }>;
+        tasks: Record<string, { status: number, mark: number | null }>;
+    }[];
+    lessons_meta: { id: string, date: string, subject: string }[];
+    tasks_meta: { id: string, deadline: string, subject: string }[];
 }
 
 export default function HomePage() {
-    return <div>
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 767);
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 767);
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, [])
+
+    return <>
         <title>Quack | Головна</title>
         {
-            isStudent() ? <StudentPage />
-                : isTeacher() ? <TeacherPage />
-                    : <></>
+            isStudent() ? <StudentPage isMobile={isMobile} />
+                : isTeacher() ? <TeacherPage isMobile={isMobile} />
+                    : isCurator() ? <CuratorPage isMobile={isMobile} />
+                        : isAdministration() ? <AdminPage isMobile={isMobile} /> : <></>
         }
-    </div>
+    </>
 }
 
-function StudentPage() {
+function StudentPage({ isMobile }: { isMobile: boolean }) {
     const [stats, setStats] = useState<StudentStats | null>(null);
     const [loading, setLoading] = useState(true);
     const [attendance, setAttendance] = useState<AttendanceRecord[]>([]);
+    const [latestNews, setLatestNews] = useState<NewsItem | null>(null);
+    const [taskStats, setTaskStats] = useState({ total: 0, urgent: 0, overdue: 0 });
 
     const fetchStats = () => {
         apiRequest('/education/student/dashboard-stats/')
             .then(res => res?.json())
             .then(data => setStats(data));
+    };
 
-        apiRequest('/education/student/attendance-history/?limit=80')
+    const fetchAttendance = () => {
+        apiRequest('/education/student/attendance-history/?limit=60')
             .then(res => res?.json())
             .then(data => setAttendance(data))
             .finally(() => setLoading(false));
     };
 
-    const fetchAttendance = () => {
-        apiRequest('/education/student/attendance-history/?limit=40')
-            .then(res => res?.json())
-            .then(data => setAttendance(data));
+    const fetchNews = async () => {
+        const res = await apiRequest('/education/news/student/');
+        if (res?.ok) {
+            const data = await res.json();
+            if (data && data.length > 0) setLatestNews(data[0]);
+        }
     };
 
-    // 🔥 Об'єднуємо обидві функції
+    const fetchTasksStats = async () => {
+        const res = await apiRequest('/education/tasks/my-tasks/?status=0');
+        if (res?.ok) {
+            const data = await res.json();
+            const now = new Date();
+            let urgent = 0;
+            let overdue = 0;
+
+            data.forEach((t: any) => {
+                const endDate = new Date(t.task.end);
+                const diffMs = endDate.getTime() - now.getTime();
+                const diffHours = diffMs / (1000 * 60 * 60);
+
+                if (diffHours < 0) overdue++;
+                else if (diffHours <= 24) urgent++;
+            });
+
+            setTaskStats({ total: data.length, urgent, overdue });
+        }
+    };
+
     const fetchAllData = () => {
         fetchStats();
         fetchAttendance();
-        setLoading(false); // Вимикаємо лоадер після запитів
+        fetchNews();
+        fetchTasksStats();
+        setLoading(false);
     };
 
     useEffect(() => {
-        // Завантажуємо при старті
         fetchAllData();
 
-        // 🔥 2. Слухаємо вебсокет: якщо прийшло сповіщення МЕНІ, миттєво оновлюємо статуси
         const handleNewNotification = () => fetchAllData();
         window.addEventListener('new_notification', handleNewNotification);
 
-        // 🔥 3. Тихе фонове оновлення кожні 30 сек (для оновлення балів ІНШИХ студентів)
         const intervalId = setInterval(fetchStats, 30000);
 
-        // Прибираємо слухачі, коли компонент зникає
         return () => {
             window.removeEventListener('new_notification', handleNewNotification);
             clearInterval(intervalId);
@@ -105,14 +172,13 @@ function StudentPage() {
 
     const getStatusColor = (status: number) => {
         switch (status) {
-            case 1: return "#00cc66"; // Зелений (Присутній)
-            case 0: return "#ff4d4d"; // Червоний (Відсутній)
-            case 2: return "#ffcc00"; // Жовтий (Запізнився)
+            case 1: return "#00cc66";
+            case 0: return "#ff4d4d";
+            case 2: return "#ffcc00";
             default: return "var(--color-ui-widget-bg)";
         }
     };
 
-    // Функція для тексту статусу в тултіп
     const getStatusText = (status: number) => {
         if (status === 1) return "Присутній";
         if (status === 0) return "Відсутній";
@@ -125,7 +191,9 @@ function StudentPage() {
     const strokeDashoffset = circumference * (1 - avgGrade / 12);
 
     return <div className={styles.container}>
-        <div className={styles.widgets}>
+        {/* 🔥 ВИКОРИСТОВУЄМО НОВИЙ GRID-КОНТЕЙНЕР 🔥 */}
+        <div className={styles.studentGrid}>
+
             {stats?.group_name && <div className={styles.LeaderBoard}>
                 <div className={styles.title}>Таблиця лідерів</div>
                 <div className={styles.currency}>
@@ -150,86 +218,103 @@ function StudentPage() {
                 </div>
             </div>}
 
-            <div className={styles.widget} style={{ width: "150px", height: "150px" }}>
-                <div className={styles.title} >Середня оцінка</div>
-
-                <div style={{ position: "relative", width: "100px", height: "100px", marginTop: "10px" }}>
-                    {/* Фон круга */}
-                    <svg width="100" height="100">
-                        <circle
-                            cx="50"
-                            cy="50"
-                            r={radius}
-                            stroke="var(--color-ui-widget-bg)"
-                            strokeWidth="8"
-                            fill="transparent"
-                        />
-                        {/* Прогресс */}
-                        <circle
-                            cx="50"
-                            cy="50"
-                            r={radius}
-                            stroke={avgGrade >= 10 ? "#00cc66" : avgGrade >= 7 ? "#ffcc00" : "#ff4d4d"}
-                            strokeWidth="8"
-                            fill="transparent"
-                            strokeLinecap="round"
-                            strokeDasharray={circumference}
-                            strokeDashoffset={strokeDashoffset}
-                            transform="rotate(-90 50 50)"
-                            style={{ transition: "stroke-dashoffset 0.5s ease" }}
-                        />
-                    </svg>
-
-                    {/* Оценка внутри круга */}
-                    <div
-                        style={{
-                            position: "absolute",
-                            top: 0,
-                            left: 0,
-                            width: "100%",
-                            height: "100%",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            fontWeight: 600,
-                            fontSize: "18px",
-                        }}
-                    >
-                        {avgGrade.toFixed(1)}
-                    </div>
-                </div>
-            </div>
-
             <div className={styles.attendanceWidget}>
-                <div className={styles.title}>Присутність на парах (останні 80)</div>
+                <div className={styles.title}>Присутність на парах (останні 60)</div>
                 <div className={styles.activityGrid}>
                     {attendance.map((record) => (
                         <div
                             key={record.id}
                             className={styles.activitySquare}
                             style={{ backgroundColor: getStatusColor(record.status) }}
-                            // Використовуємо react-tooltip, який у тебе вже підключений в AppRouter
                             data-tooltip-id="my-tooltip"
                             data-tooltip-content={`${record.subject_name} | ${new Date(record.date).toLocaleDateString()} | ${getStatusText(record.status)}`}
                         ></div>
                     ))}
-                    {/* Заповнюємо порожніми квадратами, якщо пар менше 80 */}
-                    {Array.from({ length: Math.max(0, 80 - attendance.length) }).map((_, i) => (
+                    {Array.from({ length: Math.max(0, 60 - attendance.length) }).map((_, i) => (
                         <div key={`empty-${i}`} className={styles.activitySquare} style={{ opacity: 0.2 }}></div>
                     ))}
                 </div>
             </div>
+
+            <div className={`${styles.widget} ${styles.avgGradeWidget}`}>
+                <div className={styles.title} >Середня оцінка</div>
+
+                <div className={styles.svgContainer}>
+                    <svg viewBox="0 0 100 100" className={styles.svgChart}>
+                        <circle cx="50" cy="50" r={radius} stroke="var(--color-ui-widget-bg)" strokeWidth="8" fill="transparent" />
+                        <circle cx="50" cy="50" r={radius}
+                            stroke={avgGrade >= 10 ? "#00cc66" : avgGrade >= 7 ? "#ffcc00" : "#ff4d4d"}
+                            strokeWidth="8" fill="transparent" strokeLinecap="round"
+                            strokeDasharray={circumference} strokeDashoffset={strokeDashoffset}
+                            transform="rotate(-90 50 50)" style={{ transition: "stroke-dashoffset 0.5s ease" }}
+                        />
+                    </svg>
+                    <div className={styles.gradeValue}>{avgGrade.toFixed(1)}</div>
+                </div>
+            </div>
+
+            <Link to="/news" className={styles.newsWidget}>
+                <div className={styles.newsTop}>
+                    <div className={styles.newsTag}>Остання новина</div>
+                    <div className={styles.newsTitle}>{latestNews ? latestNews.title : "Новин поки немає"}</div>
+                </div>
+                {latestNews && <div className={styles.newsDate}>{new Date(latestNews.created_at).toLocaleDateString()}</div>}
+            </Link>
+
+            <Link to="/tasks" className={styles.tasksWidget}>
+                <div className={styles.title}>Домашні завдання</div>
+                <div className={styles.tasksStats}>
+                    <div style={{ display: "flex", gap: ".5em" }}>
+                        <div className={styles.statBox}>
+                            <span className={styles.statNum}>{taskStats.total}</span>
+                            <span className={styles.statLabel}>Всього</span>
+                        </div>
+                        <div className={`${styles.statBox} ${styles.statUrgent}`}>
+                            <span className={styles.statNum}>{taskStats.urgent}</span>
+                            <span className={styles.statLabel}>Терміново</span>
+                        </div>
+                    </div>
+                    <div className={`${styles.statBox} ${styles.statOverdue}`}>
+                        <span className={styles.statNum}>{taskStats.overdue}</span>
+                        <span className={styles.statLabel}>Прострочено</span>
+                    </div>
+                </div>
+            </Link>
+
+            <div className={styles.gradesWidget}>
+                <div className={styles.title} style={{ marginBottom: "1em" }}>Останні оцінки</div>
+                <div className={styles.gradesList}>
+                    {stats?.recent_grades?.map(g => (
+                        <div key={g.id} className={styles.gradeCard}>
+                            <div className={`${styles.gradeMark} ${g.grade >= 10 ? styles.markHigh : g.grade >= 7 ? styles.markMid : styles.markLow}`}>
+                                {g.grade}
+                            </div>
+                            <div className={styles.gradeInfo}>
+                                <div className={styles.gradeSubject}>{g.subject}</div>
+                                <div className={styles.gradeTheme}>{g.theme}</div>
+                                <div className={styles.gradeDate}>{new Date(g.date).toLocaleDateString()}</div>
+                            </div>
+                        </div>
+                    ))}
+                    {(!stats?.recent_grades || stats.recent_grades.length === 0) && (
+                        <div className={styles.emptyMsg}>Оцінок поки немає</div>
+                    )}
+                </div>
+            </div>
+
         </div>
-        <div className={styles.calendar}>
+
+        {!isMobile && <div className={styles.calendar}>
             <CalendarSidebar
                 isOpen={true}
                 onClose={() => { }}
             />
-        </div>
+        </div>}
+
     </div>
 }
 
-function TeacherPage() {
+function TeacherPage({ isMobile }: { isMobile: boolean }) {
     const [data, setData] = useState<LessonInfo | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -299,11 +384,278 @@ function TeacherPage() {
                 </div>
             )}
         </div>
-        <div className={styles.calendar}>
+        {!isMobile && <div className={styles.calendar}>
             <CalendarSidebar
                 isOpen={true}
                 onClose={() => { }}
             />
-        </div>
+        </div>}
     </div>);
+}
+
+function CuratorPage({ isMobile }: { isMobile: boolean }) {
+    const [data, setData] = useState<CuratorData | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState<'lessons' | 'tasks'>('lessons');
+
+    useEffect(() => {
+        apiRequest('/education/curator/dashboard-stats/')
+            .then(res => res?.json())
+            .then(resData => {
+                if (!resData.error) setData(resData);
+            })
+            .finally(() => setLoading(false));
+    }, []);
+
+    if (loading) return <div className={styles.loader}>Завантаження...</div>;
+    if (!data) return <div className={styles.container}><div className={styles.emptyMsg}>Ви не закріплені як куратор жодної групи.</div></div>;
+
+    const getAttendanceDot = (status: number | null) => {
+        if (status === 1) return <span className={styles.attDot} style={{ background: '#00cc66' }} title="Присутній"></span>;
+        if (status === 0) return <span className={styles.attDot} style={{ background: '#ff4d4d' }} title="Відсутній"></span>;
+        if (status === 2) return <span className={styles.attDot} style={{ background: '#ffcc00' }} title="Запізнення"></span>;
+        return <span className={styles.attDot} style={{ background: 'transparent', border: '1px solid var(--color-gray)' }}></span>;
+    };
+
+    const getTaskStatus = (status: number, mark: number | null) => {
+        if (status === 2 && mark !== null) return <span className={styles.tMark}>{mark}</span>;
+        if (status === 1) return <span className={styles.tStatus} style={{ color: '#ffcc00' }}>На перевірці</span>;
+        return <span className={styles.tStatus} style={{ color: '#ff4d4d' }}>Не виконано</span>;
+    };
+
+    return (
+        <div className={styles.container} style={{width: "100%"}}>
+            <div className={styles.curatorWidget}>
+                <div className={styles.curatorHeader}>
+                    <div>
+                        <h2 className={styles.curatorTitle}>Успішність групи {data.group_name}</h2>
+                    </div>
+                    <div className={styles.curatorTabs}>
+                        <button className={`${styles.cTab} ${activeTab === 'lessons' ? styles.cTabActive : ''}`} onClick={() => setActiveTab('lessons')}>
+                            Успішність (Пари)
+                        </button>
+                        <button className={`${styles.cTab} ${activeTab === 'tasks' ? styles.cTabActive : ''}`} onClick={() => setActiveTab('tasks')}>
+                            Домашні завдання
+                        </button>
+                    </div>
+                </div>
+
+                <div className={styles.curatorTableWrapper}>
+                    <table className={styles.cTable}>
+                        <thead>
+                            <tr>
+                                <th className={`${styles.cStickyCol} ${styles.cZTop}`}>Студент</th>
+                                <th className={styles.cStickyCol2}>Сер. бал</th>
+                                {activeTab === 'lessons'
+                                    ? data.lessons_meta.map(l => (
+                                        <th key={l.id}>
+                                            <div className={styles.thDate}>{new Date(l.date).toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' })}</div>
+                                            <div className={styles.thSubj} data-tooltip-id="my-tooltip" data-tooltip-content={l.subject} data-tooltip-hidden={isMobile}>{l.subject}</div>
+                                        </th>
+                                    ))
+                                    : data.tasks_meta.map(t => (
+                                        <th key={t.id}>
+                                            <div className={styles.thDate}>до {new Date(t.deadline).toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' })}</div>
+                                            <div className={styles.thSubj} data-tooltip-id="my-tooltip" data-tooltip-content={t.subject} data-tooltip-hidden={isMobile}>{t.subject}</div>
+                                        </th>
+                                    ))
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {data.students.map((student, idx) => (
+                                <tr key={student.profile_id} className={idx % 2 === 0 ? styles.cRowEven : ''}>
+                                    <td className={styles.cStickyCol}>
+                                        <Link to={`/profile/${student.profile_id}`} className={styles.cStudentLink}>
+                                            {student.full_name}
+                                        </Link>
+                                    </td>
+                                    <td className={styles.cStickyCol2}>
+                                        <span className={styles.cAvgGrade}>
+                                            {activeTab === 'lessons' ? student.lesson_avg : student.task_avg}
+                                        </span>
+                                    </td>
+                                    {activeTab === 'lessons'
+                                        ? data.lessons_meta.map(l => {
+                                            const cell = student.lessons[l.id];
+                                            return (
+                                                <td key={l.id}>
+                                                    <div className={styles.cCellContent}>
+                                                        {getAttendanceDot(cell?.attendance)}
+                                                        {cell?.grade ? <span className={styles.cGrade}>{cell.grade}</span> : <span style={{ opacity: 0.2 }}>-</span>}
+                                                    </div>
+                                                </td>
+                                            );
+                                        })
+                                        : data.tasks_meta.map(t => {
+                                            const cell = student.tasks[t.id];
+                                            return (
+                                                <td key={t.id}>
+                                                    <div className={styles.cCellContent}>
+                                                        {getTaskStatus(cell?.status || 0, cell?.mark || null)}
+                                                    </div>
+                                                </td>
+                                            );
+                                        })
+                                    }
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// 🔥 НОВИЙ КОМПОНЕНТ АДМІНІСТРАТОРА 🔥
+function AdminPage({ isMobile }: { isMobile: boolean }) {
+    const [data, setData] = useState<CuratorData | null>(null);
+    const [groups, setGroups] = useState<{ id: string, name: string }[]>([]);
+    const [selectedGroup, setSelectedGroup] = useState<string>("");
+    const [loading, setLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState<'lessons' | 'tasks'>('lessons');
+
+    // 1. Завантажуємо список усіх груп
+    useEffect(() => {
+        apiRequest('/education/all-groups/')
+            .then(res => res?.json())
+            .then(resData => {
+                if (resData && resData.length > 0) {
+                    setGroups(resData);
+                    setSelectedGroup(resData[0].id); // Обираємо першу групу за замовчуванням
+                }
+                setLoading(false);
+            });
+    }, []);
+
+    // 2. Завантажуємо статистику при зміні групи
+    useEffect(() => {
+        if (!selectedGroup) return;
+        
+        setLoading(true);
+        apiRequest(`/education/admin/dashboard-stats/?group_id=${selectedGroup}`)
+            .then(res => res?.json())
+            .then(resData => {
+                if (!resData.error) setData(resData);
+                else setData(null);
+            })
+            .finally(() => setLoading(false));
+    }, [selectedGroup]);
+
+    const getAttendanceDot = (status: number | null) => {
+        if (status === 1) return <span className={styles.attDot} style={{ background: '#00cc66' }} title="Присутній"></span>;
+        if (status === 0) return <span className={styles.attDot} style={{ background: '#ff4d4d' }} title="Відсутній"></span>;
+        if (status === 2) return <span className={styles.attDot} style={{ background: '#ffcc00' }} title="Запізнення"></span>;
+        return <span className={styles.attDot} style={{ background: 'transparent', border: '1px solid var(--color-gray)' }}></span>;
+    };
+
+    const getTaskStatus = (status: number, mark: number | null) => {
+        if (status === 2 && mark !== null) return <span className={styles.tMark}>{mark}</span>;
+        if (status === 1) return <span className={styles.tStatus} style={{ color: '#ffcc00' }}>На перевірці</span>;
+        return <span className={styles.tStatus} style={{ color: '#ff4d4d' }}>Не виконано</span>;
+    };
+
+    if (loading && groups.length === 0) return <div className={styles.loader}>Завантаження...</div>;
+
+    return (
+        <div className={styles.container} style={{ width: "100%" }}>
+            <div className={styles.curatorWidget}>
+                
+                <div className={styles.curatorHeader}>
+                    <div>
+                        <h2 className={styles.curatorTitle}>Успішність групи</h2>
+                        {/* 🔥 СЕЛЕКТОР ГРУПИ 🔥 */}
+                        <select 
+                            className={styles.adminGroupSelect} 
+                            value={selectedGroup} 
+                            onChange={(e) => setSelectedGroup(e.target.value)}
+                        >
+                            {groups.map(g => (
+                                <option key={g.id} value={g.id}>{g.name}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className={styles.curatorTabs}>
+                        <button className={`${styles.cTab} ${activeTab === 'lessons' ? styles.cTabActive : ''}`} onClick={() => setActiveTab('lessons')}>
+                            Успішність (Пари)
+                        </button>
+                        <button className={`${styles.cTab} ${activeTab === 'tasks' ? styles.cTabActive : ''}`} onClick={() => setActiveTab('tasks')}>
+                            Домашні завдання
+                        </button>
+                    </div>
+                </div>
+
+                {loading ? (
+                    <div style={{ padding: '2em', textAlign: 'center', color: 'var(--color-grey)' }}>Оновлення даних...</div>
+                ) : !data ? (
+                    <div className={styles.emptyMsg}>Немає даних для цієї групи.</div>
+                ) : (
+                    <div className={styles.curatorTableWrapper}>
+                        <table className={styles.cTable}>
+                            <thead>
+                                <tr>
+                                    <th className={`${styles.cStickyCol} ${styles.cZTop}`}>Студент</th>
+                                    <th className={styles.cStickyCol2}>Сер. бал</th>
+                                    {activeTab === 'lessons'
+                                        ? data.lessons_meta.map(l => (
+                                            <th key={l.id}>
+                                                <div className={styles.thDate}>{new Date(l.date).toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' })}</div>
+                                                <div className={styles.thSubj} data-tooltip-id="my-tooltip" data-tooltip-content={l.subject} data-tooltip-hidden={isMobile}>{l.subject}</div>
+                                            </th>
+                                        ))
+                                        : data.tasks_meta.map(t => (
+                                            <th key={t.id}>
+                                                <div className={styles.thDate}>до {new Date(t.deadline).toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' })}</div>
+                                                <div className={styles.thSubj} data-tooltip-id="my-tooltip" data-tooltip-content={t.subject} data-tooltip-hidden={isMobile}>{t.subject}</div>
+                                            </th>
+                                        ))
+                                    }
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {data.students.map((student, idx) => (
+                                    <tr key={student.profile_id} className={idx % 2 === 0 ? styles.cRowEven : ''}>
+                                        <td className={styles.cStickyCol}>
+                                            <Link to={`/profile/${student.profile_id}`} className={styles.cStudentLink}>
+                                                {student.full_name}
+                                            </Link>
+                                        </td>
+                                        <td className={styles.cStickyCol2}>
+                                            <span className={styles.cAvgGrade}>
+                                                {activeTab === 'lessons' ? student.lesson_avg : student.task_avg}
+                                            </span>
+                                        </td>
+                                        {activeTab === 'lessons'
+                                            ? data.lessons_meta.map(l => {
+                                                const cell = student.lessons[l.id];
+                                                return (
+                                                    <td key={l.id}>
+                                                        <div className={styles.cCellContent}>
+                                                            {getAttendanceDot(cell?.attendance)}
+                                                            {cell?.grade ? <span className={styles.cGrade}>{cell.grade}</span> : <span style={{ opacity: 0.2 }}>-</span>}
+                                                        </div>
+                                                    </td>
+                                                );
+                                            })
+                                            : data.tasks_meta.map(t => {
+                                                const cell = student.tasks[t.id];
+                                                return (
+                                                    <td key={t.id}>
+                                                        <div className={styles.cCellContent}>
+                                                            {getTaskStatus(cell?.status || 0, cell?.mark || null)}
+                                                        </div>
+                                                    </td>
+                                                );
+                                            })
+                                        }
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
 }

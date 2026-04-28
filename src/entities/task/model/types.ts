@@ -12,6 +12,7 @@ export interface Task {
     id: string
     author_name: string
     subject_name: string
+    subject_image?: string | null;
     task_type_name?: string
     theme: string
     description: string
@@ -24,8 +25,10 @@ export interface TaskStatus {
     id: string
     task: Task
     status: 0 | 1 | 2 | 3 // 0: Виконується, 1: На перевірці, 2: Перевірено, 3: Видалено
-    mark?: number | null    // Додаємо це
-    comment?: string | null // І це
+    mark?: number | null
+    comment?: string | null
+    submitted_text?: string | null
+    submitted_attachments?: AttachmentGroup
 }
 
 export interface TaskOnCheck {
@@ -38,7 +41,7 @@ export interface TaskOnCheck {
 }
 
 export interface TeacherTaskToCheck {
-    id: string;              // ID запису TaskOnCheck
+    id: string;
     student_name: string;
     group_name: string;
     task_theme: string;

@@ -1,21 +1,27 @@
+.extendedTopWrap {
+    overflow-y: auto;
+}
+
 .TaskExtended {
     background-color: var(--color-bg);
-    width: 530px;
+    width: clamp(320px, 90vw, 33.125em);
     position: fixed;
     right: 0;
     top: 0;
     height: 100vh;
-    z-index: 2;
+    z-index: 100;
     border-top-left-radius: var(--radius-main);
-    border-bottom-left-radius: var(--radius-main); /* Додано для симетрії */
     padding: 2em;
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* Розтягує контент по краях */
+    gap: 1em;
+    overflow-y: auto;
 }
 
-/* Групування блоків */
-.extendedTop, .extendedBottom {
+.TaskExtended::-webkit-scrollbar { width: 6px; }
+.TaskExtended::-webkit-scrollbar-thumb { background: var(--color-gray); border-radius: 10px; }
+
+.extendedTop {
     display: flex;
     flex-direction: column;
     gap: 1em;
@@ -27,21 +33,22 @@
 }
 
 .subject {
-    font-size: 16px;
+    font-size: 1em; /* 16px */
     font-weight: bold;
 }
 
 .date {
-    font-size: 12px;
+    font-size: 0.75em; /* 12px */
 }
 
 .description {
     display: flex;
     gap: 0.5em;
+    flex-direction: column;
 }
 
 .descriptionTitle {
-    font-size: 14px;
+    font-size: 0.875em; /* 14px */
     font-weight: bold;
 }
 
@@ -52,33 +59,32 @@
 }
 
 .topicTitle {
-    font-size: 14px;
+    font-size: 0.875em; /* 14px */
     color: var(--color-text-grey);
 }
 
 .info {
-    color: var(--color-text); /* Щоб відповідь студента була контрастнішою */
-    white-space: pre-wrap;
-    max-height: calc(5 * 1.5em); 
-    line-height: 1.5em;
-    overflow-y: auto;
+    color: var(--color-text);
 }
 
 .icon {
-    width: 20px;
-    height: 20px;
+    width: 1.25em; /* 20px */
+    height: 1.25em;
     transform: rotate(45deg);
     cursor: pointer;
+    position: absolute;
+    top: 1.5em;
+    right: 1.5em;
 }
 
 .field {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 0.625em; /* 10px */
 }
 
 .label {
-    font-size: 14px;
+    font-size: 0.875em; /* 14px */
 }
 
 .required {
@@ -89,25 +95,35 @@
     color: #32c671;
 }
 
-.textarea, .markInput {
+.textarea {
     width: 100%;
+    min-height: 6.875em; /* 110px */
     border: none;
-    border-radius: 10px;
-    padding: 10px 14px;
+    border-radius: 0.625em; /* 10px */
+    padding: 0.625em; /* 10px */
+    resize: none;
     background: var(--color-opaque-secondary);
-    background-color: #e3e3e3;
+    background-color: var(--color-gray);
     color: var(--color-text);
-    font-size: 14px;
+    font-family: inherit;
+    font-size: 0.875em;
+    outline: none;
     transition: outline 0.2s;
 }
 
-.textarea {
-    min-height: 90px;
-    resize: none;
-}
-
 .markInput {
-    height: 40px;
+    width: 100%;
+    height: 2.5em; /* 40px */
+    border: none;
+    border-radius: 0.625em;
+    padding: 0.625em;
+    background: var(--color-opaque-secondary);
+    background-color: var(--color-gray);
+    color: var(--color-text);
+    font-family: inherit;
+    font-size: 0.875em;
+    outline: none;
+    transition: outline 0.2s;
 }
 
 .markInput:focus, .textarea:focus {
@@ -118,112 +134,108 @@
     outline: 2px solid #32c671;
 }
 
-.fileWrapper {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px;
-    border-radius: 10px;
-    background: var(--color-opaque-secondary);
-    cursor: pointer;
-    background-color: #e3e3e3;
-    color: var(--color-text);
-}
-
-.fileInput {
-    display: none;
-}
-
-.fileButton {
-    background: #f2f2f2;
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 14px;
-}
-
-.fileName {
-    font-size: 14px;
-    opacity: 0.8;
-}
-
-.zoomArea {
-    cursor: zoom-in;
-    transition: transform 0.2s ease;
-    width: 100%;
-    height: 100%;
-}
-
-.zoomArea:hover {
-    filter: brightness(0.95);
-}
-
-.overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: var(--blur-main);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 100;
-    cursor: zoom-out;
-}
-
-.iconModal {
-    width: 20px;
-    height: 20px;
-    transform: rotate(45deg);
-    cursor: pointer;
-    position: absolute;
-    top: -24px;
-    right: -24px;
-    color: white; /* Щоб було видно на темному фоні */
-}
-
-.fullViewer {
-    background: var(--color-bg);
-    border-radius: var(--radius-main);
-    box-shadow: var(--shadow-main);
-    padding: 10px;
-    cursor: default;
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 80vw;
-    height: 80vh;
-}
-
-.viewerWrapper {
-    height: 25vh;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    overflow: hidden;
-    border-radius: 10px;
-    background-color: var(--color-opaque-secondary);
-}
-
 .descriptionInfo {
-    max-height: calc(5 * 1.5em); 
     line-height: 1.5em;
     overflow-y: auto;
-    overflow-x: auto;
-    white-space: pre-wrap; /* Дозволяє тексту переноситися, якщо він задовгий */
+    white-space: pre-wrap;
     flex: 1;
-    margin: 0;
-    font-family: inherit; /* Щоб pre не використовував системний моноширинний шрифт */
-    color: var(--color-text);
 }
 
 .descriptionInfo::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
 }
 
-.descriptionInfo::-webkit-scrollbar-thumb {
-    background: var(--color-text-grey);
-    border-radius: 10px;
+/* --- МЕДІА ФАЙЛИ ТА ДОКУМЕНТИ --- */
+.attachmentsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9375em; /* 15px */
+    margin: 0.9375em 0;
+    padding: 0 1em;
+    overflow-y: auto;
+}
+
+.mediaGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+    align-items: start; 
+}
+
+.mediaItem {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: 0.75em;
+    background-color: var(--color-opaque-secondary);
+    border: 1px solid var(--color-gray);
+}
+
+img.mediaItem {
+    cursor: zoom-in;
+}
+
+.downloadList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.downloadBtn {
+    background-color: var(--color-opaque-secondary);
+    color: var(--color-text);
+    padding: 0.625em 0.9375em; /* 10px 15px */
+    border-radius: 0.5em; /* 8px */
+    border: 1px solid var(--color-gray);
+    text-decoration: none;
+    font-size: 0.875em; /* 14px */
+    font-weight: 500;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.downloadBtn:hover {
+    background-color: var(--color-gray);
+    color: var(--color-main);
+}
+
+/* --- МОДАЛКА КАРТИНОК --- */
+.imageModalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    cursor: zoom-out;
+}
+
+.imageModalContent {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.fullScreenImage {
+    max-width: 100%;
+    max-height: 90vh;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    object-fit: contain;
 }
 
 .loading {
@@ -234,4 +246,13 @@
 
 .img {
     object-fit: contain;
+}
+
+@media screen and (max-width: 767px) {
+    .TaskExtended {
+        width: 100vw;
+        border-radius: 0;
+        padding-top: calc(2em + var(--safe-area-top));
+        padding-bottom: calc(2em + var(--safe-area-bottom));
+    }
 }

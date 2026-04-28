@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import styles from "./ChatsPage.module.css";
-import { SVG_SEND, SVG_CLIP, SVG_PLUS, SVG_ADDREACTION } from "../../../shared/ui/icons/icons";
+import { SVG_SEND, SVG_CLIP, SVG_PLUS, SVG_ADDREACTION, SVG_MIC } from "../../../shared/ui/icons/icons";
 import toast from "react-hot-toast";
 import { apiRequest } from "../../../shared/api/api";
 import RoundButton from "../../../shared/ui/RoundButton/RoundButton";
@@ -20,10 +20,11 @@ interface ChatListItem {
 interface ChatMessage {
     id: string;
     sender_id: string;
-    sender_name?: string; // 🔥 Додано для груп
-    sender_avatar?: string | null; // 🔥 Додано для груп
+    sender_name?: string; 
+    sender_avatar?: string | null; 
     text: string;
     images: string[];
+    voice?: string | null;
     created_at: string;
     reactions?: Record<string, number>;
     my_reaction?: string | null;
@@ -78,6 +79,15 @@ export default function ChatsPage() {
     const { chatId } = useParams<{ chatId?: string }>();
     const navigate = useNavigate();
 
+    // 🔥 Стейт для перевірки мобільного екрану 🔥
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 768);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedChat, setSelectedChat] = useState<string | null>(chatId || null);
 
@@ -98,6 +108,10 @@ export default function ChatsPage() {
     const postFileInputRef = useRef<HTMLInputElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+    const [isRecording, setIsRecording] = useState(false);
+    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const audioChunksRef = useRef<Blob[]>([]);
+
     const [previewImage, setPreviewImage] = useState<string | null>(null);
     const [activeMsgReactionPopup, setActiveMsgReactionPopup] = useState<string | null>(null);
     const emojis = ['👍', '🔥', '❤️', '😂', '🤯'];
@@ -109,7 +123,6 @@ export default function ChatsPage() {
     const [groupParticipants, setGroupParticipants] = useState<GroupParticipant[]>([]);
     const [isAddingUser, setIsAddingUser] = useState(false);
 
-    // 🔥 СТЕЙТИ ДЛЯ РЕДАГУВАННЯ ГРУПИ 🔥
     const [isEditingName, setIsEditingName] = useState(false);
     const [editGroupName, setEditGroupName] = useState("");
     const groupAvatarInputRef = useRef<HTMLInputElement>(null);
@@ -119,6 +132,15 @@ export default function ChatsPage() {
         if (!token) return null;
         try { return JSON.parse(atob(token.split('.')[1])).user_id; } catch { return null; }
     })();
+
+    const scrollToBottom = (smooth = false) => {
+        if (messagesContainerRef.current) {
+            messagesContainerRef.current.scrollTo({
+                top: messagesContainerRef.current.scrollHeight,
+                behavior: smooth ? 'smooth' : 'auto'
+            });
+        }
+    };
 
     const loadChats = async () => {
         const res = await apiRequest(`/profiles/chats/?t=${Date.now()}`);
@@ -148,11 +170,15 @@ export default function ChatsPage() {
                 setTimeout(() => {
                     if (data.first_unread_id) {
                         const unreadEl = document.getElementById(`msg-${data.first_unread_id}`);
-                        unreadEl?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        if (unreadEl) {
+                            unreadEl.scrollIntoView({ behavior: 'auto', block: 'center' }); 
+                        } else {
+                            scrollToBottom();
+                        }
                     } else {
-                        messagesEndRef.current?.scrollIntoView();
+                        scrollToBottom();
                     }
-                }, 100);
+                }, 200);
             }
 
             setOffset(currentOffset + data.messages.length);
@@ -218,28 +244,32 @@ export default function ChatsPage() {
                 return;
             }
 
-            // 🔥 ДОДАНО: реагуємо також на системні 'new_message' івенти 🔥
             const isChatNotification = (notif.category === 'social' && notif.title === 'Нове повідомлення') || notif.type === 'new_message';
 
             if (isChatNotification) {
                 loadChats();
-                // 🔥 ДОДАНО: беремо chat_id з системного івенту, якщо він є
                 const targetChatId = notif.chat_id || notif.related_object_id || selectedChatRef.current;
 
                 if (selectedChatRef.current && String(targetChatId) === String(selectedChatRef.current)) {
                     const res = await apiRequest(`/profiles/chats/${selectedChatRef.current}/?offset=0&t=${Date.now()}`);
                     if (res?.ok) {
                         const data = await res.json();
+                        let hasNewMsgs = false; 
+                        
                         setMessages(prev => {
                             const existingIds = new Set(prev.map(m => m.id));
                             const newMsgs = data.messages.filter((m: any) => !existingIds.has(m.id));
 
                             if (newMsgs.length > 0) {
-                                setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
+                                hasNewMsgs = true;
                                 return [...prev, ...newMsgs];
                             }
                             return prev;
                         });
+
+                        if (hasNewMsgs) {
+                            setTimeout(() => scrollToBottom(true), 150);
+                        }
                     }
                 }
             }
@@ -248,11 +278,15 @@ export default function ChatsPage() {
         window.addEventListener('new_notification', handleNewNotif);
         return () => window.removeEventListener('new_notification', handleNewNotif);
     }, []);
+    
 
     useEffect(() => {
         if (chatId) {
             setSelectedChat(chatId);
             loadMessages(chatId);
+        } else {
+            setSelectedChat(null);
+            setMessages([]);
         }
     }, [chatId]);
 
@@ -311,7 +345,7 @@ export default function ChatsPage() {
         };
 
         setMessages(prev => [...prev, tempMsg]);
-        setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
+        setTimeout(() => scrollToBottom(true), 50);
 
         const formData = new FormData();
         formData.append('text', text);
@@ -320,6 +354,85 @@ export default function ChatsPage() {
         setMessageText("");
         setPostFiles([]);
         if (textareaRef.current) textareaRef.current.style.height = 'auto';
+
+        try {
+            const res = await apiRequest(`/profiles/chats/${selectedChat}/send/`, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (res?.ok) {
+                const fetchRes = await apiRequest(`/profiles/chats/${selectedChat}/?offset=0`);
+                if (fetchRes?.ok) {
+                    const data = await fetchRes.json();
+                    setMessages(prev => {
+                        const noTemp = prev.filter(m => m.id !== tempId);
+                        const existingIds = new Set(noTemp.map(m => m.id));
+                        const newMsgs = data.messages.filter((m: any) => !existingIds.has(m.id));
+                        return [...noTemp, ...newMsgs];
+                    });
+                }
+                loadChats();
+            } else {
+                setMessages(prev => prev.filter(m => m.id !== tempId));
+                toast.error("Помилка відправки");
+            }
+        } catch (e) {
+            setMessages(prev => prev.filter(m => m.id !== tempId));
+            toast.error("Помилка сервера");
+        }
+    };
+
+    const startRecording = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const mediaRecorder = new MediaRecorder(stream);
+            mediaRecorderRef.current = mediaRecorder;
+            audioChunksRef.current = [];
+
+            mediaRecorder.ondataavailable = (e) => {
+                if (e.data.size > 0) audioChunksRef.current.push(e.data);
+            };
+
+            mediaRecorder.onstop = async () => {
+                stream.getTracks().forEach(track => track.stop());
+                const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+                
+                // Якщо запис був менше секунди - ігноруємо (можливо це був випадковий клік)
+                if (audioBlob.size > 1000) {
+                    await handleSendVoiceMessage(audioBlob);
+                }
+            };
+
+            mediaRecorder.start();
+            setIsRecording(true);
+        } catch (err) {
+            toast.error("Помилка доступу до мікрофона");
+        }
+    };
+
+    const stopRecording = () => {
+        if (mediaRecorderRef.current && isRecording) {
+            mediaRecorderRef.current.stop();
+            setIsRecording(false);
+        }
+    };
+
+    const handleSendVoiceMessage = async (audioBlob: Blob) => {
+        if (!selectedChat) return;
+
+        const tempId = "temp-" + Date.now().toString();
+        const tempUrl = URL.createObjectURL(audioBlob);
+        const tempMsg: ChatMessage = {
+            id: tempId, sender_id: myUserId || "", text: "",
+            images: [], voice: tempUrl, created_at: new Date().toISOString()
+        };
+
+        setMessages(prev => [...prev, tempMsg]);
+        setTimeout(() => scrollToBottom(true), 50);
+
+        const formData = new FormData();
+        formData.append('voice', audioBlob, 'voice.webm'); // Django за замовчуванням прийме webm
 
         try {
             const res = await apiRequest(`/profiles/chats/${selectedChat}/send/`, {
@@ -384,7 +497,6 @@ export default function ChatsPage() {
         }
     };
 
-    // 🔥 ОНОВЛЕНО: Перейменування групи
     const handleUpdateGroupName = async () => {
         const name = editGroupName.trim();
         if (!name || name === activeChatData?.name) {
@@ -403,7 +515,7 @@ export default function ChatsPage() {
                 toast.success("Назву оновлено");
                 setIsEditingName(false);
                 loadChats();
-                if (selectedChat) loadMessages(selectedChat); // 🔥 Підтягуємо системне повідомлення
+                if (selectedChat) loadMessages(selectedChat); 
             }
         } catch { toast.error("Помилка сервера"); }
     };
@@ -430,7 +542,6 @@ export default function ChatsPage() {
         } catch { toast.error("Помилка сервера"); }
     };
 
-    // 🔥 ОНОВЛЕНО: Передача прав
     const handleTransferAdmin = async (userId: string) => {
         try {
             const res = await apiRequest(`/profiles/chats/group/${selectedChat}/transfer-admin/`, {
@@ -441,14 +552,13 @@ export default function ChatsPage() {
             if (res?.ok) {
                 toast.success("Права адміністратора передано");
                 openManageGroup();
-                if (selectedChat) loadMessages(selectedChat); // 🔥 Підтягуємо системне повідомлення
+                if (selectedChat) loadMessages(selectedChat); 
             } else {
                 toast.error("Не вдалося передати права");
             }
         } catch { toast.error("Помилка сервера"); }
     };
 
-    // 🔥 ОНОВЛЕНО: Додавання користувача
     const handleAddUserToGroup = async (userId: string) => {
         try {
             const res = await apiRequest(`/profiles/chats/group/${selectedChat}/manage/`, {
@@ -459,14 +569,13 @@ export default function ChatsPage() {
                 toast.success("Користувача додано");
                 setIsAddingUser(false);
                 openManageGroup();
-                if (selectedChat) loadMessages(selectedChat); // 🔥 Підтягуємо системне повідомлення
+                if (selectedChat) loadMessages(selectedChat); 
             } else {
                 toast.error("Помилка (можливо користувач вже в групі)");
             }
         } catch { toast.error("Помилка сервера"); }
     };
 
-    // 🔥 ОНОВЛЕНО: Вилучення користувача
     const handleRemoveUserFromGroup = async (userId: string) => {
         try {
             const res = await apiRequest(`/profiles/chats/group/${selectedChat}/manage/`, {
@@ -477,7 +586,7 @@ export default function ChatsPage() {
             if (res?.ok) {
                 toast.success("Вилучено");
                 setGroupParticipants(prev => prev.filter(p => p.id !== userId));
-                if (selectedChat) loadMessages(selectedChat); // 🔥 Підтягуємо системне повідомлення
+                if (selectedChat) loadMessages(selectedChat); 
             }
         } catch { toast.error("Помилка вилучення"); }
     };
@@ -521,289 +630,348 @@ export default function ChatsPage() {
         <div className={styles.chatPage}>
             <title>Quack | Чати</title>
 
-            <div className={styles.sidebar}>
-                <div className={styles.searchWrapper}>
-                    <input type="text" className={styles.searchInput} placeholder="Пошук користувачів..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
-                    <div className={styles.iconPlus} onClick={() => setIsCreateGroupOpen(true)}>
-                        <RoundButton button={{ icon: SVG_PLUS, text: "Створити групу" }} />
+            {/* 🔥 Умовний рендер для мобілки: якщо чат обрано - ховаємо список 🔥 */}
+            {(!isMobile || !selectedChat) && (
+                <div className={styles.sidebar}>
+                    <div className={styles.searchWrapper}>
+                        <input type="text" className={styles.searchInput} placeholder="Пошук користувачів..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+                        <div className={styles.iconPlus} onClick={() => setIsCreateGroupOpen(true)}>
+                            <RoundButton button={{ icon: SVG_PLUS, text: "Створити групу" }} />
+                        </div>
+                    </div>
+
+                    <div className={styles.chatList}>
+                        {filteredChats.length === 0 ? (
+                            <div style={{ padding: '1.25em', textAlign: 'center', opacity: 0.5, color: 'var(--color-text)' }}>Чатів не знайдено</div>
+                        ) : (
+                            filteredChats.map(chat => (
+                                <div key={chat.id} className={`${styles.chatItem} ${selectedChat === chat.id ? styles.activeChat : ""}`} onClick={() => handleChatSelect(chat.id)}>
+                                    <div className={styles.avatar} style={{ backgroundImage: `url(${chat.avatar || '/images/no-image.png'})` }}>
+                                        {chat.unread_count > 0 && (
+                                            <div className={styles.unreadBadge}>{chat.unread_count <= 99 ? chat.unread_count : '99+'}</div>
+                                        )}
+                                    </div>
+                                    <div className={styles.chatPreview}>
+                                        <div className={styles.chatHeader}>
+                                            <span className={styles.chatName}>{chat.name}</span>
+                                            <span className={styles.chatTime}>{formatSidebarTime(chat.updated_at)}</span>
+                                        </div>
+                                        <div className={styles.lastMessage}>{chat.last_message}</div>
+                                    </div>
+                                </div>
+                            ))
+                        )}
                     </div>
                 </div>
+            )}
 
-                <div className={styles.chatList}>
-                    {filteredChats.length === 0 ? (
-                        <div style={{ padding: '20px', textAlign: 'center', opacity: 0.5, color: 'var(--color-text)' }}>Чатів не знайдено</div>
-                    ) : (
-                        filteredChats.map(chat => (
-                            <div key={chat.id} className={`${styles.chatItem} ${selectedChat === chat.id ? styles.activeChat : ""}`} onClick={() => handleChatSelect(chat.id)}>
-                                <div className={styles.avatar} style={{ backgroundImage: `url(${chat.avatar || '/images/no-image.png'})` }}>
-                                    {chat.unread_count > 0 && (
-                                        <div className={styles.unreadBadge}>{chat.unread_count <= 99 ? chat.unread_count : '99+'}</div>
-                                    )}
-                                </div>
-                                <div className={styles.chatPreview}>
-                                    <div className={styles.chatHeader}>
-                                        <span className={styles.chatName}>{chat.name}</span>
-                                        <span className={styles.chatTime}>{formatSidebarTime(chat.updated_at)}</span>
+            {/* 🔥 Умовний рендер для мобілки: якщо чат не обрано - ховаємо поле чату 🔥 */}
+            {(!isMobile || selectedChat) && (
+                <div className={styles.chatArea}>
+                    {selectedChat ? (
+                        <>
+                            <div className={styles.activeChatHeader}>
+                                {/* 🔥 Кнопка Назад для мобільних 🔥 */}
+                                {isMobile && (
+                                    <div 
+                                        className={styles.backButton} 
+                                        onClick={() => { setSelectedChat(null); navigate('/chats'); }}
+                                    >
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <polyline points="15 18 9 12 15 6"></polyline>
+                                        </svg>
                                     </div>
-                                    <div className={styles.lastMessage}>{chat.last_message}</div>
-                                </div>
-                            </div>
-                        ))
-                    )}
-                </div>
-            </div>
-
-            <div className={styles.chatArea}>
-                {selectedChat ? (
-                    <>
-                        <div className={styles.activeChatHeader}>
-                            {activeChatData && (
-                                <>
-                                    <div
-                                        className={styles.avatar}
-                                        style={{ backgroundImage: `url(${activeChatData.avatar || '/images/no-image.png'})`, cursor: 'pointer' }}
-                                        onClick={() => {
+                                )}
+                                
+                                {activeChatData && (
+                                    <>
+                                        <div
+                                            className={styles.avatar}
+                                            style={{ backgroundImage: `url(${activeChatData.avatar || '/images/no-image.png'})`, cursor: 'pointer' }}
+                                            onClick={() => {
+                                                if (activeChatData.is_group) {
+                                                    openManageGroup();
+                                                } else {
+                                                    navigate(`/profile/${activeChatData.other_user_id}`);
+                                                }
+                                            }}
+                                        ></div>
+                                        <div style={{ display: 'flex', flexDirection: 'column', cursor: 'pointer' }} onClick={() => {
                                             if (activeChatData.is_group) {
                                                 openManageGroup();
                                             } else {
                                                 navigate(`/profile/${activeChatData.other_user_id}`);
                                             }
-                                        }}
-                                    ></div>
-                                    <div style={{ display: 'flex', flexDirection: 'column', cursor: 'pointer' }} onClick={() => {
-                                        if (activeChatData.is_group) {
-                                            openManageGroup();
-                                        } else {
-                                            navigate(`/profile/${activeChatData.other_user_id}`);
-                                        }
-                                    }}>
-                                        <span className={styles.activeChatName}>{activeChatData.name}</span>
-                                        {activeChatData.is_group && (
-                                            <span style={{ fontSize: '11px', color: 'var(--color-grey)' }}>Натисніть для керування групою</span>
-                                        )}
-                                    </div>
-                                </>
-                            )}
-                        </div>
-
-                        <div className={styles.messagesContainer} ref={messagesContainerRef} onScroll={handleScroll}>
-                            {hasMore && (
-                                <div style={{ textAlign: 'center', margin: '10px 0', opacity: 0.5, fontSize: '12px' }}>
-                                    Завантаження історії...
-                                </div>
-                            )}
-
-                            {messages.length === 0 ? (
-                                <div className={styles.emptyChat}>Немає повідомлень</div>
-                            ) : (
-                                groupedMessages.map(group => {
-                                    const dateText = getDateSeparator(group.messages[0].created_at);
-                                    const isToday = dateText === "Сьогодні";
-
-                                    return (
-                                        <div key={group.dateStr} className={styles.dayGroup}>
-                                            <div className={`${styles.dateSeparator} ${!isToday ? styles.stickyDate : ''}`}>
-                                                {dateText}
-                                            </div>
-
-                                            {group.messages.map(msg => {
-                                                if (msg.is_system) {
-                                                    return (
-                                                        <div key={msg.id} className={styles.systemMessage}>
-                                                            {msg.text}
-                                                        </div>
-                                                    );
-                                                }
-
-                                                const isMine = msg.sender_id === myUserId;
-                                                const isGroup = activeChatData?.is_group;
-
-                                                return (
-                                                    <React.Fragment key={msg.id}>
-                                                        {msg.id === firstUnreadId && (
-                                                            <div id="unread-indicator" style={{
-                                                                alignSelf: 'center', margin: '15px 0', padding: '4px 12px',
-                                                                background: 'var(--color-opaque-secondary)', borderRadius: '12px',
-                                                                color: 'var(--color-main)', fontSize: '12px', fontWeight: 'bold'
-                                                            }}>
-                                                                Нові повідомлення
-                                                            </div>
-                                                        )}
-
-                                                        <div id={`msg-${msg.id}`}
-                                                            className={`${styles.messageWrapper} ${isMine ? styles.myMessage : styles.otherMessage}`}
-                                                            onMouseLeave={() => setActiveMsgReactionPopup(null)}
-                                                        >
-                                                            {!isMine && isGroup && (
-                                                                <div
-                                                                    className={styles.msgAvatar}
-                                                                    style={{ backgroundImage: `url(${msg.sender_avatar || '/images/no-image.png'})` }}
-                                                                    onClick={() => navigate(`/profile/${msg.sender_id}`)}
-                                                                />
-                                                            )}
-
-                                                            {isMine && (
-                                                                <div className={styles.msgActionBtn} onClick={() => setActiveMsgReactionPopup(activeMsgReactionPopup === msg.id ? null : msg.id)}>
-                                                                    {SVG_ADDREACTION}
-                                                                    {activeMsgReactionPopup === msg.id && (
-                                                                        <div className={styles.msgReactionPopup}>
-                                                                            {emojis.map(e => (
-                                                                                <div key={e} className={styles.msgReactionCircle} onClick={(ev) => { ev.stopPropagation(); handleMsgReaction(msg.id, e); setActiveMsgReactionPopup(null); }}>{e}</div>
-                                                                            ))}
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                            )}
-
-                                                            <div style={{ display: 'flex', flexDirection: 'column', maxWidth: '70%' }}>
-                                                                {!isMine && isGroup && (
-                                                                    <span className={styles.msgSenderName} onClick={() => navigate(`/profile/${msg.sender_id}`)}>
-                                                                        {msg.sender_name}
-                                                                    </span>
-                                                                )}
-
-                                                                <div className={styles.messageBubble}>
-                                                                    {msg.text && <div className={styles.messageText}>{renderTextWithLinks(msg.text, isMine)}</div>}
-                                                                    {msg.images && msg.images.length > 0 && (
-                                                                        <div className={styles.msgImagesGrid}>
-                                                                            {msg.images.map((imgUrl, i) => (
-                                                                                <img key={i} src={imgUrl} alt="attachment" className={styles.msgImage} onClick={() => setPreviewImage(imgUrl)} />
-                                                                            ))}
-                                                                        </div>
-                                                                    )}
-
-                                                                    <div className={styles.messageFooter}>
-                                                                        {msg.reactions && Object.keys(msg.reactions).length > 0 && (
-                                                                            <div className={styles.msgReactionsContainer}>
-                                                                                {Object.entries(msg.reactions).map(([emoji, count]) => count > 0 && (
-                                                                                    <div key={emoji} onClick={() => handleMsgReaction(msg.id, emoji)} className={`${styles.msgReaction} ${msg.my_reaction === emoji ? styles.msgReactionActive : ''}`}>
-                                                                                        <span>{emoji}</span>
-                                                                                        {count > 1 && <span style={{ fontSize: '11px', fontWeight: 'bold' }}>{count}</span>}
-                                                                                    </div>
-                                                                                ))}
-                                                                            </div>
-                                                                        )}
-                                                                        <div className={styles.messageTime}>{formatTime(msg.created_at)}</div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-                                                            {!isMine && (
-                                                                <div className={styles.msgActionBtn} onClick={() => setActiveMsgReactionPopup(activeMsgReactionPopup === msg.id ? null : msg.id)}>
-                                                                    {SVG_ADDREACTION}
-                                                                    {activeMsgReactionPopup === msg.id && (
-                                                                        <div className={styles.msgReactionPopup}>
-                                                                            {emojis.map(e => (
-                                                                                <div key={e} className={styles.msgReactionCircle} onClick={(ev) => { ev.stopPropagation(); handleMsgReaction(msg.id, e); setActiveMsgReactionPopup(null); }}>{e}</div>
-                                                                            ))}
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </React.Fragment>
-                                                );
-                                            })}
+                                        }}>
+                                            <span className={styles.activeChatName}>{activeChatData.name}</span>
+                                            {activeChatData.is_group && (
+                                                <span style={{ fontSize: '0.6875em', color: 'var(--color-grey)' }}>Натисніть для керування групою</span>
+                                            )}
                                         </div>
-                                    );
-                                })
-                            )}
-                            <div ref={messagesEndRef} />
-                        </div>
+                                    </>
+                                )}
+                            </div>
 
-                        <div className={styles.inputContainerContainer}>
-                            <div className={styles.superInputContainer}>
-                                {postFiles.length > 0 && (
-                                    <div className={styles.attachments}>
-                                        {postFiles.map((f, i) => (
-                                            <div key={i} className={styles.attachedImg} style={{ backgroundImage: `url(${f.url})`, backgroundSize: 'cover' }}>
-                                                <div className={styles.deleteImg} onClick={() => setPostFiles(prev => prev.filter((_, idx) => idx !== i))}>{SVG_PLUS}</div>
-                                            </div>
-                                        ))}
+                            <div className={styles.messagesContainer} ref={messagesContainerRef} onScroll={handleScroll}>
+                                {hasMore && (
+                                    <div style={{ textAlign: 'center', margin: '0.625em 0', opacity: 0.5, fontSize: '0.75em' }}>
+                                        Завантаження історії...
                                     </div>
                                 )}
 
-                                <div className={styles.inputContainer}>
-                                    <div className={styles.inputIcon} onClick={() => postFileInputRef.current?.click()}>{SVG_CLIP}</div>
-                                    <input
-                                        type="file" multiple hidden ref={postFileInputRef} accept="image/*"
-                                        onChange={(e) => {
-                                            const files = Array.from(e.target.files || []);
-                                            const sizeLimit = 10 * 1024 * 1024;
-                                            const resLimit = 4096;
-                                            const validFiles: File[] = [];
-                                            let errors: string[] = [];
+                                {messages.length === 0 ? (
+                                    <div className={styles.emptyChat}>Немає повідомлень</div>
+                                ) : (
+                                    groupedMessages.map(group => {
+                                        const dateText = getDateSeparator(group.messages[0].created_at);
+                                        const isToday = dateText === "Сьогодні";
 
-                                            const checks = files.map(file => {
-                                                return new Promise<void>((resolve) => {
-                                                    if (!file.type.startsWith('image/')) {
-                                                        errors.push(`Файл ${file.name} не є зображенням.`);
-                                                        return resolve();
-                                                    }
-                                                    if (file.size > sizeLimit) {
-                                                        errors.push(`Файл ${file.name} завеликий (макс 10 МБ).`);
-                                                        return resolve();
+                                        return (
+                                            <div key={group.dateStr} className={styles.dayGroup}>
+                                                <div className={`${styles.dateSeparator} ${!isToday ? styles.stickyDate : ''}`}>
+                                                    {dateText}
+                                                </div>
+
+                                                {group.messages.map(msg => {
+                                                    if (msg.is_system) {
+                                                        return (
+                                                            <div key={msg.id} className={styles.systemMessage}>
+                                                                {msg.text}
+                                                            </div>
+                                                        );
                                                     }
 
-                                                    const img = new Image();
-                                                    img.src = URL.createObjectURL(file);
-                                                    img.onload = () => {
-                                                        URL.revokeObjectURL(img.src);
-                                                        if (img.width > resLimit || img.height > resLimit) {
-                                                            errors.push(`Зображення ${file.name} завелике (макс ${resLimit}x${resLimit}px).`);
-                                                        } else {
-                                                            validFiles.push(file);
+                                                    const isMine = msg.sender_id === myUserId;
+                                                    const isGroup = activeChatData?.is_group;
+
+                                                    return (
+                                                        <React.Fragment key={msg.id}>
+                                                            {msg.id === firstUnreadId && (
+                                                                <div id="unread-indicator" style={{
+                                                                    alignSelf: 'center', margin: '0.9375em 0', padding: '0.25em 0.75em',
+                                                                    background: 'var(--color-opaque-secondary)', borderRadius: '0.75em',
+                                                                    color: 'var(--color-main)', fontSize: '0.75em', fontWeight: 'bold'
+                                                                }}>
+                                                                    Нові повідомлення
+                                                                </div>
+                                                            )}
+
+                                                            <div id={`msg-${msg.id}`}
+                                                                className={`${styles.messageWrapper} ${isMine ? styles.myMessage : styles.otherMessage}`}
+                                                                onMouseLeave={() => setActiveMsgReactionPopup(null)}
+                                                                // 🔥 Мобільний лонг-прес для реакції 🔥
+                                                                onContextMenu={(e) => {
+                                                                    if (isMobile) {
+                                                                        e.preventDefault();
+                                                                        setActiveMsgReactionPopup(activeMsgReactionPopup === msg.id ? null : msg.id);
+                                                                    }
+                                                                }}
+                                                            >
+                                                                {!isMine && isGroup && (
+                                                                    <div
+                                                                        className={styles.msgAvatar}
+                                                                        style={{ backgroundImage: `url(${msg.sender_avatar || '/images/no-image.png'})` }}
+                                                                        onClick={() => navigate(`/profile/${msg.sender_id}`)}
+                                                                    />
+                                                                )}
+
+                                                                {isMine && (
+                                                                    <div className={`${styles.msgActionBtn} ${activeMsgReactionPopup === msg.id ? styles.activeBtn : ''}`} onClick={() => setActiveMsgReactionPopup(activeMsgReactionPopup === msg.id ? null : msg.id)}>
+                                                                        {SVG_ADDREACTION}
+                                                                        {activeMsgReactionPopup === msg.id && (
+                                                                            <div className={styles.msgReactionPopup}>
+                                                                                {emojis.map(e => (
+                                                                                    <div key={e} className={styles.msgReactionCircle} onClick={(ev) => { ev.stopPropagation(); handleMsgReaction(msg.id, e); setActiveMsgReactionPopup(null); }}>{e}</div>
+                                                                                ))}
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                )}
+
+                                                                <div style={{ display: 'flex', flexDirection: 'column', maxWidth: '70%' }}>
+                                                                    {!isMine && isGroup && (
+                                                                        <span className={styles.msgSenderName} onClick={() => navigate(`/profile/${msg.sender_id}`)}>
+                                                                            {msg.sender_name}
+                                                                        </span>
+                                                                    )}
+
+                                                                    <div className={styles.messageBubble}>
+                                                                        {msg.text && <div className={styles.messageText}>{renderTextWithLinks(msg.text, isMine)}</div>}
+                                                                        
+                                                                        {msg.voice && (
+                                                                            <div className={styles.voiceMessageWrapper}>
+                                                                                <audio controls src={msg.voice} className={styles.audioPlayer} />
+                                                                            </div>
+                                                                        )}
+                                                                        
+                                                                        {msg.images && msg.images.length > 0 && (
+                                                                            <div className={styles.msgImagesGrid}>
+                                                                                {msg.images.map((imgUrl, i) => (
+                                                                                    <img key={i} src={imgUrl} alt="attachment" className={styles.msgImage} onClick={() => setPreviewImage(imgUrl)} />
+                                                                                ))}
+                                                                            </div>
+                                                                        )}
+
+                                                                        <div className={styles.messageFooter}>
+                                                                            {msg.reactions && Object.keys(msg.reactions).length > 0 && (
+                                                                                <div className={styles.msgReactionsContainer}>
+                                                                                    {Object.entries(msg.reactions).map(([emoji, count]) => count > 0 && (
+                                                                                        <div key={emoji} onClick={() => handleMsgReaction(msg.id, emoji)} className={`${styles.msgReaction} ${msg.my_reaction === emoji ? styles.msgReactionActive : ''}`}>
+                                                                                            <span>{emoji}</span>
+                                                                                            {count > 1 && <span style={{ fontSize: '0.6875em', fontWeight: 'bold' }}>{count}</span>}
+                                                                                        </div>
+                                                                                    ))}
+                                                                                </div>
+                                                                            )}
+                                                                            <div className={styles.messageTime}>{formatTime(msg.created_at)}</div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                {!isMine && (
+                                                                    <div className={`${styles.msgActionBtn} ${activeMsgReactionPopup === msg.id ? styles.activeBtn : ''}`} onClick={() => setActiveMsgReactionPopup(activeMsgReactionPopup === msg.id ? null : msg.id)}>
+                                                                        {SVG_ADDREACTION}
+                                                                        {activeMsgReactionPopup === msg.id && (
+                                                                            <div className={styles.msgReactionPopup}>
+                                                                                {emojis.map(e => (
+                                                                                    <div key={e} className={styles.msgReactionCircle} onClick={(ev) => { ev.stopPropagation(); handleMsgReaction(msg.id, e); setActiveMsgReactionPopup(null); }}>{e}</div>
+                                                                                ))}
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </React.Fragment>
+                                                    );
+                                                })}
+                                            </div>
+                                        );
+                                    })
+                                )}
+                                <div ref={messagesEndRef} />
+                            </div>
+
+                            <div className={styles.inputContainerContainer}>
+                                <div className={styles.superInputContainer}>
+                                    {postFiles.length > 0 && (
+                                        <div className={styles.attachments}>
+                                            {postFiles.map((f, i) => (
+                                                <div key={i} className={styles.attachedImg} style={{ backgroundImage: `url(${f.url})`, backgroundSize: 'cover' }}>
+                                                    <div className={styles.deleteImg} onClick={() => setPostFiles(prev => prev.filter((_, idx) => idx !== i))}>{SVG_PLUS}</div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    <div className={styles.inputContainer}>
+                                        {!isRecording && (
+                                            <div className={styles.inputIcon} onClick={() => postFileInputRef.current?.click()}>{SVG_CLIP}</div>
+                                        )}
+                                        
+                                        <input
+                                            type="file" multiple hidden ref={postFileInputRef} accept="image/*"
+                                            onChange={(e) => {
+                                                const files = Array.from(e.target.files || []);
+                                                const sizeLimit = 10 * 1024 * 1024;
+                                                const resLimit = 4096;
+                                                const validFiles: File[] = [];
+                                                let errors: string[] = [];
+
+                                                const checks = files.map(file => {
+                                                    return new Promise<void>((resolve) => {
+                                                        if (!file.type.startsWith('image/')) {
+                                                            errors.push(`Файл ${file.name} не є зображенням.`);
+                                                            return resolve();
                                                         }
-                                                        resolve();
-                                                    };
-                                                    img.onerror = () => {
-                                                        URL.revokeObjectURL(img.src);
-                                                        errors.push(`Помилка при читанні файлу ${file.name}.`);
-                                                        resolve();
-                                                    };
-                                                });
-                                            });
+                                                        if (file.size > sizeLimit) {
+                                                            errors.push(`Файл ${file.name} завеликий (макс 10 МБ).`);
+                                                            return resolve();
+                                                        }
 
-                                            Promise.all(checks).then(() => {
-                                                if (errors.length > 0) toast.error(errors[0]);
-                                                if (validFiles.length > 0) {
-                                                    const newFilesWithUrls = validFiles.map(f => ({ file: f, url: URL.createObjectURL(f) }));
-                                                    setPostFiles(prev => {
-                                                        const combined = [...prev, ...newFilesWithUrls];
-                                                        if (combined.length > 5) toast.error("Можна додати максимум 5 фото.");
-                                                        return combined.slice(0, 5);
+                                                        const img = new Image();
+                                                        img.src = URL.createObjectURL(file);
+                                                        img.onload = () => {
+                                                            URL.revokeObjectURL(img.src);
+                                                            if (img.width > resLimit || img.height > resLimit) {
+                                                                errors.push(`Зображення ${file.name} завелике (макс ${resLimit}x${resLimit}px).`);
+                                                            } else {
+                                                                validFiles.push(file);
+                                                            }
+                                                            resolve();
+                                                        };
+                                                        img.onerror = () => {
+                                                            URL.revokeObjectURL(img.src);
+                                                            errors.push(`Помилка при читанні файлу ${file.name}.`);
+                                                            resolve();
+                                                        };
                                                     });
-                                                }
-                                                if (postFileInputRef.current) postFileInputRef.current.value = '';
-                                            });
-                                        }}
-                                    />
-                                    <textarea
-                                        ref={textareaRef} className={styles.input} placeholder="Написати повідомлення..."
-                                        value={messageText} maxLength={4096} rows={1} style={{ resize: 'none', maxHeight: "200px", overflow: 'auto' }}
-                                        onChange={(e) => {
-                                            const val = e.target.value;
-                                            if ((val.match(/\n/g) || []).length <= 100) setMessageText(val);
-                                            else toast.error("Досягнуто ліміт переносів рядка (100).");
-                                        }}
-                                        onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}
-                                        onInput={(e) => {
-                                            const t = e.target as HTMLTextAreaElement;
-                                            t.style.height = 'auto'; t.style.height = `${t.scrollHeight}px`;
-                                        }}
-                                    />
-                                    <div className={styles.inputIcon} onClick={handleSendMessage}>{SVG_SEND}</div>
+                                                });
+
+                                                Promise.all(checks).then(() => {
+                                                    if (errors.length > 0) toast.error(errors[0]);
+                                                    if (validFiles.length > 0) {
+                                                        const newFilesWithUrls = validFiles.map(f => ({ file: f, url: URL.createObjectURL(f) }));
+                                                        setPostFiles(prev => {
+                                                            const combined = [...prev, ...newFilesWithUrls];
+                                                            if (combined.length > 5) toast.error("Можна додати максимум 5 фото.");
+                                                            return combined.slice(0, 5);
+                                                        });
+                                                    }
+                                                    if (postFileInputRef.current) postFileInputRef.current.value = '';
+                                                });
+                                            }}
+                                        />
+
+                                        {/* 🔥 ПОЛЕ ВВОДУ АБО ІНДИКАТОР ЗАПИСУ 🔥 */}
+                                        {isRecording ? (
+                                            <div className={styles.recordingIndicator}>
+                                                <div className={styles.redDot}></div>
+                                                Запис аудіо... Відпустіть мікрофон для відправки
+                                            </div>
+                                        ) : (
+                                            <textarea
+                                                ref={textareaRef} className={styles.input} placeholder="Написати повідомлення..."
+                                                value={messageText} maxLength={4096} rows={1} style={{ resize: 'none', maxHeight: "12.5em", overflow: 'auto' }}
+                                                onChange={(e) => {
+                                                    const val = e.target.value;
+                                                    if ((val.match(/\n/g) || []).length <= 100) setMessageText(val);
+                                                    else toast.error("Досягнуто ліміт переносів рядка (100).");
+                                                }}
+                                                onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}
+                                                onInput={(e) => {
+                                                    const t = e.target as HTMLTextAreaElement;
+                                                    t.style.height = 'auto'; t.style.height = `${t.scrollHeight}px`;
+                                                }}
+                                            />
+                                        )}
+
+                                        {/* 🔥 КНОПКА ВІДПРАВКИ / МІКРОФОН 🔥 */}
+                                        {messageText.trim() || postFiles.length > 0 ? (
+                                            <div className={styles.inputIcon} onClick={handleSendMessage}>{SVG_SEND}</div>
+                                        ) : (
+                                            <div 
+                                                className={`${styles.inputIcon} ${isRecording ? styles.recordingPulse : ''}`} 
+                                                onPointerDown={startRecording}
+                                                onPointerUp={stopRecording}
+                                                onPointerCancel={stopRecording}
+                                                onContextMenu={(e) => e.preventDefault()} // Забороняємо контекстне меню на мобілках
+                                            >
+                                                {SVG_MIC}
+                                            </div>
+                                        )}
+
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </>
-                ) : (
-                    <div className={styles.emptyChat}>Оберіть чат для початку спілкування</div>
-                )}
-            </div>
+                        </>
+                    ) : (
+                        <div className={styles.emptyChat}>Оберіть чат для початку спілкування</div>
+                    )}
+                </div>
+            )}
         </div>
 
-        {/* 🔥 МОДАЛКА: СТВОРЕННЯ ГРУПИ 🔥 */}
+        {/* 🔥 МОДАЛКИ ЗАЛИШАЮТЬСЯ БЕЗ ЗМІН У ЛОГІЦІ 🔥 */}
         {isCreateGroupOpen && (
             <div className={styles.modalOverlay} onClick={() => setIsCreateGroupOpen(false)}>
                 <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
@@ -824,10 +992,9 @@ export default function ChatsPage() {
             </div>
         )}
 
-        {/* 🔥 МОДАЛКА: КЕРУВАННЯ ГРУПОЮ 🔥 */}
         {isManageGroupOpen && activeChatData && (
             <div className={styles.modalOverlay} onClick={() => setIsManageGroupOpen(false)}>
-                <div className={styles.modalContent} onClick={e => e.stopPropagation()} style={{ width: '380px' }}>
+                <div className={styles.modalContent} onClick={e => e.stopPropagation()} style={{ width: '23.75em' }}>
                     <div className={styles.modalHeader}>
                         <h3 className={styles.modalTitle}>Керування групою</h3>
                         <span className={styles.closeModal} onClick={() => setIsManageGroupOpen(false)}>✕</span>
@@ -835,7 +1002,6 @@ export default function ChatsPage() {
 
                     {!isAddingUser ? (
                         <>
-                            {/* 🔥 ШАПКА ГРУПИ (Аватар + Назва) 🔥 */}
                             <div className={styles.groupEditSection}>
                                 <div className={styles.groupAvatarWrapper} style={{ cursor: iAmAdmin ? "pointer" : "" }} onClick={() => iAmAdmin && groupAvatarInputRef.current?.click()}>
                                     <div className={styles.groupAvatarLarge} style={{ backgroundImage: `url(${activeChatData.avatar || '/images/no-image.png'})` }}>
@@ -859,7 +1025,7 @@ export default function ChatsPage() {
                                         />
                                     ) : (
                                         <div className={styles.groupNameDisplay} style={{ cursor: iAmAdmin ? "pointer" : "" }} onClick={() => iAmAdmin && setIsEditingName(true)}>
-                                            <span className={styles.modalTitle} style={{ fontSize: '18px' }}>{activeChatData.name}</span>
+                                            <span className={styles.modalTitle} style={{ fontSize: '1.125em' }}>{activeChatData.name}</span>
                                             {iAmAdmin && <span className={styles.editIcon}>✎</span>}
                                         </div>
                                     )}
@@ -895,21 +1061,21 @@ export default function ChatsPage() {
                             </div>
 
                             {iAmAdmin && (
-                                <button onClick={() => setIsAddingUser(true)} className={styles.modalBtnAdd} style={{ marginTop: '10px' }}>
+                                <button onClick={() => setIsAddingUser(true)} className={styles.modalBtnAdd} style={{ marginTop: '0.625em' }}>
                                     Додати користувача
                                 </button>
                             )}
 
-                            <button onClick={handleLeaveGroup} className={styles.leaveBtn} style={{ marginTop: '15px' }}>
+                            <button onClick={handleLeaveGroup} className={styles.leaveBtn} style={{ marginTop: '0.9375em' }}>
                                 Вийти з групи
                             </button>
                         </>
                     ) : (
                         <>
-                            <h4 style={{ margin: '0 0 10px 0', color: 'var(--color-text)', fontSize: '14px', fontWeight: '500' }}>Виберіть користувача з ваших чатів:</h4>
+                            <h4 style={{ margin: '0 0 0.625em 0', color: 'var(--color-text)', fontSize: '0.875em', fontWeight: '500' }}>Виберіть користувача з ваших чатів:</h4>
                             <div className={styles.participantList}>
                                 {availableUsersToAdd.length === 0 ? (
-                                    <div style={{ textAlign: 'center', opacity: 0.5, padding: '20px', color: 'var(--color-text)' }}>Немає кого додати</div>
+                                    <div style={{ textAlign: 'center', opacity: 0.5, padding: '1.25em', color: 'var(--color-text)' }}>Немає кого додати</div>
                                 ) : (
                                     availableUsersToAdd.map(chat => (
                                         <div key={chat.id} className={styles.participantItem} style={{ cursor: 'pointer' }} onClick={() => chat.other_user_id && handleAddUserToGroup(chat.other_user_id)}>
@@ -919,7 +1085,7 @@ export default function ChatsPage() {
                                     ))
                                 )}
                             </div>
-                            <button onClick={() => setIsAddingUser(false)} className={styles.modalBtnCancel} style={{ marginTop: '10px', width: '100%' }}>
+                            <button onClick={() => setIsAddingUser(false)} className={styles.modalBtnCancel} style={{ marginTop: '0.625em', width: '100%' }}>
                                 Назад
                             </button>
                         </>

@@ -10,6 +10,8 @@ export default function SettingsPage() {
     const [activeTab, setActiveTab] = useState('theme');
 
     return (
+        <>
+        <title>Quack | Налаштування</title>
         <div className={styles.container}>
             <div className={styles.settings}>
                 <div className={styles.tabs}>
@@ -20,8 +22,9 @@ export default function SettingsPage() {
                         >
                             Тема
                         </div>
+                        {/* 🔥 Додано клас interfaceTab для приховування на мобілках */}
                         <div
-                            className={`${styles.tab} ${activeTab === 'interface' ? styles.activeTab : ''}`}
+                            className={`${styles.tab} ${styles.interfaceTab} ${activeTab === 'interface' ? styles.activeTab : ''}`}
                             onClick={() => setActiveTab('interface')}
                         >
                             Інтерфейс
@@ -32,7 +35,6 @@ export default function SettingsPage() {
                         >
                             Профіль
                         </div>
-                        {/* 🔥 НОВА ВКЛАДКА АКАУНТ 🔥 */}
                         <div
                             className={`${styles.tab} ${activeTab === 'account' ? styles.activeTab : ''}`}
                             onClick={() => setActiveTab('account')}
@@ -40,8 +42,10 @@ export default function SettingsPage() {
                             Акаунт
                         </div>
                     </div>
+                    <div className={styles.tabPrivacy}>
+                        <Link to="/privacy" className={styles.tab} style={{ textDecoration: 'none' }}>Політика конфіденційності</Link>
+                    </div>
 
-                    <Link to="/privacy" className={styles.tab} style={{ textDecoration: 'none' }}>Політика конфіденційності</Link>
                 </div>
 
                 <div className={styles.line}></div>
@@ -50,28 +54,25 @@ export default function SettingsPage() {
                     {activeTab === 'theme' && <ThemeSettings />}
                     {activeTab === 'interface' && <InterfaceSettings />}
                     {activeTab === 'profile' && <ProfileSettings />}
-                    {/* 🔥 КОМПОНЕНТ АКАУНТУ 🔥 */}
                     {activeTab === 'account' && <AccountSettings />}
                 </div>
             </div>
         </div>
+        </>
     );
 }
 
-// 🔥 НОВИЙ КОМПОНЕНТ ДЛЯ АКАУНТУ 🔥
 function AccountSettings() {
-    const { mode } = useContext(AppContext); // Дістаємо тему для відправки в запиті
+    const { mode } = useContext(AppContext);
 
-    // Стейти для паролю
     const [oldPassword, setOldPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [loadingPass, setLoadingPass] = useState(false);
 
-    // Стейти для пошти
     const [newEmail, setNewEmail] = useState("");
     const [emailCode, setEmailCode] = useState("");
-    const [emailStep, setEmailStep] = useState<0 | 1>(0); // 0 - введення пошти, 1 - введення коду
+    const [emailStep, setEmailStep] = useState<0 | 1>(0);
     const [loadingEmail, setLoadingEmail] = useState(false);
 
     const hasPassChanges = oldPassword.length > 0 && newPassword.length > 0 && confirmPassword.length > 0;
@@ -109,7 +110,7 @@ function AccountSettings() {
         try {
             const res = await apiRequest('/email-change-request/', {
                 method: 'POST',
-                body: JSON.stringify({ new_email: newEmail, theme: mode }) // 🔥 Передаємо тему!
+                body: JSON.stringify({ new_email: newEmail, theme: mode })
             });
             if (res?.ok) {
                 toast.success(`Код відправлено на ${newEmail}`);
@@ -149,27 +150,26 @@ function AccountSettings() {
         }
     };
 
-    // Інлайн стилі для інпутів (підтягують CSS-змінні проєкту)
+    // Твої оригінальні стилі інпутів, тільки 14px -> 0.875em
     const inputStyle = {
         width: '100%', background: 'var(--color-opaque-secondary)', border: '1px solid var(--color-gray)',
         borderRadius: 'var(--radius-secondary)', padding: '0.8rem', color: 'var(--color-text)',
-        fontFamily: 'inherit', fontSize: '14px', outline: 'none', marginBottom: '15px', transition: 'border-color 0.2s'
+        fontFamily: 'inherit', fontSize: '0.875em', outline: 'none', marginBottom: '15px', transition: 'border-color 0.2s'
     };
 
     return (
         <div className={styles.profileSettings} style={{ height: '100%', overflowY: 'auto', paddingRight: '10px' }}>
-            
-            {/* --- БЛОК ЗМІНИ ПОШТИ --- */}
+
             <div className={styles.settingItem} style={{ marginBottom: '20px' }}>
                 <div className={styles.title}>Електронна пошта</div>
                 <div style={{ marginTop: '10px', maxWidth: '400px' }}>
                     {emailStep === 0 ? (
                         <>
-                            <input 
-                                type="email" placeholder="Введіть нову пошту" 
+                            <input
+                                type="email" placeholder="Введіть нову пошту"
                                 value={newEmail} onChange={e => setNewEmail(e.target.value)} style={inputStyle}
                             />
-                            <button 
+                            <button
                                 className={styles.saveBtn} onClick={handleRequestEmailCode} disabled={loadingEmail || !newEmail}
                                 style={{ opacity: (!newEmail || loadingEmail) ? 0.5 : 1, width: '100%' }}
                             >
@@ -178,19 +178,19 @@ function AccountSettings() {
                         </>
                     ) : (
                         <>
-                            <div style={{ fontSize: '13px', opacity: 0.7, marginBottom: '10px' }}>Код відправлено на {newEmail}</div>
-                            <input 
+                            <div style={{ fontSize: '0.8125em', opacity: 0.7, marginBottom: '10px' }}>Код відправлено на {newEmail}</div>
+                            <input
                                 type="text" placeholder="6-значний код" maxLength={6}
                                 value={emailCode} onChange={e => setEmailCode(e.target.value)} style={inputStyle}
                             />
                             <div style={{ display: 'flex', gap: '10px' }}>
-                                <button 
-                                    className={styles.saveBtn} onClick={() => {setEmailStep(0); setEmailCode("");}}
+                                <button
+                                    className={styles.saveBtn} onClick={() => { setEmailStep(0); setEmailCode(""); }}
                                     style={{ background: 'transparent', border: '1px solid var(--color-gray)', color: 'var(--color-text)', flex: 1 }}
                                 >
                                     Скасувати
                                 </button>
-                                <button 
+                                <button
                                     className={styles.saveBtn} onClick={handleConfirmEmail} disabled={loadingEmail || !emailCode}
                                     style={{ opacity: (!emailCode || loadingEmail) ? 0.5 : 1, flex: 1 }}
                                 >
@@ -202,23 +202,22 @@ function AccountSettings() {
                 </div>
             </div>
 
-            {/* --- БЛОК ЗМІНИ ПАРОЛЮ --- */}
             <div className={styles.settingItem}>
                 <div className={styles.title}>Зміна паролю</div>
                 <div style={{ marginTop: '10px', maxWidth: '400px' }}>
-                    <input 
-                        type="password" placeholder="Поточний пароль" 
+                    <input
+                        type="password" placeholder="Поточний пароль"
                         value={oldPassword} onChange={e => setOldPassword(e.target.value)} style={inputStyle}
                     />
-                    <input 
-                        type="password" placeholder="Новий пароль (мінімум 8 символів)" 
+                    <input
+                        type="password" placeholder="Новий пароль (мінімум 8 символів)"
                         value={newPassword} onChange={e => setNewPassword(e.target.value)} style={inputStyle}
                     />
-                    <input 
-                        type="password" placeholder="Підтвердження нового паролю" 
+                    <input
+                        type="password" placeholder="Підтвердження нового паролю"
                         value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} style={inputStyle}
                     />
-                    <button 
+                    <button
                         className={styles.saveBtn} onClick={handleSavePassword} disabled={!hasPassChanges || loadingPass}
                         style={{ opacity: (!hasPassChanges || loadingPass) ? 0.5 : 1, width: '100%' }}
                     >
@@ -267,7 +266,7 @@ function InterfaceSettings() {
                                 onChange={(e) => setOpenOnHover(e.target.checked)}
                                 style={{ width: '18px', height: '18px', cursor: 'pointer' }}
                             />
-                            <span style={{ fontSize: '16px' }}>Відкривається при наведенні</span>
+                            <span style={{ fontSize: '1em' }}>Відкривається при наведенні</span>
                         </label>
                         <label style={{ display: 'flex', gap: '10px', alignItems: 'center', cursor: 'pointer' }}>
                             <input
@@ -276,7 +275,7 @@ function InterfaceSettings() {
                                 onChange={(e) => setKeepOpenOnNav(e.target.checked)}
                                 style={{ width: '18px', height: '18px', cursor: 'pointer' }}
                             />
-                            <span style={{ fontSize: '16px' }}>Не закривати при переході на іншу сторінку</span>
+                            <span style={{ fontSize: '1em' }}>Не закривати при переході на іншу сторінку</span>
                         </label>
                         <label style={{ display: 'flex', gap: '10px', alignItems: 'center', cursor: 'pointer' }}>
                             <input
@@ -285,7 +284,7 @@ function InterfaceSettings() {
                                 onChange={(e) => setShowTooltips(e.target.checked)}
                                 style={{ width: '18px', height: '18px', cursor: 'pointer' }}
                             />
-                            <span style={{ fontSize: '16px' }}>Показувати підказки при наведенні</span>
+                            <span style={{ fontSize: '1em' }}>Показувати підказки при наведенні</span>
                         </label>
                     </div>
                 </div>
@@ -306,7 +305,6 @@ function InterfaceSettings() {
         </div>
     );
 }
-
 
 function ThemeSettings() {
     const { mode, setMode } = useContext(AppContext)

@@ -24,21 +24,33 @@ export default function NavigationButton({
         }
     }
 
-    // Тултип ХОВАЄТЬСЯ, якщо:
-    // 1. Юзер вимкнув тултипи в налаштуваннях (!showTooltip)
-    // 2. Сайдбар зараз відкритий (visible)
+    // 🔥 ДОДАНО: Обробник для кліку коліщатком миші
+    const onAuxClick = (e: React.MouseEvent) => {
+        if (e.button === 1) { // 1 = клік коліщатком
+            e.preventDefault()
+            
+            if (navigationButton.slug) {
+                // Перевіряємо, чи використовується HashRouter (як в Electron/Capacitor)
+                const isHashMode = window.location.hash.startsWith('#');
+                const fullUrl = isHashMode 
+                    ? `${window.location.origin}/#${navigationButton.slug}` 
+                    : `${window.location.origin}${navigationButton.slug}`;
+                
+                window.open(fullUrl, '_blank');
+            }
+        }
+    }
+
     const isTooltipHidden = !showTooltip || visible;
 
     return <div className={style.navigation}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
         onClick={onClick}
+        onAuxClick={onAuxClick} // 🔥 Додано подію
         
-        // 🔥 Статичний ID
         data-tooltip-id="my-tooltip"
-        // 🔥 Контент є завжди
         data-tooltip-content={navigationButton.text}
-        // 🔥 Використовуємо вбудоване приховування react-tooltip
         data-tooltip-hidden={isTooltipHidden}
         data-tooltip-place="right"
     >

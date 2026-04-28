@@ -4,8 +4,10 @@ import RoundButton from '../../../shared/ui/RoundButton/RoundButton'
 import RoleSwitch from '../../RoleSwitch/ui/RoleSwitch'
 import styles from './ButtonsMenu.module.css'
 import NotificationSidebar from '../../../shared/ui/NotificationSidebar/ui/NotificationSidebar';
-import { apiRequest } from '../../../shared/api/api';
 import CalendarSidebar from '../../../shared/ui/CalendarSidebar/ui/CalendarSidebar';
+import MobileNotification from '../../../shared/ui/MobileNotification/ui/MobileNotification';
+import MobileCalendar from '../../../shared/ui/MobileCalendar/ui/MobileCalendar';
+import { apiRequest } from '../../../shared/api/api';
 import { useLocation } from 'react-router-dom';
 import { isStudent, isTeacher } from '../../../entities/session/lib/jwt';
 
@@ -14,11 +16,15 @@ export default function ButtonsMenu({ direction = "vertical" }) {
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
     const location = useLocation();
 
-    // 🔥 Окремі стейти для категорій
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 767);
+
     const [unreadEdu, setUnreadEdu] = useState(false);
     const [unreadSoc, setUnreadSoc] = useState(false);
 
     useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 767);
+        window.addEventListener('resize', handleResize);
+        
         const checkUnread = async () => {
             try {
                 const resEdu = await apiRequest('/notifications/?category=education&page=1');
@@ -58,6 +64,7 @@ export default function ButtonsMenu({ direction = "vertical" }) {
         window.addEventListener('update_unread_status', handleUpdate);
 
         return () => {
+            window.removeEventListener('resize', handleResize);
             window.removeEventListener('new_notification', handleNew);
             window.removeEventListener('update_unread_status', handleUpdate);
         };
@@ -69,14 +76,14 @@ export default function ButtonsMenu({ direction = "vertical" }) {
 
 
     return <>
-        <div className={`${styles.menu} ${styles[direction]}`}>
+        <div className={`${styles.menu} ${isMobile ? styles.horizontal : styles[direction]}`}>
             {(location.pathname !== "/chats" && location.pathname !== "/profile" ) && <div
-                style={{ position: 'relative', right: location.pathname === "/" && (isStudent() || isTeacher()) ? "300px" : "0", cursor: 'pointer' }}
+                style={{ position: 'relative', right: location.pathname === "/" && (isStudent() || isTeacher()) && !isMobile ? "300px" : "0", cursor: 'pointer' }}
             >
                 <RoleSwitch/>
             </div>}
             <div
-                style={{ position: 'relative', right: location.pathname === "/" && (isStudent() || isTeacher()) ? "300px" : "0", cursor: 'pointer' }}
+                style={{ position: 'relative', right: location.pathname === "/" && (isStudent() || isTeacher()) && !isMobile ? "300px" : "0", cursor: 'pointer' }}
                 onClick={() => setIsNotificationsOpen(true)} // Кружечок більше не зникає просто так!
             >
                 {hasAnyUnread && (
@@ -84,25 +91,27 @@ export default function ButtonsMenu({ direction = "vertical" }) {
                 )}
                 <RoundButton button={{ icon: SVG_NOTIFICATION, text: "Сповіщення" }} />
             </div>
-            {location.pathname !== "/" && <div onClick={() => setIsCalendarOpen(true)}>
-                <RoundButton button={{ icon: SVG_CALENDAR, text: "Розклад" }} />
-            </div>}
+            {(location.pathname !== "/" || isMobile) && (
+                <div onClick={() => setIsCalendarOpen(true)}>
+                    <RoundButton button={{ icon: SVG_CALENDAR, text: "Розклад" }} />
+                </div>
+            )}
         </div>
 
         {isNotificationsOpen && (
-            <NotificationSidebar
-                isOpen={isNotificationsOpen} // 🔥 Тепер передаємо стан як проп
-                onClose={() => setIsNotificationsOpen(false)}
-                unreadEdu={unreadEdu}
-                unreadSoc={unreadSoc}
-            />
+            isMobile ? (
+                <MobileNotification isOpen={isNotificationsOpen} onClose={() => setIsNotificationsOpen(false)} unreadEdu={unreadEdu} unreadSoc={unreadSoc} />
+            ) : (
+                <NotificationSidebar isOpen={isNotificationsOpen} onClose={() => setIsNotificationsOpen(false)} unreadEdu={unreadEdu} unreadSoc={unreadSoc} />
+            )
         )}
 
         {isCalendarOpen && (
-            <CalendarSidebar
-                isOpen={isCalendarOpen}
-                onClose={() => setIsCalendarOpen(false)}
-            />
+            isMobile ? (
+                <MobileCalendar isOpen={isCalendarOpen} onClose={() => setIsCalendarOpen(false)} />
+            ) : (
+                <CalendarSidebar isOpen={isCalendarOpen} onClose={() => setIsCalendarOpen(false)} />
+            )
         )}
 
 

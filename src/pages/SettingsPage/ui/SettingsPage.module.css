@@ -1,5 +1,6 @@
 .container {
     width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -7,36 +8,63 @@
 }
 
 .settings {
-    width: 70%;
-    height: 92vh;
+    /* Адаптивна ширина замість фіксованих 70% */
+    width: clamp(320px, 80vw, 1400px);
+    height: clamp(80vh, 92vh, 95vh);
     background-color: var(--color-opaque-secondary);
     box-shadow: var(--shadow-main);
     border-radius: var(--radius-main);
     backdrop-filter: var(--blur-form);
-    display: flex;
-    padding: 2em;
-    gap: 2em;
+
+    display: grid;
+    /* На десктопі 3 колонки: меню, лінія, опції */
+    grid-template-columns: minmax(180px, 20%) 1px minmax(0, 1fr);
+    padding: clamp(1em, 3vw, 2em);
+    gap: clamp(1em, 3vw, 2em);
 }
 
 .tabs {
-    width: 28%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    height: 100%;
+}
+
+.tabPrivacy {
+    display: flex;
+}
+
+.tabsUpper {
+    display: flex;
+    flex-direction: column;
 }
 
 .tab {
     padding: 0.5em 1em;
+    cursor: pointer;
+    opacity: 0.6;
+    margin-bottom: 0.5em;
+    text-decoration: none;
+    font-size: clamp(0.875em, 1.2vw, 1em);
+    /* Гнучкий шрифт замість px */
 }
 
 .tab:hover {
     background-color: var(--color-opaque-secondary);
     border-radius: var(--radius-secondary);
+    opacity: 1;
+}
+
+.activeTab {
+    opacity: 1;
+    background-color: var(--color-opaque-secondary);
+    border-radius: var(--radius-secondary);
+    color: var(--color-main);
 }
 
 .line {
-    width: 100%;
     width: 1px;
+    height: 100%;
     background-color: var(--color-opaque-secondary);
 }
 
@@ -55,59 +83,59 @@
 
 .radioGroup {
     display: flex;
-    gap: 20px; /* Расстояние между двумя кнопками */
-    align-items: center; /* Выравнивание по центру по вертикали */
+    gap: 20px;
+    align-items: center;
 }
 
 .radioLabel {
     display: flex;
     align-items: center;
-    gap: 8px; /* Расстояние между самим кружочком и текстом */
+    gap: 8px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 0.875em;
+    /* 14px -> 0.875em */
 }
 
 .radioInput {
     cursor: pointer;
-    margin: 0; /* Убираем стандартные отступы браузера */
+    margin: 0;
     accent-color: var(--color-main);
 }
 
 .title {
     font-weight: bold;
+    font-size: clamp(1em, 1.5vw, 1.125em);
+    /* Робимо заголовок адаптивним */
 }
 
-/* Контейнер: сетка 5 колонок */
 .colorGrid {
     display: grid;
-    grid-template-columns: repeat(5, 22px); /* 5 кружочков по 36px */
-    gap: 10px; /* Отступы между кружочками */
+    grid-template-columns: repeat(5, 22px);
+    gap: 10px;
     margin-top: 0.5em;
+    margin-left: .25em;
 }
 
-/* Сам кружок с цветом */
 .colorCircle {
     width: 22px;
     height: 22px;
     border-radius: 50%;
     cursor: pointer;
     transition: transform 0.2s ease, outline 0.2s ease;
-    border: 2px solid transparent; /* Подготовка для рамки */
+    border: 2px solid transparent;
 }
 
-/* Эффект при наведении мышкой (немного увеличивается) */
 .colorCircle:hover {
     transform: scale(1.1);
+    z-index: 5;
 }
 
-/* КЛАСС ДЛЯ ВЫБРАННОГО ЦВЕТА */
 .selectedColor {
-    transform: scale(1.15); /* Увеличиваем сильнее */
-    border: 2px solid var(--color-bg); /* Делаем отступ цветом фона (чтобы была щель) */
-    outline: 2px solid var(--color-main); /* Внешнее кольцо обводки */
+    transform: scale(1.15);
+    border: 2px solid var(--color-bg);
+    outline: 2px solid var(--color-main);
 }
 
-/* --- КНОПКА СОХРАНЕНИЯ --- */
 .saveContainer {
     display: flex;
     justify-content: flex-end;
@@ -116,18 +144,17 @@
 .saveBtn {
     padding: 10px 24px;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 0.875em;
+    /* 14px -> 0.875em */
     font-weight: 500;
     border: none;
     transition: all 0.2s ease;
-    /* Убедись, что шрифты наследуются правильно */
-    font-family: inherit; 
+    font-family: inherit;
 }
 
-/* Состояние: Есть изменения (Кнопка активна) */
 .saveBtn:not(:disabled) {
     background-color: var(--color-main);
-    color: #ffffff; /* Белый текст на яркой кнопке */
+    color: #ffffff;
     cursor: pointer;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
@@ -136,7 +163,6 @@
     opacity: 0.9;
 }
 
-/* Состояние: Нет изменений (Кнопка неактивна) */
 .saveBtn:disabled {
     background-color: var(--color-opaque-secondary);
     color: var(--color-text);
@@ -153,11 +179,28 @@
 
 .containerSave {
     width: 100%;
-    
 }
 
 .options {
     width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    padding-right: 10px;
+    /* Місце для скролбару */
+}
+
+/* Кастомний скролбар для опцій */
+.options::-webkit-scrollbar {
+    width: 6px;
+}
+
+.options::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+.options::-webkit-scrollbar-track {
+    background: transparent;
 }
 
 .profileSettings {
@@ -174,7 +217,6 @@
     gap: 0.8rem;
 }
 
-/* --- БАННЕР --- */
 .bannerUpload {
     position: relative;
     width: 100%;
@@ -199,7 +241,6 @@
     justify-content: center;
 }
 
-/* --- АВАТАР --- */
 .avatarUpload {
     position: relative;
     width: 80px;
@@ -225,7 +266,6 @@
     justify-content: center;
 }
 
-/* --- ИКОНКИ И ИНПУТЫ --- */
 .uploadIcon {
     width: 20px;
     opacity: 0.5;
@@ -237,56 +277,6 @@
     inset: 0;
     opacity: 0;
     cursor: pointer;
-}
-
-/* --- ТЕКСТОВОЕ ПОЛЕ --- */
-.textarea {
-    width: 100%;
-    min-height: 100px;
-    background: var(--color-opaque-secondary);
-    border: 1px solid var(--color-gray);
-    border-radius: var(--radius-secondary);
-    padding: 0.8rem;
-    color: var(--color-text);
-    font-family: inherit;
-    font-size: 14px;
-    resize: none;
-    outline: none;
-    transition: border-color 0.2s;
-}
-
-.textarea:focus {
-    border-color: var(--color-main);
-}
-
-/* --- КНОПКА (СПРАВА СНИЗУ) --- */
-.containerSave {
-    display: flex;
-    justify-content: flex-end; /* Выравнивание вправо */
-    margin-top: 1rem;
-}
-
-
-.tab {
-    padding: 0.5em 1em;
-    cursor: pointer;
-    opacity: 0.6; /* Неактивные вкладки чуть тусклее */
-    margin-bottom: 0.5em;
-    text-decoration: none;
-}
-
-.tab:hover {
-    background-color: var(--color-opaque-secondary);
-    border-radius: var(--radius-secondary);
-    opacity: 1;
-}
-
-/* СТИЛЬ ДЛЯ ВЫБРАННОЙ ВКЛАДКИ */
-.activeTab {
-    opacity: 1;
-    background-color: var(--color-opaque-secondary);
-    border-radius: var(--radius-secondary);
-    color: var(--color-main); /* Можно выделить основным цветом текст */
 }
 
 .textareaWrapper {
@@ -301,26 +291,101 @@
     border: 1px solid var(--color-gray);
     border-radius: var(--radius-secondary);
     padding: 0.8rem;
-    padding-bottom: 2rem; /* Оставляем место снизу, чтобы текст не перекрывал счетчик */
+    padding-bottom: 2rem;
     color: var(--color-text);
     font-family: inherit;
-    font-size: 14px;
+    font-size: 0.875em;
+    /* 14px -> 0.875em */
     resize: none;
     outline: none;
     transition: border-color 0.2s;
+}
+
+.textarea:focus {
+    border-color: var(--color-main);
 }
 
 .charCounter {
     position: absolute;
     bottom: 10px;
     right: 12px;
-    font-size: 11px;
+    font-size: 0.6875em;
+    /* 11px -> 0.6875em */
     color: var(--color-text);
     opacity: 0.5;
-    pointer-events: none; /* Чтобы счетчик не мешал кликать по textarea */
+    pointer-events: none;
 }
 
-/* Когда лимит достигнут, можно подсветить счетчик (опционально) */
-.textarea:focus + .charCounter {
+.textarea:focus+.charCounter {
     opacity: 0.8;
+}
+
+
+/* =========================================
+   АДАПТИВНІСТЬ (МЕДІА-ЗАПИТИ)
+   ========================================= */
+
+@media screen and (max-width: 1024px) {
+    .settings {
+        grid-template-columns: minmax(140px, 20%) 1px minmax(0, 1fr);
+    }
+}
+
+/* Mobile (< 768px) */
+@media screen and (max-width: 767px) {
+    .settings {
+        width: 100vw;
+        height: 100%;
+        padding: 1em;
+
+        /* Перемикаємо грід з вертикального на горизонтальний */
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1px minmax(0, 1fr);
+        gap: 1em;
+    }
+
+    /* 🔥 ХОВАЄМО ВКЛАДКУ "ІНТЕРФЕЙС" НА МОБІЛЬНОМУ 🔥 */
+    .interfaceTab {
+        display: none !important;
+    }
+
+    .tabs {
+        height: auto;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5em;
+    }
+
+    .tabsUpper {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5em;
+        width: 100%;
+    }
+
+    .tab {
+        margin-bottom: 0;
+        text-align: center;
+        padding: 0.6em 0.8em;
+        font-size: 0.8125em;
+        /* 13px */
+        flex: 1;
+        min-width: 80px;
+    }
+
+    .line {
+        width: 100%;
+        height: 1px;
+    }
+
+    .options {
+        padding-right: 5px;
+    }
+
+    .saveBtn {
+        width: 60%;
+    }
 }
